@@ -1,4 +1,4 @@
-fun printMessage(message: String): Unit {
+fun printMessage(message: String) {
     println(message)
 }
 
