@@ -9,9 +9,8 @@ interface ServerLauncher {
     fun build(): Launcher<LanguageClient>
 }
 
-class StdIOLauncher : ServerLauncher {
+class StdIOLauncher(private val server: SarifLanguageServer) : ServerLauncher {
     override fun build(): Launcher<LanguageClient> {
-        val server = SarifLanguageServer()
         val launcher = LSPLauncher.Builder<LanguageClient>()
             .setLocalService(server)
             .setRemoteInterface(LanguageClient::class.java)
@@ -29,10 +28,9 @@ class StdIOLauncher : ServerLauncher {
 }
 
 // TCP Launcher now takes a port and IP address as input
-class TcpLauncher(private val ipAddress: String, private val port: Int) : ServerLauncher {
+class TcpLauncher(private val server: SarifLanguageServer, private val ipAddress: String, private val port: Int) : ServerLauncher {
     override fun build(): Launcher<LanguageClient> {
         val socket = Socket(ipAddress, port)
-        val server = SarifLanguageServer()
         val launcher = LSPLauncher.Builder<LanguageClient>()
             .setLocalService(server)
             .setRemoteInterface(LanguageClient::class.java)
@@ -54,10 +52,12 @@ enum class LauncherType {
 
 // Updated Factory class
 class LauncherFactory {
-    fun createLauncher(type: LauncherType, ipAddress: String = "", port: Int = 0): ServerLauncher {
-        return when(type) {
-            LauncherType.STDIO -> StdIOLauncher()
-            LauncherType.TCP -> TcpLauncher(ipAddress, port)
+    companion object {
+        fun createLauncher(type: LauncherType, server: SarifLanguageServer = SarifLanguageServer(), ipAddress: String = "", port: Int = 0): ServerLauncher {
+            return when (type) {
+                LauncherType.STDIO -> StdIOLauncher(server)
+                LauncherType.TCP -> TcpLauncher(server, ipAddress, port)
+            }
         }
     }
 }

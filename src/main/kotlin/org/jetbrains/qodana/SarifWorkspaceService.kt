@@ -1,3 +1,5 @@
+package org.jetbrains.qodana
+
 import org.apache.logging.log4j.LogManager
 import org.eclipse.lsp4j.DidChangeConfigurationParams
 import org.eclipse.lsp4j.DidChangeWatchedFilesParams

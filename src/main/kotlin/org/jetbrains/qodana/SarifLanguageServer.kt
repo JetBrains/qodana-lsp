@@ -1,3 +1,5 @@
+package org.jetbrains.qodana
+
 import org.apache.logging.log4j.LogManager
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.services.LanguageClient
@@ -14,7 +16,7 @@ class SarifLanguageServer: LanguageServer, LanguageClientAware {
     private val textDocumentService = SarifTextDocumentService(this)
     private val workspaceService = SarifWorkspaceService(this)
     private var clientCapabilities: ClientCapabilities? = null
-    private var languageClient: LanguageClient? = null
+    var languageClient: LanguageClient? = null
     private var exitCode = -1
 
     override fun initialize(params: InitializeParams?): CompletableFuture<InitializeResult> {
