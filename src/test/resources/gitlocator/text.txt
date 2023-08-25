@@ -9,14 +9,6 @@
                 // add text
                 val repo = git.repository
                 val revWalk = RevWalk(repo)
-                // add text
-                val commitId = repo.resolve(commitHash) ?: return null // need to fetch the revision
-                revWalk.parseBody(revWalk.parseCommit(commitId))
-                val treeWalk = TreeWalk(repo)
-                // add text
-                treeWalk.addTree(revWalk.parseTree(commitId))
-                treeWalk.isRecursive = true
-                GitLocator(git, repo, revWalk, treeWalk)
             } catch (e: IOException) {
                 null
             } catch (e: GitAPIException) {
