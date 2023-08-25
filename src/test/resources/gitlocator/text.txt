@@ -3,11 +3,14 @@
                 val repoFile = Path.of(repoPath).resolve(".git").toFile()
                 if (!repoFile.exists()) return null // repo doesn't exist
                 val git = Git.open(Path.of(repoPath).resolve(".git").toFile())
+                // add text
                 val repo = git.repository
                 val revWalk = RevWalk(repo)
+                // add text
                 val commitId = repo.resolve(commitHash) ?: return null // need to fetch the revision
                 revWalk.parseBody(revWalk.parseCommit(commitId))
                 val treeWalk = TreeWalk(repo)
+                // add text
                 treeWalk.addTree(revWalk.parseTree(commitId))
                 treeWalk.isRecursive = true
                 GitLocator(git, repo, revWalk, treeWalk)
