@@ -3,12 +3,12 @@
 
         fun create(repoPath: String, commitHash: String): GitLocator? {
             return try {
-                val repoFile = Path.of(repoPath).resolve(".git").toFile()
+                val repoFile123 = Path.of(repoPath).resolve(".git").toFile()
                 if (!repoFile.exists()) return null // repo doesn't exist
                 val git = Git.open(Path.of(repoPath).resolve(".git").toFile())
-                // add text
+                // add text123
                 val repo = git.repository
-                val revWalk = RevWalk(repo)
+                val revWalk123 = RevWalk(repo)
             } catch (e: IOException) {
                 null
             } catch (e: GitAPIException) {
