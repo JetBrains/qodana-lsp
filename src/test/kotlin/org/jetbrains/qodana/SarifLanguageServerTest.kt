@@ -1,8 +1,9 @@
 package org.jetbrains.qodana
 
-import org.eclipse.lsp4j.Diagnostic
-import org.eclipse.lsp4j.DidOpenTextDocumentParams
-import org.eclipse.lsp4j.TextDocumentItem
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
+import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.services.LanguageClient
 import org.junit.jupiter.api.AfterEach
@@ -10,11 +11,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 class SarifLanguageServerTest {
-    private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
     private lateinit var client: SarifTestLanguageClient
     private lateinit var server: SarifLanguageServer
     private lateinit var launcher: Launcher<LanguageClient>
@@ -33,28 +33,46 @@ class SarifLanguageServerTest {
     @AfterEach
     fun tearDown() {
         server.shutdown()
-        executorService.shutdown()
     }
 
     @Test
-    fun testDidOpen() {
-        val uri = Paths.get("src/test/resources/testFile.txt").toUri().toString()
-
-        // Pretend to open a file
-        val openParams = DidOpenTextDocumentParams().apply {
-            textDocument = TextDocumentItem().apply {
-                this.uri = uri
-                this.languageId = "plaintext"
-                this.version = 0
-                this.text = "initial text"
-            }
+    fun testFullCycle() {
+        val feature = CompletableFuture<Unit>()
+        server.state.scope.launch {
+            server.setSourceLocation(SetSourceLocationParams(Paths.get("src/test/resources/sources").toString())).await()
+            server.setSarifFile(SetSarifFileParams(Paths.get("src/test/resources/sarif/qodana.sarif.json").toString())).await()
+            while (client.diagnostics.size != 11) yield()
+            server.state.requestChannel.send(object : IRequest {
+                override suspend fun execute(state: SarifLanguageServer.ServerState) {
+                    feature.complete(Unit)
+                }
+            })
         }
-        server.textDocumentService.didOpen(openParams)
+        feature.get(10, TimeUnit.SECONDS)
 
-        // Get the diagnostics produced by the server in the didOpen method
-        val diagnostics = client.diagnostics.toList()
+        val diagnostics = client.diagnostics
+        assertEquals(11, diagnostics.size)
+        val file = Paths.get("src/test/resources/sources/DFAchecks.cpp").toUri().toString()
+        val diagsInFile = diagnostics[file]!!.toList()
+        assertEquals(18, diagsInFile.size)
+        client.diagnostics.clear()
 
-        // Check the diagnostics
-        assertEquals(diagnostics, emptyList<Diagnostic>())
+        // now we are going to remove 2 checks
+        val feature2 = CompletableFuture<Unit>()
+        server.state.scope.launch {
+            server.textDocumentService.didChange(DidChangeTextDocumentParams(
+                VersionedTextDocumentIdentifier(file,2),
+                listOf(TextDocumentContentChangeEvent(Range(Position(250,0), Position(255,1)), ""))
+            ))
+            while (client.diagnostics.size != 1) yield()
+            server.state.requestChannel.send(object : IRequest {
+                override suspend fun execute(state: SarifLanguageServer.ServerState) {
+                    feature2.complete(Unit)
+                }
+            })
+        }
+        feature2.get(10, TimeUnit.SECONDS)
+        val newDiagsInFile = diagnostics[file]!!.toList()
+        assertEquals(16, newDiagsInFile.size)
     }
 }

@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+permissions:
+  contents: write
+jobs:
+  qodana-jvm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
+          fetch-depth: 0  # a full history is required for pull request analysis
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2023.2
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_JVM }} # read the steps about it below
+
+  qodana-js:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
+          fetch-depth: 0  # a full history is required for pull request analysis
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2023.2
+        with:
+          args: -i,vscode/qodana
+          pr-mode: false
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_JS }} # read the steps about it below
+
+  build:
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        submodules: true
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Setup JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+        cache: gradle
+    - name: Run Java tests
+      run: ./gradlew test
+    - name: Build Fat jar
+      run: ./gradlew shadowJar
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.16'
+    - name: Install dependencies
+      run: npm install -g vsce && npm ci
+      working-directory: vscode/qodana
+    - name: Run ts tests
+      run: xvfb-run -a npm run test
+      working-directory: vscode/qodana
+      if: matrix.os == 'ubuntu-latest'
+    - name: Run ts tests
+      run: npm run test
+      working-directory: vscode/qodana
+      if: runner.os != 'Linux'
+    - name: Package
+      run: npm run package
+      working-directory: vscode/qodana
+    - name: Save artifact
+      uses: actions/upload-artifact@v2
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: qodana
+        path: vscode/qodana/*.vsix
+    - name: Publish
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
+      run: |
+        ./changelog.sh > changelog.md
+        gh release create ${GITHUB_REF##*/} -F changelog.md
+        vsce publish -p ${{ secrets.VSCE_PAT }} -i qodana-cloud-plugin.vsix
+      working-directory: vscode/qodana
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,3 @@
+[submodule "src/test/resources/sources"]
+	path = src/test/resources/sources
+	url = git@github.com:qodana/cpp-demo.git

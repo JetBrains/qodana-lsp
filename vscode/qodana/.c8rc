@@ -1,0 +1,7 @@
+{
+  "all": true,
+  "include": ["out/**"],
+  "exclude": ["**/node_modules/**", "out/test/"],
+  "reporter": ["text", "lcovonly"],
+  "report-dir": ".qodana/code-coverage"
+}

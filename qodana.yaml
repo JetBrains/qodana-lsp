@@ -1,0 +1,18 @@
+version: "1.0"
+linter: jetbrains/qodana-jvm:2023.2
+profile:
+  name: qodana.recommended
+exclude:
+  - name: VulnerableLibrariesLocal
+include:
+  - name: CheckDependencyLicenses
+dependencyOverrides:
+  - name: "qodana-sarif"
+    version: "0.2.8"
+    url: "https://github.com/JetBrains/qodana-sarif"
+    licenses:
+      - key: "Apache-2.0"
+        url: "https://github.com/JetBrains/qodana-sarif/blob/d310b96256b51d2f029d795cb620d861cd2a62b2/LICENSE"
+dependencyIgnores:
+  - name: "org.eclipse.lsp4j.jsonrpc"
+  - name: "org.eclipse.lsp4j"

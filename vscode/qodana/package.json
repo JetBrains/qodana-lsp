@@ -1,0 +1,169 @@
+{
+  "name": "qodana",
+  "displayName": "Qodana",
+  "description": "Integrates linter execution results from Qodana Cloud into VS Code.",
+  "publisher": "jetbrains",
+  "author": "JetBrains s.r.o.",
+  "license": "SEE LICENSE IN LICENSE",
+  "version": "0.1.0",
+  "icon": "plugin-icon.png",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:qodana/qodana-lsp.git"
+  },
+  "engines": {
+    "vscode": "^1.81.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Qodana",
+      "properties": {
+        "qodana.projectId": {
+          "type": "string",
+          "default": "",
+          "description": "Project ID from Qodana Cloud project URL (URLs have following format https://qodana.cloud/projects/PROJECT_ID/reports/REPORT_ID)."
+        },
+        "qodana.pathPrefix": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path prefix to locate files from report. Change only if there are no issues displayed. For more details, refer to extension description."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "qodana.resetToken",
+        "title": "Qodana: Reset authentication"
+      },
+      {
+        "command": "qodana.resetAllSettings",
+        "title": "Qodana: Reset all settings"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "qodana",
+        "title": "Get started with Qodana",
+        "description": "Step-by-step guide to configuring extension to deliver results from Qodana Cloud into VS Code",
+        "steps": [
+          {
+            "id": "checkjava",
+            "title": "Check that Java is installed",
+            "description": "Qodana requires Java 11 or higher to be installed and available in $PATH.",
+            "media": {
+              "image": "media/java.png",
+              "altText": "Java in Terminal"
+            }
+          },
+          {
+            "id": "checkQodanaProject",
+            "title": "Make sure you have a project in Qodana Cloud",
+            "description": "Go to [Qodana Cloud](https://qodana.cloud), create a project for your repository if one does not already exist.",
+            "media": {
+              "image": "media/tos.png",
+              "altText": "Create a Qodana Project"
+            }
+          },
+          {
+            "id": "setprojectid",
+            "title": "Open issue to connect to project in Qodana Cloud",
+            "description": "Clicking \"Open in VSCode\" under any problem in report in Qodana Cloud. \n You can do it manually as well [Open Settings](command:workbench.action.openWorkspaceSettings?%22@ext:jetbrains.qodana%22)",
+            "media": {
+              "image": "media/open.png",
+              "altText": "Open issue to connect to project in Qodana Cloud"
+            },
+            "completionEvents": [
+              "onSettingChanged:qodana.projectId"
+            ]
+          },
+          {
+            "id": "dofirstanalysis",
+            "title": "Make sure that at least one report was created",
+            "description": "Run Qodana analysis. It can be executed either locally using Qodana CLI or through CI/CD pipelines.",
+            "media": {
+              "image": "media/analyze.png",
+              "altText": "Generate Report"
+            }
+          },
+          {
+            "id": "openfolder",
+            "title": "Open your project source code in VSCode",
+            "description": "Open code of your project as a folder in VSCode.",
+            "media": {
+              "image": "media/folder.png",
+              "altText": "Open Project as a Folder"
+            }
+          },
+          {
+            "id": "seereport",
+            "title": "See report",
+            "description": "You can see analysis report in Problems panel (View - Problems).",
+            "media": {
+              "image": "media/problems.png",
+              "altText": "Check Problems panel"
+            }
+          },
+          {
+            "id": "adjustpathprefix",
+            "title": "Adjust path prefix",
+            "description": "If you see no issues from report, you may need to adjust path prefix. \n See extension decription for details. \n [Open Settings](command:workbench.action.openWorkspaceSettings?%22@ext:jetbrains.qodana%22)",
+            "media": {
+              "image": "media/prefix.png",
+              "altText": "Adjust path prefix"
+            }
+          },
+          {
+            "id": "turnonoff",
+            "title": "Turn Qodana on/off",
+            "description": "You can turn Qodana integration on or off for current Workspace by clicking on Qodana icon in status bar.",
+            "media": {
+              "image": "media/eye.png",
+              "altText": "Toggle Qodana"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package -o qodana-cloud-plugin.vsix",
+    "coverage": "c8 --check-coverage  --lines 50 --functions 50 --branches 50 npm run test"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "20.2.5",
+    "@types/stream-json": "^1.7.4",
+    "@types/vscode": "^1.81.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "@vscode/test-electron": "^2.3.2",
+    "c8": "^8.0.1",
+    "eslint": "^8.41.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "sinon": "^16.0.0",
+    "ts-sinon": "^2.0.2",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "@vscode/extension-telemetry": "^0.8.5",
+    "axios": "^1.5.0",
+    "vscode-languageclient": "^8.1.0"
+  }
+}

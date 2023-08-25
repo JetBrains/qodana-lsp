@@ -5,10 +5,8 @@ build/
 !**/src/test/**/build/
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/**
+vscode/qodana/.idea/**
 *.iws
 *.iml
 *.ipr
@@ -41,4 +39,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-lib/
+/logs/
+/vscode/qodana/lib/
+/vscode/qodana/.vscode-test/
+/vscode/qodana/*.vsix

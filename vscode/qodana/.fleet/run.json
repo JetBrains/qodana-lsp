@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "type": "npm",
+            "name": "npm configuration",
+            "command": "run",
+            "scripts": "compile"
+        },
+        {
+            "type": "node",
+            "name": "Node.js configuration",
+            "dependsOn": ["npm configuration"],
+            "file": "out/test/runTest.js"
+        }
+    ]
+}

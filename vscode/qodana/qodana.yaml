@@ -1,0 +1,18 @@
+version: "1.0"
+linter: jetbrains/qodana-js:2023.2
+profile:
+  name: qodana.recommended
+exclude:
+  - name: VulnerableLibrariesLocal
+  - name: All
+    paths:
+      - ".vscode-test"
+      - "out"
+include:
+  - name: CheckDependencyLicenses
+bootstrap: npm ci
+licenseRules:
+  - keys:
+    - "Apache-2.0"
+    allowed:
+      - "0BSD"
