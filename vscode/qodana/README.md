@@ -49,6 +49,29 @@ To reset the extension settings, use the command `Qodana: Reset settings`.
 To temporarily disable the extension, click on Qodana item in the status bar, so that it turns yellow.
 
 Feel free to commit .vscode/settings.json to your repository to share the Qodana integration settings with your team!
+
+## Qodana Extension Telemetry
+
+Qodana VS Code extension is enhanced with telemetry functionality, aimed at collecting valuable data on how you use the extension. Importantly, no project-specific or personal data is collected as part of this telemetry. The items logged, which exclusively use predefined string literals, include the following events:
+
+- **Extension Start and Stop**
+
+- **Opening the Report from Qodana Cloud**
+
+- **Opening a File Using URL from Qodana Cloud**
+
+- **Settings Reset**
+
+- **Turning Off/On Displaying the Issues from Qodana Cloud**
+
+- **Predefined Error Messages**
+
+The telemetry information increases the efficiency of the extension by availing usage data for improvements. Logging is performed using the recommended API by the [extension authors guide](https://code.visualstudio.com/api/extension-guides/telemetry).
+
+Respecting your privacy, we provide the option to opt-out of telemetry data collection. You can revoke consent by uninstalling the Qodana Cloud VS Code extension or switching the `telemetry.telemetryLevel` setting in VS Code to *off*.
+
+This information helps us understand your needs better to enhance the functionality and user experience of the Qodana Cloud VS Code extension, while keeping your data private and secure. Your feedback is always appreciated!
+
 ​
 ## Questions, issues, or feedback?
 ​
