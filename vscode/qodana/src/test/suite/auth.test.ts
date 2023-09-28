@@ -175,7 +175,7 @@ describe('Authentification Test Suite', () => {
     });
 
     async function getContext() {
-        let ext = vscode.extensions.getExtension('jetbrains.qodana');
+        let ext = vscode.extensions.getExtension('jetbrains.qodana-code');
         if (!ext) {
             assert.fail('Extension is not present');
         }

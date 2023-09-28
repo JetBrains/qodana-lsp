@@ -1,5 +1,5 @@
 {
-  "name": "qodana",
+  "name": "qodana-code",
   "displayName": "Qodana",
   "description": "Integrates linter execution results from Qodana Cloud into VS Code.",
   "publisher": "jetbrains",

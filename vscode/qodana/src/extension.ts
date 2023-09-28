@@ -51,13 +51,13 @@ export async function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		telemetry.extensionRemoved();
-		if (!vscode.extensions.getExtension('jetbrains.qodana')) {
+		if (!vscode.extensions.getExtension('jetbrains.qodana-code')) {
 			await extensionInstance.resetAllSettings();
 		}
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('qodana.openWorkspaceSettings', async () => {
-		vscode.commands.executeCommand('workbench.action.openWorkspaceSettings', '@ext:jetbrains.qodana');
+		vscode.commands.executeCommand('workbench.action.openWorkspaceSettings', '@ext:jetbrains.qodana-code');
 	}));
 
 	let handler = new ShowMarkerHandler(context);

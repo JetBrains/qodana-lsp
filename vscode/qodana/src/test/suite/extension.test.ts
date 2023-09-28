@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 
 describe('Extension Test Suite', () => {
 	it('Extension should be present', () => {
-		assert.ok(vscode.extensions.getExtension('jetbrains.qodana'));
+		assert.ok(vscode.extensions.getExtension('jetbrains.qodana-code'));
 	});
 
 	it('Extension registered commands should be present', () => {

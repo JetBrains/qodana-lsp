@@ -7,8 +7,8 @@ describe('URL Handler Test Suite', () => {
     var sandbox: sinon.SinonSandbox;
     let context: vscode.ExtensionContext;
     let uris: vscode.Uri[] = [
-        vscode.Uri.parse('vscode://jetbrains.qodana/showMarker?path=DFAchecks.cpp:255:1&cloud_project_id=ADwgY&length=8'),
-        vscode.Uri.parse('vscode://jetbrains.qodana/showMarker?path=DFAchecks.cpp:255:1'),
+        vscode.Uri.parse('vscode://jetbrains.qodana-code/showMarker?path=DFAchecks.cpp:255:1&cloud_project_id=ADwgY&length=8'),
+        vscode.Uri.parse('vscode://jetbrains.qodana-code/showMarker?path=DFAchecks.cpp:255:1'),
     ];
 
 	beforeEach(async () => {
