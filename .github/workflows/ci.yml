@@ -94,8 +94,7 @@ jobs:
     - name: Publish
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
       run: |
-        ./changelog.sh > changelog.md
-        gh release create ${GITHUB_REF##*/} -F changelog.md
+        gh release create ${GITHUB_REF##*/}
         vsce publish -p ${{ secrets.VSCE_PAT }} -i qodana-cloud-plugin.vsix
       working-directory: vscode/qodana
       env:

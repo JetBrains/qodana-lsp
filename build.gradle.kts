@@ -33,7 +33,7 @@ dependencies {
 tasks {
     shadowJar {
         archiveBaseName.set("sarif-lsp")
-        archiveVersion.set("0.1.0")
+        archiveVersion.set("1.0.0")
         archiveClassifier.set("")
         destinationDirectory.set(file("vscode/qodana/lib"))
         manifest.attributes["Multi-Release"] = "true"

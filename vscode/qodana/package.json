@@ -5,7 +5,7 @@
   "publisher": "jetbrains",
   "author": "JetBrains s.r.o.",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "icon": "plugin-icon.png",
   "repository": {
     "type": "git",
