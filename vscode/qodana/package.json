@@ -9,7 +9,7 @@
   "icon": "plugin-icon.png",
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com:qodana/qodana-lsp.git"
+    "url": "ssh://git@github.com:JetBrains/qodana-lsp.git"
   },
   "engines": {
     "vscode": "^1.81.0"
