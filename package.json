@@ -1,0 +1,13 @@
+{
+  "name": "@qodana/lsp",
+  "version": "1.0.0",
+  "description": "Common code for Qodana IDE extensions.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JetBrains/qodana-lsp.git"
+  },
+  "workspaces": [
+    "vscode/qodana"
+  ]
+}

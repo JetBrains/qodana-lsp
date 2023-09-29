@@ -40,9 +40,6 @@ jobs:
           fetch-depth: 0  # a full history is required for pull request analysis
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2023.2
-        with:
-          args: -i,vscode/qodana
-          pr-mode: false
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_JS }} # read the steps about it below
 
@@ -72,8 +69,7 @@ jobs:
       with:
         node-version: '18.16'
     - name: Install dependencies
-      run: npm install -g vsce && npm ci
-      working-directory: vscode/qodana
+      run: npm install -g @vscode/vsce && npm ci
     - name: Run ts tests
       run: xvfb-run -a npm run test
       working-directory: vscode/qodana
