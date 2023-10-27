@@ -1,33 +1,52 @@
-# Qodana for Visual Studio Code extension
+# Qodana extension for Visual Studio Code
 
 [![GitHub Discussions](https://img.shields.io/github/discussions/jetbrains/qodana)](https://github.com/JetBrains/Qodana/discussions/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/Qodana?style=social&logo=twitter)](https://twitter.com/Qodana)
 
-This extension connects to Qodana Cloud and showcases the latest code quality issues for your project.
+The Qodana extension lets you fix the existing problems detected in your project codebase. It connects and synchronizes your project with 
+a Qodana report uploaded to [Qodana Cloud](https://qodana.cloud), and showcases the latest code quality problems detected in 
+your project. You can overview them directly in the editor, or toggle the **PROBLEMS** tab to see them in the form of list. 
 
-## Prerequisites
+![](./media/how-it-works.gif)
 
-Before utilizing the extension, please ensure you fulfill the following prerequisites:
+## Requirements
 
-1. You have a Qodana Cloud account. If not, please create one [here](https://qodana.cloud/).
-2. You have a project set up on Qodana Cloud. If not, please create one [here](https://qodana.cloud/).
-3. The source code of this project has been downloaded to your local machine and is opened in a VS Code workspace
-4. You have run the Qodana analysis for your project at least once and generated a report in your Qodana Cloud project.
-5. There is a Java binary on your system path (JRE 11 or higher is required). You can check it by running the command "java -version" in the Terminal.
+To use the extension, you need to run Visual Studio Code version 1.81 and later. 
 
-## Installation and Configuration
+Also, ensure you fulfill the following prerequisites:
 
-1. Open your project as a Workspace in VS Code, make sure your VS Code window is a top most among other VS Code windows.
-2. Open Qodana Cloud, navigate to your project and click "Open in VSCode" button from the dropdown selector under any issue found in the project.
-3. You will be prompted to authenticate with Qodana Cloud. Once authorized, the extension will be set and ready for use.
+1. You have a Qodana Cloud account and a project in it. If necessary, navigate to [Qodana Cloud](https://qodana.cloud/) and accomplish these steps.
+2. You have run Qodana over your project at least once, and the generated report has been uploaded to your Qodana Cloud project.
+3. The source code of this project has been was opened in a VS Code workspace
+4. There is a Java binary on your system path (JRE 11 or higher is required). You can check it by running the command "java -version" in the Terminal.
+
+![](./media/prereqs.gif)
+
+## Prepare your project
+
+1. In your Visual Studio Code, open your project as a Workspace.
+2. In your browser, open [Qodana Cloud](https://qodana.cloud) and navigate to your project.
+3. In Qodana Cloud, click the **Open file in Visual Studio Code** button from the dropdown selector under any issue found in the project.
+4. In lower-right corner of the Visual Studio Code UI, follow the Qodana Cloud login instructions. 
+5. In Qodana Cloud, navigate to the project report and click **Open file in Visual Studio Code**.
+6. Overview Qodana reports in your Visual Studio Code. 
+
+![](./media/setup_updated2.gif)
 
 Alternatively:
-1. Open your Workspace settings: go to Code > Settings > Settings and choose the Workspace tab, select Qodana extension.
-2. Enter the Qodana Cloud project ID into the "Project ID" field. To locate this ID, open your project in Qodana Cloud; the URL will have the following format: `https://qodana.cloud/projects/PROJECT_ID/reports/REPORT_ID`.
-3. You will be prompted to authenticate with Qodana Cloud. Once authorized, the extension will be set and ready for use.
 
-If you don't see any issues from the report after successfully loading it, adjust the "Path Prefix" field in Settings.
-The rule is: `"Full Path" = "Workspace" + "Path Prefix" + "Path in SARIF"`
+1. In Visual Studio Code, navigate to the **Settings** page and find the **Qodana** configuration settings.
+2. On the **Settings** page, in the **Project ID** field enter the Qodana Cloud project ID. To locate this ID, open your project in Qodana Cloud; the URL will have the following format: `https://qodana.cloud/projects/PROJECT_ID/reports/REPORT_ID`.
+
+![](./media/extention-config.png)
+
+3. Follow the instructions to log in to Qodana Cloud.
+
+### Troubleshooting
+
+If you can't still overview a report, on the **Settings** page adjust the **Path Prefix** value.
+
+The basic rule is: `Full Path = Workspace + Path Prefix + Path in SARIF`
 
 Here are examples how to define the correct path prefix:
 
@@ -37,22 +56,23 @@ Here are examples how to define the correct path prefix:
 | /foo/bar/baz/file | baz/file      | /foo/bar/baz | ..                |
 | /foo/bar/baz/file | file          | /foo/bar     | baz               |
 
-You can refer to the Qodana Cloud report (within the Files section beneath the sunburst diagram) to see how the "Path in SARIF" is set.
+To see how the `Path in SARIF` is set in the project, in Qodana Cloud navigate to the **Files** section located beneath the sunburst diagram.
 
+![](./media/qodana-cloud-report.png)
 
-## Usage
+> Feel free to commit `.vscode/settings.json` in your repository to share the Qodana integration settings with your team!
 
-Once the project is set up, it will synchronize with Qodana Cloud. If there are any issues found by Qodana analysis, they will be displayed in the file list and under the Problems view (View > Problems).
+## Clear settings
 
-To stop receiving new reports from Qodana Cloud, use the command `Qodana: Reset authentication`.
-To reset the extension settings, use the command `Qodana: Reset settings`.
-To temporarily disable the extension, click on Qodana item in the status bar, so that it turns yellow.
+To disconnect from Qodana Cloud, in Visual Studio Code use the `Qodana: Reset authentication` command.
 
-Feel free to commit .vscode/settings.json to your repository to share the Qodana integration settings with your team!
+To reset the extension settings, in Visual Studio Code use the `Qodana: Reset settings` command.
 
-## Qodana Extension Telemetry
+To temporarily disable the extension, in the status bar click **Qodana**.
 
-Qodana VS Code extension is enhanced with telemetry functionality, aimed at collecting valuable data on how you use the extension. Importantly, no project-specific or personal data is collected as part of this telemetry. The items logged, which exclusively use predefined string literals, include the following events:
+## Data and telemetry
+
+The Qodana extension for Visual Studio Code is enhanced with telemetry functionality aimed at collecting valuable data on how you use the extension. Importantly, no project-specific or personal data is collected as part of this telemetry. The items logged, which exclusively use predefined string literals, include the following events:
 
 - **Extension Start and Stop**
 
@@ -68,9 +88,9 @@ Qodana VS Code extension is enhanced with telemetry functionality, aimed at coll
 
 The telemetry information increases the efficiency of the extension by availing usage data for improvements. Logging is performed using the recommended API by the [extension authors guide](https://code.visualstudio.com/api/extension-guides/telemetry).
 
-Respecting your privacy, we provide the option to opt-out of telemetry data collection. You can revoke consent by uninstalling the Qodana Cloud VS Code extension or switching the `telemetry.telemetryLevel` setting in VS Code to *off*.
+Respecting your privacy, we provide the option to opt-out of telemetry data collection. You can revoke consent by uninstalling the Qodana Cloud VS Code extension or switching the `telemetry.telemetryLevel` setting in Visual Studio Code to *off*.
 
-This information helps us understand your needs better to enhance the functionality and user experience of the Qodana Cloud VS Code extension, while keeping your data private and secure. Your feedback is always appreciated!
+This information helps us understand your needs better to enhance the functionality and user experience of the Qodana extension for Visual Studio Code while keeping your data private and secure. Your feedback is always appreciated!
 
 
 ## Questions, issues, or feedback?
@@ -86,3 +106,9 @@ To file a new issue, please follow this link: [YouTrack | New Issue][youtrack-ne
 [jb:discussions]: https://jb.gg/qodana-discussions
 [jb:twitter]: https://twitter.com/Qodana
 [jb:docker]: https://hub.docker.com/r/jetbrains/qodana
+
+## License
+
+Copyright © 2000-2023 JetBrains s.r.o.
+
+This software is licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
