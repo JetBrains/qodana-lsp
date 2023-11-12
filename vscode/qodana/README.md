@@ -21,7 +21,8 @@ The following prerequisites also apply:
 3. The source code of the project has been opened in a Visual Studio Code workspace.
 4. There is a Java binary on your system path (JRE 11 or higher is required). You can check it by running the `java -version` command in the Terminal.
 
-![Prerequisites to using the Qodana extension for Visual Studio Code](./media/prereqs.gif)
+![Prerequisites to using the Qodana extension for Visual Studio Code](/qodana-lsp/vscode/qodana/media/prereqs.gif)
+
 
 ## Prepare your project
 
