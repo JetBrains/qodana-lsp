@@ -149,6 +149,7 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "20.2.5",
     "@types/stream-json": "^1.7.4",
+    "@types/tar": "^6.1.9",
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
@@ -164,6 +165,7 @@
   "dependencies": {
     "@vscode/extension-telemetry": "^0.8.5",
     "axios": "^1.6.0",
+    "tar": "^6.2.0",
     "vscode-languageclient": "^8.1.0"
   }
 }

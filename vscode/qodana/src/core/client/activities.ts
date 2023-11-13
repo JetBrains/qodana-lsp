@@ -16,17 +16,17 @@ async function announceWorkspaceFolder(client: LanguageClient, context: vscode.E
 }
 
 export async function announceSarifFile(client: LanguageClient, context: vscode.ExtensionContext, auth: Auth): Promise<NodeJS.Timer> {
-    await sarifAnnouncer(client, context, auth);
+    await openReportOnce(client, context, auth);
     return setInterval(async () => {
-        await sarifAnnouncer(client, context, auth);
+        await openReportOnce(client, context, auth);
     }, 5 * 60 * 1000);
 }
 
-async function sarifAnnouncer(client: LanguageClient, context: vscode.ExtensionContext, auth: Auth) {
+export async function openReportOnce(client: LanguageClient, context: vscode.ExtensionContext, auth: Auth) {
     let token = await auth.getTokenToCloud();
     if (token) {
         let reportPath = await getReportFile(context, token);
-        let openedReport = await context.workspaceState.get('openedreport');
+        let openedReport = context.workspaceState.get('openedreport');
         if (reportPath && openedReport !== reportPath) {
             if (openedReport) {
                 let answer = await vscode.window.showInformationMessage(NEW_REPORT_AVAILABLE, YES, NO);
@@ -42,8 +42,10 @@ async function sarifAnnouncer(client: LanguageClient, context: vscode.ExtensionC
                 }
             }
             await announceWorkspaceFolder(client, context);
+            let showBaselineIssues = context.workspaceState.get('baselineIssues', false);
             let sarifParams: SetSarifFileParams = {
-                path: reportPath
+                path: reportPath,
+                showBaselineIssues: showBaselineIssues
             };
             await client.sendRequest("setSarifFile", sarifParams);
             await context.workspaceState.update('openedreport', reportPath);
@@ -65,4 +67,5 @@ export interface SetSourceLocationParams {
 
 export interface SetSarifFileParams {
     path: string;
+    showBaselineIssues: Boolean;
 }

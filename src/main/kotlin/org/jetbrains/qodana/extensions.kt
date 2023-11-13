@@ -18,6 +18,6 @@ interface ExtendedLanguageServer : LanguageServer {
 
 data class SetSourceLocationParams(val path: String)
 
-data class SetSarifFileParams(val path: String)
+data class SetSarifFileParams(val path: String, val showBaselineIssues: Boolean)
 
 class DiagnosticWithHighlight(range: Range, message: String, severity: DiagnosticSeverity, source: String, code: String, val highlightedText: String): Diagnostic(range, message, severity, source, code)

@@ -506,6 +506,7 @@
      "partialFingerprints": {
       "equalIndicator/v1": "fbc12bbc606520a7ff07947049dd1c96c5b8c3dde2500b4d796378878eef2085"
      },
+     "baselineState": "unchanged",
      "properties": {
       "tags": [
        "C++"
@@ -549,6 +550,7 @@
      "partialFingerprints": {
       "equalIndicator/v1": "851c971fdbd8e387c7859ec390e0fca46f4333c90cd38f051f33687a9db893df"
      },
+     "baselineState": "new",
      "properties": {
       "tags": [
        "C++"
@@ -592,6 +594,7 @@
      "partialFingerprints": {
       "equalIndicator/v1": "27230f61cecc4413acd0b6f40b31187fc9947399421878592fe5b3c61411b049"
      },
+     "baselineState": "updated",
      "properties": {
       "tags": [
        "C++"

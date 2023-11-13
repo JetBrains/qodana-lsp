@@ -58,4 +58,12 @@ export function failedToObtainReportId(reportId: string, projectId: string) { re
 export function noFilesFound(reportId: string, projectId: string) { return vscode.l10n.t('[Qodana] No files available for report ID {0} in project {1}.', reportId, projectId); }
 export function failedToObtainReport(reportId: string, projectId: string) { return vscode.l10n.t('[Qodana] Unable to retrieve report id {0} for project {1}.', reportId, projectId); }
 export function failedToDownloadReport(projectId: string) { return vscode.l10n.t('[Qodana] Unable to download report for specified project {0}.', projectId); }
+export function failedToDownloadReportWithId(projectId: string, reportId: string) { return vscode.l10n.t('[Qodana] Unable to download report {0} for specified project {1}.', reportId, projectId); }
 export function projectIdIsNotValid(projectId: string) { return vscode.l10n.t('[Qodana] Project ID {0} is not valid.', projectId); }
+
+// JBR
+
+export function failedToDownloadJbr(jbr: string) { return vscode.l10n.t('[Qodana] Unable to download JBR Runtime {0}.', jbr); }
+export function failedToExtractJbr(jbr: string) { return vscode.l10n.t('[Qodana] Unable to extract JBR Runtime {0}.', jbr); }
+export const DOWNLOAD_CONFIRMATION = vscode.l10n.t('[Qodana] requires Java 11 or higher to run. Do you want to download and use JetBrains Runtime?');
+export function successfullyExtracted(jbr: string) { return vscode.l10n.t('[Qodana] Extracted JBR Runtime to {0}.', jbr); }

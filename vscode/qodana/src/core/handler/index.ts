@@ -4,6 +4,8 @@ import { FAILED_ID_NOT_PRESENT, FAILED_PATH_NOT_PRESENT, FAILED_PREFIX_NOT_SET, 
 import config from '../config';
 import { join } from 'node:path';
 import telemetry from '../telemetry';
+import { extensionInstance } from '../extension';
+import { State } from 'vscode-languageclient';
 
 
 export class ShowMarkerHandler implements UriHandler {
@@ -55,11 +57,28 @@ export class ShowMarkerHandler implements UriHandler {
                 telemetry.errorReceived('#handleUri no projectId');
                 return;
             }
+            let reportId = query.find((value) => {
+                return value.startsWith('cloud_report_id=');
+            });
+            if (reportId) {
+                let reportIdValue = reportId.split('=')[1];
+                // this value will be picked up by next report fetch
+                // we set it here in advance if projectId was not previously set
+                // so that it will be picked up afterwards
+                await this.context.workspaceState.update('handlerReportId', reportIdValue);
+            }
             let projectIdInSettings = vscode.workspace.getConfiguration().get('qodana.projectId');
             let projectIdValue = projectId.split('=')[1];
             let projectIdAccepted = await this.projectIdNotSet(projectIdValue, projectIdInSettings);
             if (!projectIdAccepted) {
+                if (reportId) {
+                    await this.context.workspaceState.update('handlerReportId', undefined);
+                }
                 return;
+            }
+            if (reportId && extensionInstance.languageClient?.state === State.Running) {
+                // we don't await here, since downloading report could take a while
+                extensionInstance.openFreshReport();
             }
             let pathValueParts = pathValue.split(':');
             if (pathValueParts.length === 3) {

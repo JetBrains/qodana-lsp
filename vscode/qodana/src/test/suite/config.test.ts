@@ -4,8 +4,8 @@ import assert = require('assert');
 
 import config from '../../core/config';
 import { QodanaExtension } from '../../core/extension';
-import { PROCEED, RELOAD } from '../../core/messages';
-import { State } from "vscode-languageclient/node";
+import { PROCEED, RELOAD, ULS_PROCEED } from '../../core/messages';
+import { LanguageClient, State } from "vscode-languageclient/node";
 
 describe('Configuration Test Suite', () => {
     var sandbox: sinon.SinonSandbox;
@@ -64,7 +64,7 @@ describe('Configuration Test Suite', () => {
 
     it('4: Global settings are set, asked to reset', async () => {
         globalMap.set('qodana.projectId', 'ADwgY');
-        let stub = sandbox.stub(vscode.window, 'showErrorMessage').rejects();
+        let stub = sandbox.stub(vscode.window, 'showErrorMessage').returns(ULS_PROCEED as any);
         sandbox.stub(vscode.workspace, 'onDidChangeConfiguration').callsFake((callback: (e: vscode.ConfigurationChangeEvent) => any, text?: any, disable?: any): any => {
             callback({ affectsConfiguration: (section: string) => { return section === 'qodana'; } });
         });
@@ -98,12 +98,11 @@ describe('Configuration Test Suite', () => {
                 });
             });
         });
-        let notCalled1 = sandbox.stub(QodanaExtension.instance.languageClient!, 'stop').resolves();
-        let notCalled2 = sandbox.stub(QodanaExtension.instance.languageClient!, 'start').resolves();
+        
+        let client = { state: State.Running, stop: null, start: null } as unknown as LanguageClient;
+        let notCalled1 = sandbox.stub(client, 'stop').resolves();
+        let notCalled2 = sandbox.stub(client, 'start').resolves();
         sandbox.stub(config, 'configIsValid').resolves(true);
-
-        let client = QodanaExtension.instance.languageClient!;
-        sandbox.stub(client, 'state').value(State.Running);
         sandbox.stub(vscode.window, 'showInformationMessage').resolves(RELOAD as any);
         let stub = sandbox.stub(vscode.commands, 'executeCommand').resolves();
         config.sectionChangeHandler(client, {} as any);
