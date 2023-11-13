@@ -21,7 +21,7 @@ The following prerequisites also apply:
 3. The source code of the project has been opened in a Visual Studio Code workspace.
 4. There is a Java binary on your system path (JRE 11 or higher is required). You can check it by running the `java -version` command in the Terminal.
 
-![Prerequisites to using the Qodana extension for Visual Studio Code](qodana-lsp/vscode/qodana/media/prereqs.gif)
+![Prerequisites to using the Qodana extension for Visual Studio Code](./vscode/qodana/media/prereqs.gif)
 
 
 ## Prepare your project
@@ -33,7 +33,7 @@ The following prerequisites also apply:
 5. In Qodana Cloud, navigate to the project report and click **Open file in Visual Studio Code**.
 6. View the Qodana reports in your Visual Studio Code editor.
 
-![Prepare your project for using the Qodana extension for Visual Studio Code](./media/setup_updated2.gif)
+![Prepare your project for using the Qodana extension for Visual Studio Code](./vscode/qodana/media/setup_updated2.gif)
 
 Alternatively:
 
@@ -63,7 +63,7 @@ Here are some examples how to define the correct path prefix:
 To see how the `Path in SARIF` is set in the project, in Qodana Cloud, navigate to the **Files** section located 
 beneath the sunburst diagram.
 
-<img src="./media/qodana-cloud-report.png" width="960" alt="SARIF paths in the project">
+<img src="./vscode/qodana/media/qodana-cloud-report.png" width="960" alt="SARIF paths in the project">
 
 > Feel free to commit `.vscode/settings.json` in your repository to share the Qodana integration settings with your team!
 
