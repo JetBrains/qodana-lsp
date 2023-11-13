@@ -77,6 +77,7 @@ export class ShowMarkerHandler implements UriHandler {
                 return;
             }
             if (reportId && extensionInstance.languageClient?.state === State.Running) {
+                // we don't await here, since downloading report could take a while
                 extensionInstance.openFreshReport();
             }
             let pathValueParts = pathValue.split(':');

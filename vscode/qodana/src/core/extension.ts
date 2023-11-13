@@ -185,8 +185,8 @@ export class QodanaExtension {
         this.applyBaselineTogglerBarItemStatus();
     }
 
-    async openFreshReport() {
-        await openReportOnce(this.languageClient as LanguageClient, this.context as vscode.ExtensionContext, this.auth as Auth);
+    openFreshReport() {
+        openReportOnce(this.languageClient as LanguageClient, this.context as vscode.ExtensionContext, this.auth as Auth);
     }
 }
 
