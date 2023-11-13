@@ -186,7 +186,9 @@ export class QodanaExtension {
     }
 
     openFreshReport() {
-        openReportOnce(this.languageClient as LanguageClient, this.context as vscode.ExtensionContext, this.auth as Auth);
+        openReportOnce(this.languageClient as LanguageClient, this.context as vscode.ExtensionContext, this.auth as Auth).then(() => {
+            // ignore
+        });
     }
 }
 
