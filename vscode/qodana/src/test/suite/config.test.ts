@@ -4,7 +4,7 @@ import assert = require('assert');
 
 import config from '../../core/config';
 import { QodanaExtension } from '../../core/extension';
-import { PROCEED, RELOAD } from '../../core/messages';
+import { PROCEED, RELOAD, ULS_PROCEED } from '../../core/messages';
 import { State } from "vscode-languageclient/node";
 
 describe('Configuration Test Suite', () => {
@@ -64,7 +64,7 @@ describe('Configuration Test Suite', () => {
 
     it('4: Global settings are set, asked to reset', async () => {
         globalMap.set('qodana.projectId', 'ADwgY');
-        let stub = sandbox.stub(vscode.window, 'showErrorMessage').rejects();
+        let stub = sandbox.stub(vscode.window, 'showErrorMessage').returns(ULS_PROCEED as any);
         sandbox.stub(vscode.workspace, 'onDidChangeConfiguration').callsFake((callback: (e: vscode.ConfigurationChangeEvent) => any, text?: any, disable?: any): any => {
             callback({ affectsConfiguration: (section: string) => { return section === 'qodana'; } });
         });
@@ -98,6 +98,8 @@ describe('Configuration Test Suite', () => {
                 });
             });
         });
+        
+        sandbox.stub(QodanaExtension.instance, 'languageClient').value({ state: null, stop: null, start: null } as any);
         let notCalled1 = sandbox.stub(QodanaExtension.instance.languageClient!, 'stop').resolves();
         let notCalled2 = sandbox.stub(QodanaExtension.instance.languageClient!, 'start').resolves();
         sandbox.stub(config, 'configIsValid').resolves(true);
