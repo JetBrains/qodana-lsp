@@ -16,13 +16,13 @@ async function announceWorkspaceFolder(client: LanguageClient, context: vscode.E
 }
 
 export async function announceSarifFile(client: LanguageClient, context: vscode.ExtensionContext, auth: Auth): Promise<NodeJS.Timer> {
-    await sarifAnnouncer(client, context, auth);
+    await openReportOnce(client, context, auth);
     return setInterval(async () => {
-        await sarifAnnouncer(client, context, auth);
+        await openReportOnce(client, context, auth);
     }, 5 * 60 * 1000);
 }
 
-async function sarifAnnouncer(client: LanguageClient, context: vscode.ExtensionContext, auth: Auth) {
+export async function openReportOnce(client: LanguageClient, context: vscode.ExtensionContext, auth: Auth) {
     let token = await auth.getTokenToCloud();
     if (token) {
         let reportPath = await getReportFile(context, token);

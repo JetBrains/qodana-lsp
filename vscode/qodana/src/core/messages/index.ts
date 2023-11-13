@@ -58,4 +58,5 @@ export function failedToObtainReportId(reportId: string, projectId: string) { re
 export function noFilesFound(reportId: string, projectId: string) { return vscode.l10n.t('[Qodana] No files available for report ID {0} in project {1}.', reportId, projectId); }
 export function failedToObtainReport(reportId: string, projectId: string) { return vscode.l10n.t('[Qodana] Unable to retrieve report id {0} for project {1}.', reportId, projectId); }
 export function failedToDownloadReport(projectId: string) { return vscode.l10n.t('[Qodana] Unable to download report for specified project {0}.', projectId); }
+export function failedToDownloadReportWithId(projectId: string, reportId: string) { return vscode.l10n.t('[Qodana] Unable to download report {0} for specified project {1}.', reportId, projectId); }
 export function projectIdIsNotValid(projectId: string) { return vscode.l10n.t('[Qodana] Project ID {0} is not valid.', projectId); }

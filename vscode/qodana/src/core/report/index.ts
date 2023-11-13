@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import axios from 'axios';
 import * as fs from 'fs';
-import { failedToObtainData, noReportsFound, failedToObtainReportId, noFilesFound, failedToObtainReport, failedToDownloadReport, projectIdIsNotValid } from "../messages";
+import { failedToObtainData, noReportsFound, failedToObtainReportId, noFilesFound, failedToObtainReport, failedToDownloadReport, projectIdIsNotValid, failedToDownloadReportWithId } from "../messages";
 import { apiUrl, isValidString } from "../defaults";
 import telemetry from "../telemetry";
 
@@ -134,23 +134,13 @@ async function fetchReportFile(context: vscode.ExtensionContext, reportId: strin
     }
 }
 
-export async function getReportFile(context: vscode.ExtensionContext, token: string): Promise<string | undefined> {
-    // get project id from plugin settings
-    let projectId = vscode.workspace.getConfiguration().get('qodana.projectId');
-    if (!projectId) {
-        // should not happen
-        return undefined;
-    }
+export async function getReportFileById(context: vscode.ExtensionContext, token: string, projectId: string, reportId: string): Promise<string | undefined> {
     try {
-        let newReportId = await getReportId(token, projectId as string);
-        if (!newReportId) {
-            return undefined;
-        }
         // compare with the stored report id
         let storedReportId = context.workspaceState.get('reportId');
-        if (storedReportId === newReportId) {
+        if (storedReportId === reportId) {
             // return the stored file path
-            let path = await reportPath(context, newReportId);
+            let path = await reportPath(context, reportId);
             // if file exists
             try {
                 await fs.promises.access(path);
@@ -160,18 +150,18 @@ export async function getReportFile(context: vscode.ExtensionContext, token: str
             }
         }
         // fetch the report file url for the new report id
-        let reportUrl = await fetchReportFileUrl(token, newReportId as string, projectId as string);
+        let reportUrl = await fetchReportFileUrl(token, reportId, projectId);
         if (!reportUrl) {
             return undefined;
         }
         // fetch the file for that report id and url
-        let newReportPath = await fetchReportFile(context, newReportId as string, projectId as string, reportUrl as string);
+        let newReportPath = await fetchReportFile(context, reportId, projectId, reportUrl as string);
         if (!newReportPath) {
-            vscode.window.showErrorMessage(failedToDownloadReport(projectId as string));
+            vscode.window.showErrorMessage(failedToDownloadReport(projectId));
             return undefined;
         }
         // store the report id 
-        context.workspaceState.update('reportId', newReportId);
+        await context.workspaceState.update('reportId', reportId);
         if (storedReportId) {
             // remove old report
             let storedReportPath = await reportPath(context, storedReportId as string);
@@ -186,6 +176,40 @@ export async function getReportFile(context: vscode.ExtensionContext, token: str
             }
         }
         return newReportPath;
+    } catch (e) {
+        vscode.window.showErrorMessage(failedToDownloadReportWithId(projectId, reportId) + `: ${e}`);
+        telemetry.errorReceived('#getReportById exception');
+        return undefined;
+    }
+}
+
+export async function getReportFile(context: vscode.ExtensionContext, token: string): Promise<string | undefined> {
+    // get project id from plugin settings
+    let projectId = vscode.workspace.getConfiguration().get('qodana.projectId');
+    if (!projectId) {
+        // should not happen
+        return undefined;
+    }
+    try {
+        let reportIdFromHandler = context.workspaceState.get<string | undefined>('handlerReportId');
+        if (reportIdFromHandler) {
+            // opening such a report should be a one time action
+            await context.workspaceState.update('handlerReportId', undefined);
+            let handlerReportPath = await getReportFileById(context, token, projectId as string, reportIdFromHandler);
+            if (handlerReportPath) {
+                if (context.workspaceState.get('openedreport') !== handlerReportPath) {
+                    // we need to remove openedreport from workspace state, so that report gets opened immediately
+                    await context.workspaceState.update('openedreport', undefined);
+                }
+                return handlerReportPath;
+            }
+            // probably wrong report id, try to get the latest report id
+        }
+        let latestReportId = await getReportId(token, projectId as string);
+        if (!latestReportId) {
+            return undefined;
+        }
+        return getReportFileById(context, token, projectId as string, latestReportId);
     } catch (e) {
         vscode.window.showErrorMessage(failedToDownloadReport(projectId as string) + `: ${e}`);
         telemetry.errorReceived('#getReportFile exception');

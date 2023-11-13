@@ -9,7 +9,7 @@ import { getLanguageClient } from "./client";
 import config from "./config";
 
 
-import { SetSarifFileParams, announceSarifFile } from "./client/activities";
+import { SetSarifFileParams, announceSarifFile, openReportOnce } from "./client/activities";
 import { Auth } from './auth';
 
 export class QodanaExtension {
@@ -183,6 +183,10 @@ export class QodanaExtension {
         await this.resetToken();
         this.settingsNotValid();
         this.applyBaselineTogglerBarItemStatus();
+    }
+
+    async openFreshReport() {
+        await openReportOnce(this.languageClient as LanguageClient, this.context as vscode.ExtensionContext, this.auth as Auth);
     }
 }
 
