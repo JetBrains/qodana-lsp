@@ -9,14 +9,15 @@ import { getLanguageClient } from "./client";
 import config from "./config";
 
 
-import { announceSarifFile } from "./client/activities";
+import { SetSarifFileParams, announceSarifFile } from "./client/activities";
 import { Auth } from './auth';
 
 export class QodanaExtension {
     public languageClient?: LanguageClient;
     private context?: vscode.ExtensionContext;
     private recurringTimer?: NodeJS.Timer;
-    private statusBarItem?: vscode.StatusBarItem;
+    private qodanaStateBarItem?: vscode.StatusBarItem;
+    private baselineTogglerBarItem?: vscode.StatusBarItem;
     private auth?: Auth;
     private warningBg = new vscode.ThemeColor('statusBarItem.warningBackground');
     private static _instance: QodanaExtension;
@@ -59,9 +60,14 @@ export class QodanaExtension {
 
 
         // create icon in the status bar
-        this.statusBarItem = this.createStatusBarItem();
-        this.statusBarItem.show();
+        this.qodanaStateBarItem = this.createQodanaStateBarItem();
+        this.qodanaStateBarItem.show();
         this.notAttachedToReport();
+
+        // create baseline toggler in the status bar
+        this.baselineTogglerBarItem = this.createBaselineTogglerBarItem();
+        this.baselineTogglerBarItem.show();
+        this.applyBaselineTogglerBarItemStatus();
 
         if (await config.configIsValid(this.context, true)) {
             await this.languageClient.start();
@@ -72,37 +78,77 @@ export class QodanaExtension {
     }
 
     private notAttachedToReport() {
-        if (!this.statusBarItem) {
+        if (!this.qodanaStateBarItem) {
             return;
         }
-        this.statusBarItem.text = '$(eye-closed) Qodana';
-        this.statusBarItem.tooltip = 'Not attached to report';
-        this.statusBarItem.command = 'qodana.toggleQodana';
-        this.statusBarItem.backgroundColor = this.warningBg;
+        this.qodanaStateBarItem.text = '$(eye-closed) Qodana';
+        this.qodanaStateBarItem.tooltip = 'Not attached to report';
+        this.qodanaStateBarItem.command = 'qodana.toggleQodana';
+        this.qodanaStateBarItem.backgroundColor = this.warningBg;
     }
 
     private settingsNotValid() {
-        if (!this.statusBarItem) {
+        if (!this.qodanaStateBarItem) {
             return;
         }
-        this.statusBarItem.text = '$(gear) Qodana';
-        this.statusBarItem.tooltip = 'Settings are not valid';
-        this.statusBarItem.command = 'qodana.openWorkspaceSettings';
-        this.statusBarItem.backgroundColor = undefined;
+        this.qodanaStateBarItem.text = '$(gear) Qodana';
+        this.qodanaStateBarItem.tooltip = 'Settings are not valid';
+        this.qodanaStateBarItem.command = 'qodana.openWorkspaceSettings';
+        this.qodanaStateBarItem.backgroundColor = undefined;
     }
 
     private attachedToReport(reportId: string | undefined) {
-        if (!this.statusBarItem) {
+        if (!this.qodanaStateBarItem) {
             return;
         }
-        this.statusBarItem.text = '$(eye) Qodana';
-        this.statusBarItem.command = 'qodana.toggleQodana';
-        this.statusBarItem.tooltip = 'Attached to report: ' + reportId;
-        this.statusBarItem.backgroundColor = undefined;
+        this.qodanaStateBarItem.text = '$(eye) Qodana';
+        this.qodanaStateBarItem.command = 'qodana.toggleQodana';
+        this.qodanaStateBarItem.tooltip = 'Attached to report: ' + reportId;
+        this.qodanaStateBarItem.backgroundColor = undefined;
     }
 
-    private createStatusBarItem(): vscode.StatusBarItem {
+    private createQodanaStateBarItem(): vscode.StatusBarItem {
         return vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    }
+
+    private createBaselineTogglerBarItem(): vscode.StatusBarItem {
+        return vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+    }
+
+    private applyBaselineTogglerBarItemStatus() {
+        if (!this.baselineTogglerBarItem) {
+            return;
+        }
+        let showBaselineIssues = this.context?.workspaceState.get('baselineIssues', false);
+        if (showBaselineIssues) {
+            this.baselineTogglerBarItem.text = '$(filter-filled) All issues';
+            this.baselineTogglerBarItem.tooltip = '[Qodana] Baseline issues are shown';
+        } else {
+            this.baselineTogglerBarItem.text = '$(filter) New issues';
+            this.baselineTogglerBarItem.tooltip = '[Qodana] Baseline issues are hidden';
+        }
+        this.baselineTogglerBarItem.command = 'qodana.toggleBaseline';
+    }
+
+    async toggleBaseline() {
+        if (!this.context) {
+            return;
+        }
+        await this.context.workspaceState.update('baselineIssues', !this.context.workspaceState.get('baselineIssues', false));
+        this.applyBaselineTogglerBarItemStatus();
+        if (this.languageClient) {
+            if (this.languageClient.state === State.Running) {
+                let reportPath = this.context.workspaceState.get<string | undefined>('openedreport', undefined);
+                if (!reportPath) {
+                    return;
+                }
+                let sarifParams: SetSarifFileParams = {
+                    path: reportPath,
+                    showBaselineIssues: this.context.workspaceState.get('baselineIssues', false)
+                };
+                await this.languageClient.sendRequest("setSarifFile", sarifParams);
+            }
+        }
     }
 
     async toggleQodana() {
@@ -126,7 +172,6 @@ export class QodanaExtension {
                     // ignore
                 });
                 await this.auth.resetTokens();
-                await this.languageClient.start();
             } else {
                 await this.auth.resetTokens();
             }
@@ -137,6 +182,7 @@ export class QodanaExtension {
         await config.resetSettings(this.context as vscode.ExtensionContext);
         await this.resetToken();
         this.settingsNotValid();
+        this.applyBaselineTogglerBarItemStatus();
     }
 }
 

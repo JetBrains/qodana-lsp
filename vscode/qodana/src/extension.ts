@@ -45,6 +45,15 @@ export async function activate(context: vscode.ExtensionContext) {
 		await extensionInstance.toggleQodana();
 	}));
 
+	// baseline toggle command
+	context.subscriptions.push(vscode.commands.registerCommand('qodana.toggleBaseline', async () => {
+		if (!extensionInstance) {
+			return;
+		}
+		telemetry.baselineToggled();
+		await extensionInstance.toggleBaseline();
+	}));
+
 	// remove settings if the extension is uninstalled
 	context.subscriptions.push(vscode.extensions.onDidChange(async () => {
 		if (!extensionInstance) {

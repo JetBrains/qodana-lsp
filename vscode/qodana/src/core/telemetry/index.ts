@@ -27,6 +27,7 @@ class TelemetryEvents {
         AUTHENTICATION_RESETTED: 'authenticationResetted',
         SETTINGS_RESETTED: 'settingsResetted',
         ISSUES_TOGGLED: 'issuesToggled',
+        BASELINE_TOGGLED: 'baselineToggled',
     };
 
     extensionStarted(context: vscode.ExtensionContext) {
@@ -56,6 +57,10 @@ class TelemetryEvents {
 
     issuesToggled() {
         this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.ISSUES_TOGGLED);
+    }
+
+    baselineToggled() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.BASELINE_TOGGLED);
     }
 
     errorReceived(error: string) {
