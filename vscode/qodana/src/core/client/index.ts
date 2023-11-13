@@ -13,7 +13,7 @@ import {
     ServerOptions,
     State,
 } from "vscode-languageclient/node";
-import { FAILED_TO_INITIALIZE, JAVA_NOT_FOUND } from "../messages";
+import { FAILED_TO_INITIALIZE, JAVA_NOT_FOUND, JAVA_TOO_OLD } from "../messages";
 import telemetry from "../telemetry";
 
 
@@ -91,10 +91,35 @@ function getJavaExecutablePath(): string | null {
     try {
         javaHome = require('child_process').execSync(cmd).toString().split('=')[1].trim();
     } catch (error) {
-        telemetry.errorReceived('#getJavaExecutablePath exception');
+        telemetry.errorReceived('#getJavaExecutablePath exception (getting java path)');
         console.log("Failed to get JAVA_HOME. " + (error));
     }
     if (javaHome) {
+        if (os.platform() === 'win32') {
+            cmd = "java -XshowSettings:properties -version 2>&1 | findstr \"java.class.version\"";
+        } else {
+            cmd = "java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.class.version'";
+        }
+        let javaClassVersion: string | null = null;
+        try {
+            javaClassVersion = require('child_process').execSync(cmd).toString().split('=')[1].trim();
+        } catch (error) {
+            telemetry.errorReceived('#getJavaExecutablePath exception (getting java class version)');
+            console.log("Failed to get JAVA_HOME. " + (error));
+        }
+
+        if (javaClassVersion) {
+            let version = javaClassVersion.split('.')[0];
+            if (version) {
+                if (parseInt(version) < 55) {
+                    vscode.window.showErrorMessage(JAVA_TOO_OLD);
+                    return null;
+                }
+            }
+        } else {
+            return null;
+        }
+
         return path.join(javaHome, 'bin', 'java' + (os.platform() === 'win32' ? '.exe' : ''));
     }
     return null;

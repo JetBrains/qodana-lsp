@@ -194,6 +194,7 @@ export async function getReportFile(context: vscode.ExtensionContext, token: str
         let reportIdFromHandler = context.workspaceState.get<string | undefined>('handlerReportId');
         if (reportIdFromHandler) {
             // opening such a report should be a one time action
+            // it could be postponed (due to accepting the project id or auth, so we do in-place check here)
             await context.workspaceState.update('handlerReportId', undefined);
             let handlerReportPath = await getReportFileById(context, token, projectId as string, reportIdFromHandler);
             if (handlerReportPath) {

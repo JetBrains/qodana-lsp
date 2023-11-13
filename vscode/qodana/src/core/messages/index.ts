@@ -30,6 +30,7 @@ export function computedPrefix(prefix: string|undefined) { return vscode.l10n.t(
 
 export const FAILED_TO_INITIALIZE = vscode.l10n.t('[Qodana] Failed to initialize extension. Please try restarting VS Code or reinstalling extension. If issue persists, please contact us via YouTrack.');
 export const JAVA_NOT_FOUND = vscode.l10n.t('[Qodana] Java executable not found in PATH. Please ensure Java is installed and its path is added to system PATH.');
+export const JAVA_TOO_OLD = vscode.l10n.t('[Qodana] Unsupported Java version found. Please install JDK 11 at least.');
 
 // CONFIG
 
