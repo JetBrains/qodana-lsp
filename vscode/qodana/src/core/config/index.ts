@@ -37,6 +37,7 @@ class ConfigurationHelper {
         await context.workspaceState.update('reportId', null);
         await context.workspaceState.update('computedPrefix', null);
         await context.workspaceState.update('baselineIssues', false);
+        await context.globalState.update('javaExecutablePath', null);
         // reset workspace settings
         await vscode.workspace.getConfiguration().update('qodana.projectId', undefined, vscode.ConfigurationTarget.Workspace);
         await vscode.workspace.getConfiguration().update('qodana.pathPrefix', undefined, vscode.ConfigurationTarget.Workspace);

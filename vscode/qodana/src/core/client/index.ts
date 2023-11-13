@@ -13,8 +13,8 @@ import {
     ServerOptions,
     State,
 } from "vscode-languageclient/node";
-import { FAILED_TO_INITIALIZE, JAVA_NOT_FOUND, JAVA_TOO_OLD } from "../messages";
-import telemetry from "../telemetry";
+import { FAILED_TO_INITIALIZE, JAVA_NOT_FOUND } from "../messages";
+import { getJavaForExecution } from "../jdk/jbrDownloader";
 
 
 const LS_LAUNCHER_MAIN: string = "org.jetbrains.qodana.SarifLanguageServerLauncher";
@@ -56,7 +56,7 @@ export async function getLanguageClient(context: vscode.ExtensionContext): Promi
 }
 
 async function getServerOptions(context: vscode.ExtensionContext): Promise<ServerOptions | null> {
-    let javaExecutablePath = getJavaExecutablePath();
+    let javaExecutablePath = await getJavaForExecution(context);
     if (!javaExecutablePath) {
         vscode.window.showErrorMessage(JAVA_NOT_FOUND);
         return null;
@@ -78,49 +78,4 @@ async function getServerOptions(context: vscode.ExtensionContext): Promise<Serve
 
 function getJarPath(context: vscode.ExtensionContext): string {
     return `${context.asAbsolutePath('lib/')}*`;
-}
-
-function getJavaExecutablePath(): string | null {
-    let cmd: String;
-    if (os.platform() === 'win32') {
-        cmd = "java -XshowSettings:properties -version 2>&1 | findstr \"java.home\"";
-    } else {
-        cmd = "java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home'";
-    }
-    let javaHome: string | null = null;
-    try {
-        javaHome = require('child_process').execSync(cmd).toString().split('=')[1].trim();
-    } catch (error) {
-        telemetry.errorReceived('#getJavaExecutablePath exception (getting java path)');
-        console.log("Failed to get JAVA_HOME. " + (error));
-    }
-    if (javaHome) {
-        if (os.platform() === 'win32') {
-            cmd = "java -XshowSettings:properties -version 2>&1 | findstr \"java.class.version\"";
-        } else {
-            cmd = "java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.class.version'";
-        }
-        let javaClassVersion: string | null = null;
-        try {
-            javaClassVersion = require('child_process').execSync(cmd).toString().split('=')[1].trim();
-        } catch (error) {
-            telemetry.errorReceived('#getJavaExecutablePath exception (getting java class version)');
-            console.log("Failed to get JAVA_HOME. " + (error));
-        }
-
-        if (javaClassVersion) {
-            let version = javaClassVersion.split('.')[0];
-            if (version) {
-                if (parseInt(version) < 55) {
-                    vscode.window.showErrorMessage(JAVA_TOO_OLD);
-                    return null;
-                }
-            }
-        } else {
-            return null;
-        }
-
-        return path.join(javaHome, 'bin', 'java' + (os.platform() === 'win32' ? '.exe' : ''));
-    }
-    return null;
 }

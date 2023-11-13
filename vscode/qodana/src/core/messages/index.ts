@@ -30,7 +30,6 @@ export function computedPrefix(prefix: string|undefined) { return vscode.l10n.t(
 
 export const FAILED_TO_INITIALIZE = vscode.l10n.t('[Qodana] Failed to initialize extension. Please try restarting VS Code or reinstalling extension. If issue persists, please contact us via YouTrack.');
 export const JAVA_NOT_FOUND = vscode.l10n.t('[Qodana] Java executable not found in PATH. Please ensure Java is installed and its path is added to system PATH.');
-export const JAVA_TOO_OLD = vscode.l10n.t('[Qodana] Unsupported Java version found. Please install JDK 11 at least.');
 
 // CONFIG
 
@@ -61,3 +60,10 @@ export function failedToObtainReport(reportId: string, projectId: string) { retu
 export function failedToDownloadReport(projectId: string) { return vscode.l10n.t('[Qodana] Unable to download report for specified project {0}.', projectId); }
 export function failedToDownloadReportWithId(projectId: string, reportId: string) { return vscode.l10n.t('[Qodana] Unable to download report {0} for specified project {1}.', reportId, projectId); }
 export function projectIdIsNotValid(projectId: string) { return vscode.l10n.t('[Qodana] Project ID {0} is not valid.', projectId); }
+
+// JBR
+
+export function failedToDownloadJbr(jbr: string) { return vscode.l10n.t('[Qodana] Unable to download JBR Runtime {0}.', jbr); }
+export function failedToExtractJbr(jbr: string) { return vscode.l10n.t('[Qodana] Unable to extract JBR Runtime {0}.', jbr); }
+export const DOWNLOAD_CONFIRMATION = vscode.l10n.t('[Qodana] requires Java 11 or higher to run. Do you want to download and use JetBrains Runtime?');
+export function successfullyExtracted(jbr: string) { return vscode.l10n.t('[Qodana] Extracted JBR Runtime to {0}.', jbr); }

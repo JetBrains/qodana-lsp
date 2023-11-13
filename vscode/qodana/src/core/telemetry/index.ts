@@ -28,6 +28,7 @@ class TelemetryEvents {
         SETTINGS_RESETTED: 'settingsResetted',
         ISSUES_TOGGLED: 'issuesToggled',
         BASELINE_TOGGLED: 'baselineToggled',
+        JBR_DOWNLOADED: 'jbrDownloaded',
     };
 
     extensionStarted(context: vscode.ExtensionContext) {
@@ -61,6 +62,10 @@ class TelemetryEvents {
 
     baselineToggled() {
         this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.BASELINE_TOGGLED);
+    }
+
+    jbrDownloaded() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.JBR_DOWNLOADED);
     }
 
     errorReceived(error: string) {
