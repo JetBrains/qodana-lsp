@@ -1,4 +1,4 @@
-import axios from 'axios';
+import * as https from 'https';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { DOWNLOAD_CONFIRMATION, NO, YES, failedToDownloadJbr, successfullyExtracted } from '../messages';
@@ -9,10 +9,34 @@ import * as path from 'path';
 import { downloadFile, reportPath } from '../report';
 
 
-export async function getJbrReleases() {
-    let data = await axios.get('https://api.github.com/repos/JetBrains/JetBrainsRuntime/releases/127486177'); // 13.11.2023
-    let body = data.data.body;
-    return parseData(body);
+export function getJbrReleases(): Promise<Map<string, Release>> {
+    return new Promise((resolve, reject) => {
+        let options = {
+            hostname: 'api.github.com',
+            path: '/repos/JetBrains/JetBrainsRuntime/releases/127486177',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            headers: { 'User-Agent': 'qodana-lsp' },
+            method: 'GET'
+        };
+        let req = https.request(options, res => {
+            if (res.statusCode && (res.statusCode < 200 || res.statusCode >= 300)) {
+                return reject(new Error(`Status Code: ${res.statusCode}`));
+            }
+            var data = "";
+            res.on('data', chunk => { data += chunk; });
+            res.on('end', () => {
+                try {
+                    let json = JSON.parse(data);
+                    let body = json.body;
+                    resolve(parseData(body));
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        });
+        req.on('error', reject);
+        req.end();
+    });
 }
 
 export async function fetchJbr(url: string, filePath: string): Promise<string | undefined> {
