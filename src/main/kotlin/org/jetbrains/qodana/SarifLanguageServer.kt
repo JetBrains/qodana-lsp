@@ -64,7 +64,7 @@ class SarifLanguageServer: ExtendedLanguageServer, LanguageClientAware {
 
         scope.launch {
             try {
-                requestChannel.send(SarifFile(params.path))
+                requestChannel.send(SarifFile(params.path, params.showBaselineIssues))
                 future.complete(Unit)
             } catch (ex: Exception) {
                 future.completeExceptionally(ex)

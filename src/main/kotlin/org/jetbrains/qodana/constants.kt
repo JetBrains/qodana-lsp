@@ -1,4 +1,5 @@
 package org.jetbrains.qodana
 
 const val DebounceInterval = 500L
-val AllowedBaselineStates = setOf("new", "updated", "unchanged")
+val BaselineAllIssues = setOf("new", "updated", "unchanged")
+val BaselineOnlyNewIssues = setOf("new", "updated")

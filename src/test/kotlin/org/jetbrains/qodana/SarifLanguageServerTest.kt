@@ -40,7 +40,7 @@ class SarifLanguageServerTest {
         val feature = CompletableFuture<Unit>()
         server.state.scope.launch {
             server.setSourceLocation(SetSourceLocationParams(Paths.get("src/test/resources/sources").toString())).await()
-            server.setSarifFile(SetSarifFileParams(Paths.get("src/test/resources/sarif/qodana.sarif.json").toString())).await()
+            server.setSarifFile(SetSarifFileParams(Paths.get("src/test/resources/sarif/qodana.sarif.json").toString(), true)).await()
             while (client.diagnostics.size != 11) yield()
             server.state.requestChannel.send(object : IRequest {
                 override suspend fun execute(state: SarifLanguageServer.ServerState) {
@@ -74,5 +74,34 @@ class SarifLanguageServerTest {
         feature2.get(10, TimeUnit.SECONDS)
         val newDiagsInFile = diagnostics[file]!!.toList()
         assertEquals(16, newDiagsInFile.size)
+    }
+
+    @Test
+    fun testNonBaselineIssues() {
+        val feature = CompletableFuture<Unit>()
+        server.state.scope.launch {
+            server.setSourceLocation(SetSourceLocationParams(Paths.get("src/test/resources/sources").toString()))
+                .await()
+            server.setSarifFile(
+                SetSarifFileParams(
+                    Paths.get("src/test/resources/sarif/qodana.sarif.json").toString(),
+                    false
+                )
+            ).await()
+            while (client.diagnostics.size != 11) yield()
+            server.state.requestChannel.send(object : IRequest {
+                override suspend fun execute(state: SarifLanguageServer.ServerState) {
+                    feature.complete(Unit)
+                }
+            })
+        }
+        feature.get(10, TimeUnit.SECONDS)
+
+        val diagnostics = client.diagnostics
+        assertEquals(11, diagnostics.size)
+        val file = Paths.get("src/test/resources/sources/DFAchecks.cpp").toUri().toString()
+        val diagsInFile = diagnostics[file]!!.toList()
+        assertEquals(17, diagsInFile.size)
+        client.diagnostics.clear()
     }
 }

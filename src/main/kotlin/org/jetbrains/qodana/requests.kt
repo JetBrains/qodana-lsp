@@ -35,7 +35,7 @@ class SourceLocation(private val path: String): IRequest {
 }
 
 
-class SarifFile(private val path: String): IRequest {
+class SarifFile(private val path: String, private val showBaselineIssues: Boolean): IRequest {
     override suspend fun execute(state: SarifLanguageServer.ServerState) {
         if (!File(path).exists()) {
             logger.error("sarif report doesn't exist at {$path}")
@@ -47,7 +47,7 @@ class SarifFile(private val path: String): IRequest {
             return
         }
         state.sarifLocation = path
-        val diags = computeDiagnosticsAsIs()
+        val diags = computeDiagnosticsAsIs(showBaselineIssues)
         val oldFiles = state.diagnostic?.keys ?: emptyList()
         state.diagnostic = diags.toMap(mutableMapOf())
         state.repositoryFileCache = mutableMapOf()
@@ -92,10 +92,11 @@ class SarifFile(private val path: String): IRequest {
         }
     }
 
-    private fun computeDiagnosticsAsIs(): MutableMap<String, MutableList<DiagnosticWithHighlight>> {
+    private fun computeDiagnosticsAsIs(showBaselineIssues: Boolean): MutableMap<String, MutableList<DiagnosticWithHighlight>> {
         val diags = mutableMapOf<String, MutableList<DiagnosticWithHighlight>>()
+        val filterBaselineState = if (showBaselineIssues) BaselineAllIssues else BaselineOnlyNewIssues
         for (problem in getProblems(path)) {
-            if (problem.baselineState != null && !AllowedBaselineStates.contains(problem.baselineState.value().lowercase())) continue
+            if (problem.baselineState != null && !filterBaselineState.contains(problem.baselineState.value().lowercase())) continue
             if (problem.locations != null && problem.locations.isNotEmpty()) {
                 val location = problem.locations[0]
                 val locationUri = location.physicalLocation?.artifactLocation?.uri
