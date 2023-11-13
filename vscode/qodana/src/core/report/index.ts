@@ -95,38 +95,42 @@ export async function reportPath(context: vscode.ExtensionContext, reportId: str
     return `${pluginStoragePath}/${reportId}`;
 }
 
+export async function downloadFile(url: string, filePath: string): Promise<string | undefined> {
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'stream',
+    });
+    const writer = fs.createWriteStream(filePath);
+    const totalBytes = parseInt(response.headers['content-length']);
+
+    let receivedBytes = 0;
+
+    return vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Downloading File",
+        cancellable: false
+    }, (progress) => {
+        // The event 'data' will be emitted when there is data available.
+        response.data.on('data', (chunk: any) => {
+            receivedBytes += chunk.length;
+            let percentage = Math.floor((receivedBytes / totalBytes) * 100).toString() + '%';
+            progress.report({ message: percentage });
+        });
+
+        response.data.pipe(writer);
+
+        return new Promise((resolve, reject) => {
+            writer.on('finish', () => { resolve(filePath); });
+            writer.on('error', reject);
+        });
+    });
+}
+
 async function fetchReportFile(context: vscode.ExtensionContext, reportId: string, projectId: string, url: string): Promise<string | undefined> {
     try {
         let filePath = await reportPath(context, reportId);
-        const response = await axios({
-            url,
-            method: 'GET',
-            responseType: 'stream',
-        });
-        const writer = fs.createWriteStream(filePath);
-        const totalBytes = parseInt(response.headers['content-length']);
-
-        let receivedBytes = 0;
-
-        return vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: "Downloading File",
-            cancellable: false
-        }, (progress) => {
-            // The event 'data' will be emitted when there is data available.
-            response.data.on('data', (chunk: any) => {
-                receivedBytes += chunk.length;
-                let percentage = Math.floor((receivedBytes / totalBytes) * 100).toString() + '%';
-                progress.report({ message: percentage });
-            });
-
-            response.data.pipe(writer);
-
-            return new Promise((resolve, reject) => {
-                writer.on('finish', () => { resolve(filePath); });
-                writer.on('error', reject);
-            });
-        });
+        return await downloadFile(url, filePath);
     } catch (e) {
         vscode.window.showErrorMessage(failedToDownloadReport(projectId) + `: ${e}`);
         telemetry.errorReceived('#fetchReportFile exception');

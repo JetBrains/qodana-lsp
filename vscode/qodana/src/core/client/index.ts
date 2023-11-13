@@ -1,5 +1,3 @@
-import path = require("path");
-import os = require('os');
 import { reportPath } from '../report';
 import * as vscode from "vscode";
 import {

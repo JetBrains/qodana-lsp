@@ -6,7 +6,7 @@ import telemetry from '../telemetry';
 import * as tar from 'tar';
 import * as os from 'os';
 import * as path from 'path';
-import { reportPath } from '../report';
+import { downloadFile, reportPath } from '../report';
 
 
 export async function getJbrReleases() {
@@ -17,38 +17,10 @@ export async function getJbrReleases() {
 
 export async function fetchJbr(url: string, filePath: string): Promise<string | undefined> {
     try {
-        const response = await axios({
-            url,
-            method: 'GET',
-            responseType: 'stream',
-        });
-        const writer = fs.createWriteStream(filePath);
-        const totalBytes = parseInt(response.headers['content-length']);
-
-        let receivedBytes = 0;
-
-        return vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: "Downloading File",
-            cancellable: false
-        }, (progress) => {
-            // The event 'data' will be emitted when there is data available.
-            response.data.on('data', (chunk: any) => {
-                receivedBytes += chunk.length;
-                let percentage = Math.floor((receivedBytes / totalBytes) * 100).toString() + '%';
-                progress.report({ message: percentage });
-            });
-
-            response.data.pipe(writer);
-
-            return new Promise((resolve, reject) => {
-                writer.on('finish', () => { resolve(filePath); });
-                writer.on('error', reject);
-            });
-        });
+        return await downloadFile(url, filePath);
     } catch (e) {
         vscode.window.showErrorMessage(failedToDownloadJbr(url) + `: ${e}`);
-        telemetry.errorReceived('#fetchReportFile exception');
+        telemetry.errorReceived('#fetchJbr exception');
         return undefined;
     }
 }
@@ -210,7 +182,7 @@ export async function getJavaForExecution(context: vscode.ExtensionContext): Pro
 
 function parseData(data: string) {
     // regular expression to find markdown table row data
-    const re = /\| (.*?) \| .*? \| \[(.*?)\]\((.*?)\)/g;
+    const re = /\| (.*?) \| .*? \| \[(.*?)]\((.*?)\)/g;
     let match;
     // create mutable map of platform+arch to file name and file url
     const map = new Map<string, Release>();
