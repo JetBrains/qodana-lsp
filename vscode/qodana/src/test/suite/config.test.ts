@@ -5,7 +5,7 @@ import assert = require('assert');
 import config from '../../core/config';
 import { QodanaExtension } from '../../core/extension';
 import { PROCEED, RELOAD, ULS_PROCEED } from '../../core/messages';
-import { State } from "vscode-languageclient/node";
+import { LanguageClient, State } from "vscode-languageclient/node";
 
 describe('Configuration Test Suite', () => {
     var sandbox: sinon.SinonSandbox;
@@ -99,13 +99,10 @@ describe('Configuration Test Suite', () => {
             });
         });
         
-        sandbox.stub(QodanaExtension.instance, 'languageClient').value({ state: null, stop: null, start: null } as any);
-        let notCalled1 = sandbox.stub(QodanaExtension.instance.languageClient!, 'stop').resolves();
-        let notCalled2 = sandbox.stub(QodanaExtension.instance.languageClient!, 'start').resolves();
+        let client = { state: State.Running, stop: null, start: null } as unknown as LanguageClient;
+        let notCalled1 = sandbox.stub(client, 'stop').resolves();
+        let notCalled2 = sandbox.stub(client, 'start').resolves();
         sandbox.stub(config, 'configIsValid').resolves(true);
-
-        let client = QodanaExtension.instance.languageClient!;
-        sandbox.stub(client, 'state').value(State.Running);
         sandbox.stub(vscode.window, 'showInformationMessage').resolves(RELOAD as any);
         let stub = sandbox.stub(vscode.commands, 'executeCommand').resolves();
         config.sectionChangeHandler(client, {} as any);
