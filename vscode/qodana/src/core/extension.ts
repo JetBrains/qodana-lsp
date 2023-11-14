@@ -77,6 +77,16 @@ export class QodanaExtension {
         config.sectionChangeHandler(this.languageClient, this.context);
     }
 
+    attachedToReport(reportId: string | undefined) {
+        if (!this.qodanaStateBarItem) {
+            return;
+        }
+        this.qodanaStateBarItem.text = '$(eye) Qodana';
+        this.qodanaStateBarItem.command = 'qodana.toggleQodana';
+        this.qodanaStateBarItem.tooltip = 'Attached to report: ' + reportId;
+        this.qodanaStateBarItem.backgroundColor = undefined;
+    }
+
     private notAttachedToReport() {
         if (!this.qodanaStateBarItem) {
             return;
@@ -94,16 +104,6 @@ export class QodanaExtension {
         this.qodanaStateBarItem.text = '$(gear) Qodana';
         this.qodanaStateBarItem.tooltip = 'Settings are not valid';
         this.qodanaStateBarItem.command = 'qodana.openWorkspaceSettings';
-        this.qodanaStateBarItem.backgroundColor = undefined;
-    }
-
-    private attachedToReport(reportId: string | undefined) {
-        if (!this.qodanaStateBarItem) {
-            return;
-        }
-        this.qodanaStateBarItem.text = '$(eye) Qodana';
-        this.qodanaStateBarItem.command = 'qodana.toggleQodana';
-        this.qodanaStateBarItem.tooltip = 'Attached to report: ' + reportId;
         this.qodanaStateBarItem.backgroundColor = undefined;
     }
 

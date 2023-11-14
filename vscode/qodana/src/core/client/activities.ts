@@ -7,6 +7,7 @@ import { CLOUD_REPORT_LOADED, NEW_REPORT_AVAILABLE, NO, SHOW_PROBLEMS, YES } fro
 import config from "../config";
 import sarif from "../sarif";
 import telemetry from "../telemetry";
+import { extensionInstance } from "../extension";
 
 async function announceWorkspaceFolder(client: LanguageClient, context: vscode.ExtensionContext) {
     let locationParams: SetSourceLocationParams = {
@@ -49,6 +50,7 @@ export async function openReportOnce(client: LanguageClient, context: vscode.Ext
             };
             await client.sendRequest("setSarifFile", sarifParams);
             await context.workspaceState.update('openedreport', reportPath);
+            extensionInstance.attachedToReport(context.workspaceState.get('reportId'));
             vscode.window.showInformationMessage(CLOUD_REPORT_LOADED, SHOW_PROBLEMS).then((value) => {
                 if (value === SHOW_PROBLEMS) {
                     vscode.commands.executeCommand("workbench.action.problems.focus");
