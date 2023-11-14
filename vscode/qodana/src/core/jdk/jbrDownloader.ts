@@ -6,7 +6,7 @@ import telemetry from '../telemetry';
 import * as tar from 'tar';
 import * as os from 'os';
 import * as path from 'path';
-import { downloadFile, reportPath } from '../report';
+import { downloadFile } from '../report';
 
 
 export function getJbrReleases(): Promise<Map<string, Release>> {
@@ -171,7 +171,7 @@ export function getJavaExecutablePath(): string | null {
 
 export async function getJavaForExecution(context: vscode.ExtensionContext): Promise<string | undefined> {
     try {
-        let javaFromSettings = context.workspaceState.get<string | undefined>('javaExecutablePath');
+        let javaFromSettings = context.globalState.get<string | undefined>('javaExecutablePath');
         if (javaFromSettings) {
             try {
                 await fs.promises.access(javaFromSettings);
@@ -187,7 +187,7 @@ export async function getJavaForExecution(context: vscode.ExtensionContext): Pro
         }
         let decision = await vscode.window.showErrorMessage(DOWNLOAD_CONFIRMATION, YES, NO);
         if (decision === YES) {
-            let downloadedJbrDir = await reportPath(context, Math.random().toString(36).substring(7));
+            let downloadedJbrDir = path.join(context.globalStorageUri.fsPath, Math.random().toString(36).substring(7));
             await fs.promises.mkdir(downloadedJbrDir, { recursive: true });
             let java = await downloadAndUnpackJbr(downloadedJbrDir);
             if (java) {
