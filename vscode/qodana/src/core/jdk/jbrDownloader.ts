@@ -56,10 +56,11 @@ export async function extractJbr(filePath: string, releaseName: string, extractP
             cwd: extractPath
         });
         let dirName = releaseName.replace('.tar.gz', '');
-        if (getOsAndArch().osType === 'osx') {
+        let osType = getOsAndArch().osType;
+        if (osType === 'osx') {
             return path.join(extractPath, dirName, 'Contents', 'Home', 'bin', 'java');
         }
-        return path.join(extractPath, dirName, 'bin', 'java');
+        return path.join(extractPath, dirName, 'bin', 'java'  + (osType === 'windows' ? '.exe' : ''));
     } catch (e) {
         vscode.window.showErrorMessage(failedToDownloadJbr(filePath) + `: ${e}`);
         telemetry.errorReceived('#extractJbr exception');

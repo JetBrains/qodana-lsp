@@ -31,6 +31,8 @@ describe('JBR Downloader', () => {
             await fs.promises.access(javaPath!);
             assert.strictEqual(javaPath!.endsWith('java') || javaPath!.endsWith('java.exe'), true);
         } catch (e) {
+            assert.fail('Failed to download and unpack the JBR');
+        } finally {
             await fs.promises.rm(tempDirName, { recursive: true });
         }
     });
