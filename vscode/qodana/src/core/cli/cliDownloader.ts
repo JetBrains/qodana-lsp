@@ -79,6 +79,9 @@ async function sha256sum(file: string): Promise<string> {
 
 async function computeExtractedCliPath(destPath: string): Promise<string | undefined> {
     let ret = path.join(destPath, EXECUTABLE);
+    if (process.platform === 'win32') {
+        ret += '.exe';
+    }
     try {
         await fs.promises.access(ret);
         return ret;
