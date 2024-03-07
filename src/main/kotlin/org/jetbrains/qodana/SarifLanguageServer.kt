@@ -73,6 +73,20 @@ class SarifLanguageServer: ExtendedLanguageServer, LanguageClientAware {
         return future
     }
 
+    override fun closeReport(): CompletableFuture<Unit> {
+        val future = CompletableFuture<Unit>()
+
+        scope.launch {
+            try {
+                requestChannel.send(CloseReport())
+                future.complete(Unit)
+            } catch (ex: Exception) {
+                future.completeExceptionally(ex)
+            }
+        }
+        return future
+    }
+
     override fun initialize(params: InitializeParams?): CompletableFuture<InitializeResult> {
         logger.info("server/initialize")
         return CompletableFuture.supplyAsync {
@@ -103,6 +117,7 @@ class SarifLanguageServer: ExtendedLanguageServer, LanguageClientAware {
 
     override fun connect(client: LanguageClient?) {
         logger.info("server/connect")
+//        logger.info("$client")
         state.languageClient = client
     }
 

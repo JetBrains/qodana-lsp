@@ -2,7 +2,7 @@ import { LanguageClient, State } from "vscode-languageclient/node";
 import * as vscode from "vscode";
 
 import { Auth } from "../auth";
-import { openReportById, openReportByTimer } from "../report";
+import { openReportById, openReportByProjectId } from "../report";
 import { CLOUD_REPORT_LOADED, SHOW_PROBLEMS } from "../messages";
 import config, {
     CONF_PROJ_ID,
@@ -19,9 +19,9 @@ import { BaselineToggle } from "../menuitems/BaselineToggle";
 
 export function onUrlCallback(context: vscode.ExtensionContext, auth: Auth) {
     Events.instance.onUrlCallback(async (event: UrlCallbackEvent) => {
-        let token = await auth.getTokenToCloud();
-        if (token) {
-            await openReportById(event.projectId, event.reportId, context, token);
+        let authorized = auth.getAuthorized();
+        if (authorized) {
+            await openReportById(event.projectId, event.reportId, context, authorized);
         } else {
             telemetry.errorReceived('#onUrlCallback exception');
         }
@@ -32,9 +32,9 @@ export function onTimerCallback(context: vscode.ExtensionContext, auth: Auth) {
     Events.instance.onTimer(async () => {
         let projectId = vscode.workspace.getConfiguration().get<string>(CONF_PROJ_ID);
         if (projectId) {
-            let token = await auth.getTokenToCloud();
-            if (token) {
-                await openReportByTimer(projectId, context, token);
+            let authorized = auth.getAuthorized();
+            if (authorized) {
+                await openReportByProjectId(projectId, context, authorized);
             } else {
                 telemetry.errorReceived('#onTimerCallback exception');
             }

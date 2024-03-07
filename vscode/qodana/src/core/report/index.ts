@@ -1,27 +1,29 @@
 import * as vscode from "vscode";
 import axios from 'axios';
 import * as fs from 'fs';
-import { failedToObtainData, noReportsFound, failedToObtainReportId, noFilesFound, failedToObtainReport, failedToDownloadReport, projectIdIsNotValid, failedToDownloadReportWithId, YES, NEW_REPORT_AVAILABLE, NO } from "../messages";
-import { apiUrl, isValidString } from "../defaults";
+import { noFilesFound, failedToObtainReport, failedToDownloadReport, failedToDownloadReportWithId, YES, NEW_REPORT_AVAILABLE, NO } from "../messages";
 import telemetry from "../telemetry";
 import { Events } from "../events";
 import { WS_OPENED_REPORT, WS_REPORT_ID } from "../config";
+import {Authorized} from "../auth";
 
-export async function openReportById(projectId: string, reportId: string, context: vscode.ExtensionContext, token: string) {
-    let handlerReportPath = await getReportFileById(context, token, projectId, reportId);
+export async function openReportById(projectId: string, reportId: string, context: vscode.ExtensionContext, authorized: Authorized) {
+    let handlerReportPath = await getReportFileById(context, authorized, projectId, reportId);
     if (handlerReportPath) {
         // no need to ask user confirmation, since it is triggered by URL handler
         await openReportByPath(handlerReportPath, reportId, false, context);
     }
 }
 
-export async function openReportByTimer(projectId: string, context: vscode.ExtensionContext, token: string) {
+export async function openReportByProjectId(projectId: string, context: vscode.ExtensionContext, authorized: Authorized) {
     // need to ask user confirmation if opened report differs from the latest report
-    let latestReportId = await getReportId(token, projectId as string);
+    let latestReportId = await authorized.qodanaCloudUserApi( (api) => {
+        return api.getReportId(projectId as string);
+    });
     if (!latestReportId) {
         return undefined;
     }
-    await openReportById(projectId, latestReportId, context, token);
+    await openReportById(projectId, latestReportId, context, authorized);
 }
 
 export async function openReportByPath(path: string, reportId: string, confirmation: boolean, context: vscode.ExtensionContext) {
@@ -40,67 +42,15 @@ export async function openReportByPath(path: string, reportId: string, confirmat
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
-// fetch the report id using the token
-async function getReportId(token: string, projectId: string): Promise<string | undefined> {
-    if (!isValidString(projectId)) {
-        telemetry.errorReceived('#getReportId invalid project id');
-        vscode.window.showErrorMessage(projectIdIsNotValid(projectId));
-        return undefined;
-    }
-    // get report id from the server
-    let pagination = {
-        offset: 0,
-        limit: 1,
-        states: ''
-    };
-    pagination['states'] = 'UPLOADED,PROCESSED,PINNED';
-    const config = {
-        url: (new URL(`v1/projects/${projectId}/timeline`, apiUrl())).toString(),
-        method: 'get',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-        data: pagination
-    };
-    let res = await axios(config);
-    if (!res.data) {
-        vscode.window.showErrorMessage(failedToObtainData(projectId));
-        telemetry.errorReceived('#getReportId no data');
-        return undefined;
-    }
-    let timeline = res.data as PaginatedResponse<QodanaCloudReportResponse>;
-    if (!timeline.items || timeline.items.length === 0) {
-        vscode.window.showInformationMessage(noReportsFound(projectId));
-        telemetry.errorReceived('#getReportId no reports');
-        return undefined;
-    }
-    return timeline.items[0].reportId;
-}
-
 // fetch the report file to the temporary location
-async function fetchReportFileUrl(token: string, reportId: string, projectId: string): Promise<string | undefined> {
+async function fetchReportFileUrl(authorized: Authorized, reportId: string, projectId: string): Promise<string | undefined> {
     try {
-        if (!isValidString(projectId)) {
-            telemetry.errorReceived('#fetchReportFileUrl invalid project id');
-            vscode.window.showErrorMessage(projectIdIsNotValid(projectId));
+        let files = await authorized.qodanaCloudUserApi((api) => {
+            return api.getReport(reportId, projectId);
+        });
+        if (files === undefined) {
             return undefined;
         }
-        const config = {
-            url: (new URL(`v1/reports/${reportId}/files?${new URLSearchParams({ paths: 'qodana.sarif.json' })}`, apiUrl())).toString(),
-            method: 'get',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        };
-        let res = await axios(config);
-        if (!res.data) {
-            vscode.window.showErrorMessage(failedToObtainReportId(reportId, projectId));
-            telemetry.errorReceived('#fetchReportFileUrl no report id');
-            return undefined;
-        }
-        let files = res.data as Files<QodanaCloudFileResponse>;
         if (files.files.length === 0) {
             vscode.window.showErrorMessage(noFilesFound(reportId, projectId));
             telemetry.errorReceived('#fetchReportFileUrl no files');
@@ -171,7 +121,7 @@ async function fetchReportFile(context: vscode.ExtensionContext, reportId: strin
     }
 }
 
-export async function getReportFileById(context: vscode.ExtensionContext, token: string, projectId: string, reportId: string): Promise<string | undefined> {
+export async function getReportFileById(context: vscode.ExtensionContext, authorized: Authorized, projectId: string, reportId: string): Promise<string | undefined> {
     try {
         // compare with the stored report id
         let storedReportId = context.workspaceState.get(WS_REPORT_ID);
@@ -187,7 +137,7 @@ export async function getReportFileById(context: vscode.ExtensionContext, token:
             }
         }
         // fetch the report file url for the new report id
-        let reportUrl = await fetchReportFileUrl(token, reportId, projectId);
+        let reportUrl = await fetchReportFileUrl(authorized, reportId, projectId);
         if (!reportUrl) {
             return undefined;
         }
@@ -218,23 +168,4 @@ export async function getReportFileById(context: vscode.ExtensionContext, token:
         telemetry.errorReceived('#getReportById exception');
         return undefined;
     }
-}
-
-
-interface PaginatedResponse<T> {
-    items: T[];
-    next: number | null;
-}
-
-interface QodanaCloudReportResponse {
-    reportId: string;
-}
-
-interface Files<T> {
-    files: T[];
-}
-
-interface QodanaCloudFileResponse {
-    file: string;
-    url: string;
 }

@@ -51,6 +51,40 @@
       {
         "command": "qodana.runLocally",
         "title": "Qodana: Run locally"
+      },
+      {
+        "command": "qodana.openLocalReport",
+        "title": "Open Local Report"
+      },
+      {
+        "command": "qodana.login",
+        "title": "Log In to Qodana"
+      },
+      {
+        "command": "qodanaLinkView.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "qodanaLinkView.link",
+        "title": "Link",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "qodanaLinkView.unlink",
+        "title": "Unlink"
+      },
+      {
+        "command": "qodanaLinkView.open-report",
+        "title": "OpenReport"
+      },
+      {
+        "command": "qodanaLinkView.selectNode",
+        "title": "Select node"
+      },
+      {
+        "command": "qodanaTreeNode.other-item",
+        "title": "Link other project2"
       }
     ],
     "walkthroughs": [
@@ -136,7 +170,79 @@
           }
         ]
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "qodanaView",
+          "title": "Qodana",
+          "icon": "media/qodana.svg"
+        }
+      ]
+    },
+    "views": {
+      "qodanaView": [
+        {
+          "id": "qodana.login-view",
+          "name": "",
+          "when": "!qodana.signed-in && !qodana.authorizing"
+        },
+        {
+          "id": "qodana.authorizing-view",
+          "name": "Authorizing",
+          "when": "qodana.authorizing"
+        },
+        {
+          "id": "qodana.link-view",
+          "name": "Link project",
+          "titleActions": ["qodanaLinkView.refresh"],
+          "when": "qodana.signed-in && !qodana.linked"
+        },
+        {
+          "id": "qodana.linked",
+          "name": "Qodana Linked View",
+          "when": "qodana.signed-in && qodana.linked"
+        },
+        {
+          "id": "qodana.settings",
+          "name": "Settings",
+          "when": "qodana.signed-in"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "qodana.login-view",
+        "contents": "Log In to Qodana\n[Log In](command:qodana.login)\n[Qodana Self-Hosted](command:qodana.loginCustomServer)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)"
+      },
+      {
+        "view": "qodana.authorizing-view",
+        "contents": "Authorizing\n[Cancel](command:qodana.cancel-authorization)"
+      },
+      {
+        "view": "qodana.linked",
+        "contents": "[Unlink](command:qodanaLinkView.unlink)\n[Open report](command:qodanaLinkView.open-report)"
+      },
+      {
+        "view": "qodana.settings",
+        "name": "Settings",
+        "contents": "[Log Out](command:qodana.logout)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "qodanaLinkView.refresh",
+          "when": "view == qodana.link-view",
+          "group": "navigation"
+        },
+        {
+          "command": "qodanaLinkView.link",
+          "when": "view == qodana.link-view",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

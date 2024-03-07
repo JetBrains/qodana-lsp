@@ -267,6 +267,16 @@ class CloseFile(private val uri: String): IRequest {
     }
 }
 
+class CloseReport : IRequest {
+    override suspend fun execute(state: SarifLanguageServer.ServerState) {
+        val oldFiles = state.diagnostic?.keys ?: emptyList()
+        state.diagnostic = null
+        for (file in oldFiles) {
+            state.requestChannel.send(AnnounceDiagnostics(file, emptyList()))
+        }
+    }
+}
+
 
 fun getProblems(sarifPath: String): Sequence<Result> = sequence {
     FileReader(sarifPath).use { fileReader ->

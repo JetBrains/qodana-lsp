@@ -6,7 +6,7 @@ import {
 } from "vscode-languageclient/node";
 
 import { getLanguageClient } from "./client";
-import config, { WS_BASELINE_ISSUES } from "./config";
+import config, {WS_BASELINE_ISSUES} from "./config";
 
 
 import { onBaselineStatusChange, onConfigChange, onReportFile, onServerStateChange, onTimerCallback, onUrlCallback } from "./client/activities";
@@ -17,6 +17,10 @@ import { obtainToken } from "./cli/token";
 import { Events } from "./events";
 import { QodanaState } from "./menuitems/QodanaState";
 import { BaselineToggle } from "./menuitems/BaselineToggle";
+import { ProjectsView } from "./ui/projectsView";
+import { LinkService } from "./cloud/link";
+import {openReportByProjectId} from "./report";
+import {LocalRunsService} from "./localRun";
 
 export class QodanaExtension {
     public languageClient?: LanguageClient;
@@ -25,6 +29,7 @@ export class QodanaExtension {
     private static _instance: QodanaExtension;
     private statusIcon: QodanaState = QodanaState.instance;
     private baselineFilterIcon: BaselineToggle = BaselineToggle.instance;
+    private localRunService?: LocalRunsService;
 
     private constructor() {
     }
@@ -45,7 +50,14 @@ export class QodanaExtension {
         if (!this.context) {
             throw new Error("Context is not set");
         }
-        this.auth = new Auth(this.context);
+        this.auth = await Auth.create(this.context);
+
+        this.localRunService = new LocalRunsService(this.context);
+
+        this.initProjectsView();
+        this.initAuthMethods();
+        this.initLinkService();
+
 
         this.languageClient = await getLanguageClient(this.context);
         this.languageClient.onDidChangeState(
@@ -53,7 +65,6 @@ export class QodanaExtension {
                 Events.instance.fireServerStateChange(stateChangeEvent.newState);
             }
         );
-
         this.statusIcon.notAttachedToReport();
         this.baselineFilterIcon.toggle(this.context?.workspaceState.get(WS_BASELINE_ISSUES, false));
 
@@ -68,6 +79,84 @@ export class QodanaExtension {
         onTimerCallback(this.context, this.auth);
         onUrlCallback(this.context, this.auth);
         await this.languageClient.start();
+    }
+
+    initAuthMethods() {
+        if (!this.context) {
+            return;
+        }
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand('qodana.login', async () => {
+                this.auth?.handleUnauthorizedState();
+            })
+        );
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand('qodana.loginCustomServer', async () => {
+                const userInput = await vscode.window.showInputBox({
+                    prompt: "Input Qodana Self-Hosted Url"
+                });
+                if (userInput !== undefined) {
+                    this.auth?.handleUnauthorizedState(userInput);
+                }
+                // todo handle error
+            })
+        );
+
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand('qodana.logout', async () => {
+                await this.closeReport();
+                this.auth?.logOut();
+            })
+        );
+        this.context.subscriptions.push(
+            vscode.commands.registerCommand('qodana.cancel-authorization', async () => {
+                this.auth?.cancelAuthorization();
+            })
+        );
+    }
+
+    initProjectsView() {
+        if (!this.context) {
+            return;
+        }
+        const projectsView = new ProjectsView(async () => {
+            return this.auth?.getProjects();
+        });
+        this.context.subscriptions.push(vscode.window.createTreeView("qodana.link-view", {
+            treeDataProvider: projectsView
+        }));
+
+        vscode.commands.registerCommand('qodanaLinkView.refresh', () => projectsView.refresh());
+    }
+
+    initLinkService() {
+        const linkService = new LinkService(async () => {
+            if (!this.context) {
+                return;
+            }
+            await this.closeReport();
+        });
+
+        vscode.commands.registerCommand('qodanaLinkView.open-report', () => {
+            let projectId = linkService.getLinkedProjectId();
+            if (projectId === undefined || this.languageClient === undefined || this.auth === undefined || this.context === undefined) {
+                return;
+            }
+            let authorized = this.auth.getAuthorized();
+            if (authorized) {
+                openReportByProjectId(projectId, this.context, authorized);
+                vscode.commands.executeCommand("workbench.action.problems.focus");
+            }
+        });
+    }
+
+    async closeReport() {
+        //todo refactor
+        Events.instance.fireReportFile({
+            reportFile: undefined,
+            reportId: undefined
+        });
+        await this.languageClient?.sendRequest("closeReport");
     }
 
     async toggleBaseline() {
