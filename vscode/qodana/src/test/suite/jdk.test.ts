@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 describe('JBR Downloader', () => {
-    var sandbox: sinon.SinonSandbox;
+    let sandbox: sinon.SinonSandbox;
 
     beforeEach(async () => {
         sandbox = sinon.createSandbox();

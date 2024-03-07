@@ -23,7 +23,6 @@ export const SHOW_PROBLEMS = vscode.l10n.t('Show Problems');
 export const YES = vscode.l10n.t('Yes');
 export const NO = vscode.l10n.t('No');
 export const CLOUD_REPORT_LOADED = vscode.l10n.t('[Qodana] Cloud report has been successfully loaded.');
-export const COMPUTING = vscode.l10n.t('[Qodana] Computing prefix...');
 export function computedPrefix(prefix: string|undefined) { return vscode.l10n.t('[Qodana] Computed prefix: {0}.', prefix || 'unknown'); }
 
 // CLIENT
@@ -48,6 +47,7 @@ export const ID_SET = vscode.l10n.t('Set');
 export const ID_CANCEL = vscode.l10n.t('Cancel');
 export const FAILED_PATH_NOT_PRESENT = vscode.l10n.t('[Qodana] Failed to open report. path is missing from URI. Please refer to extension description for guidance.');
 export const FAILED_ID_NOT_PRESENT = vscode.l10n.t('[Qodana] Failed to open report. Project ID is missing from extension settings. Refer to extension description for guidance on how to set it properly.');
+export const FAILED_REPORT_ID_NOT_PRESENT = vscode.l10n.t('[Qodana] Failed to open report. Report ID is missing in the URL.');
 export const FAILED_PREFIX_NOT_SET = vscode.l10n.t('[Qodana] Path prefix is not set in settings. Refer to extension description for guidance on how to set it properly.');
 
 // REPORT
@@ -67,3 +67,45 @@ export function failedToDownloadJbr(jbr: string) { return vscode.l10n.t('[Qodana
 export function failedToExtractJbr(jbr: string) { return vscode.l10n.t('[Qodana] Unable to extract JBR Runtime {0}.', jbr); }
 export const DOWNLOAD_CONFIRMATION = vscode.l10n.t('[Qodana] requires Java 11 or higher to run. Do you want to download and use JetBrains Runtime?');
 export function successfullyExtracted(jbr: string) { return vscode.l10n.t('[Qodana] Extracted JBR Runtime to {0}.', jbr); }
+
+// CLI
+
+export function cliUnsupportedArch(arch: string) { return vscode.l10n.t('[Qodana] Unsupported architecture {0}.', arch); }
+export function cliUnsupportedPlatform(platform: string) { return vscode.l10n.t('[Qodana] Unsupported platform {0}.', platform); }
+export function failedToDownloadCli(cli: string) { return vscode.l10n.t('[Qodana] Unable to download CLI {0}.', cli); }
+export function failedToExtractCli(cli: string) { return vscode.l10n.t('[Qodana] Unable to extract CLI {0}.', cli); }
+export function cliChecksumMismatch(cli: string) { return vscode.l10n.t('[Qodana] Checksum mismatch for CLI {0}.', cli); }
+export function cliSuccessfullyExtracted(cli: string) { return vscode.l10n.t('[Qodana] Extracted CLI to {0}.', cli); }
+export const CLI_DOWNLOAD_CONFIRMATION = vscode.l10n.t('[Qodana] requires CLI to run. Do you want to download and use it?');
+
+// TOKEN
+
+export const GET_TOKEN = vscode.l10n.t('[Qodana] Enter Qodana token.');
+
+// SELECTION 
+
+export const NO_LINTERS_FOUND = vscode.l10n.t('[Qodana] No supported linters found in the workspace.');
+
+// CLI EXECUTION 
+
+export function scanFinished(exitStatus: number| undefined) { 
+    if (exitStatus) { return vscode.l10n.t('[Qodana] Scan finished with exit code {0}.', exitStatus); }
+    return vscode.l10n.t('[Qodana] Scan finished with unknown exit code.');
+}
+export const NO_REPORT_FOUND = vscode.l10n.t('[Qodana] No report found.');
+
+// baseline toggler
+
+export const BL_STATUS_ALL_ISSUES = vscode.l10n.t('$(filter-filled) All issues');
+export const BL_TTIP_ALL_ISSUES = vscode.l10n.t('[Qodana] Baseline issues are shown');
+export const BL_STATUS_NEW_ISSUES = vscode.l10n.t('$(filter) New issues');
+export const BL_TTIP_NEW_ISSUES = vscode.l10n.t('[Qodana] Baseline issues are hidden');
+
+// qodana state
+
+export const QS_STATUS_ATTACHED = vscode.l10n.t('$(eye) Qodana');
+export const QS_TIP_ATTACHED = vscode.l10n.t('Attached to report: ');
+export const QS_STATUS_NOT_ATTACHED = vscode.l10n.t('$(eye-closed) Qodana');
+export const QS_TIP_NOT_ATTACHED = vscode.l10n.t('Not attached to report');
+export const QS_STATUS_SETTINGS_INVALID = vscode.l10n.t('$(gear) Qodana');
+export const QS_TIP_SETTINGS_INVALID = vscode.l10n.t('Settings are not valid');

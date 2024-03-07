@@ -9,6 +9,12 @@ import telemetry from "../telemetry";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
+export const QODANA_TOKEN = 'qodanaToken';
+export const SEC_TOKEN = 'token';
+export const SEC_REFRESH_TOKEN = 'refreshToken';
+export const SEC_EXPIRES = 'expires';
+export const SEC_REFRESH_TOKEN_USED = 'refreshTokenUsed';
+
 export enum AuthState {
     Unauthorized,
     TokenPresent,
@@ -29,10 +35,11 @@ export class Auth {
     }
 
     async resetTokens(): Promise<void> {
-        await this.context.secrets.delete('token');
-        await this.context.secrets.delete('refreshToken');
-        await this.context.secrets.delete('expires');
-        await this.context.secrets.delete('refreshTokenUsed');
+        await this.context.secrets.delete(SEC_TOKEN);
+        await this.context.secrets.delete(SEC_REFRESH_TOKEN);
+        await this.context.secrets.delete(SEC_EXPIRES);
+        await this.context.secrets.delete(SEC_REFRESH_TOKEN_USED);
+        await this.context.secrets.delete(QODANA_TOKEN);
     }
 
     async getTokenToCloud(): Promise<string | undefined> {
@@ -46,7 +53,7 @@ export class Auth {
                 return this.handleTokenExpiredState();
             } else if (authState === AuthState.TokenPresent) {
                 // get data
-                return await this.context.secrets.get('token');
+                return await this.context.secrets.get(SEC_TOKEN);
             }
         } catch (error) {
             vscode.window.showErrorMessage(`${FAILED_TO_AUTHENTICATE} ${error}`);
@@ -56,14 +63,13 @@ export class Auth {
     }
 
     async getAuthState(): Promise<AuthState> {
-        const token = await this.context.secrets.get('token');
-        const refreshToken = await this.context.secrets.get('refreshToken');
-        const refreshTokenUsed = await this.context.secrets.get('refreshTokenUsed');
-        const expires = await this.context.secrets.get('expires');
+        const token = await this.context.secrets.get(SEC_TOKEN);
+        const refreshToken = await this.context.secrets.get(SEC_REFRESH_TOKEN);
+        const refreshTokenUsed = await this.context.secrets.get(SEC_REFRESH_TOKEN_USED);
+        const expires = await this.context.secrets.get(SEC_EXPIRES);
         if (!token || !refreshToken || !expires) {
             return AuthState.Unauthorized;
         }
-        // need to compare expires with current time
         let now = new Date();
         let expiresDate = new Date(expires);
         if (now > expiresDate) {
@@ -104,7 +110,7 @@ export class Auth {
     }
 
     async handleTokenExpiredState(): Promise<string | undefined> {
-        let refreshToken = await this.context.secrets.get('refreshToken');
+        let refreshToken = await this.context.secrets.get(SEC_REFRESH_TOKEN);
         let auth = await this.requestToken(
             new URL('v1/idea/auth/refresh/', apiUrl()).toString(), 
             null, 
@@ -114,7 +120,7 @@ export class Auth {
             telemetry.errorReceived('#handleTokenExpiredState no auth');
             return undefined;
         }
-        await this.context.secrets.store('refreshTokenUsed', 'true');
+        await this.context.secrets.store(SEC_REFRESH_TOKEN_USED, 'true');
         await this.storeAuthTokens(auth);
         return auth.access;
     }
@@ -135,10 +141,10 @@ export class Auth {
     }
 
     async storeAuthTokens(auth: AuthorizationResponseData) {
-        await this.context.secrets.store('token', auth.access);
-        await this.context.secrets.store('refreshToken', auth.refresh);
-        await this.context.secrets.store('expires', auth.expires_at);
-        await this.context.secrets.store('refreshTokenUsed', 'false');
+        await this.context.secrets.store(SEC_TOKEN, auth.access);
+        await this.context.secrets.store(SEC_REFRESH_TOKEN, auth.refresh);
+        await this.context.secrets.store(SEC_EXPIRES, auth.expires_at);
+        await this.context.secrets.store(SEC_REFRESH_TOKEN_USED, 'false');
     }
 
     async getCodeFromOAuth(): Promise<String | undefined> {

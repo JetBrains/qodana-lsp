@@ -6,21 +6,25 @@ import {
 } from "vscode-languageclient/node";
 
 import { getLanguageClient } from "./client";
-import config from "./config";
+import config, { WS_BASELINE_ISSUES } from "./config";
 
 
-import { SetSarifFileParams, announceSarifFile, openReportOnce } from "./client/activities";
+import { onBaselineStatusChange, onConfigChange, onReportFile, onServerStateChange, onTimerCallback, onUrlCallback } from "./client/activities";
 import { Auth } from './auth';
+import { runQodana, showLocalReport } from "./cli/executor";
+import { getCli } from "./cli/cliDownloader";
+import { obtainToken } from "./cli/token";
+import { Events } from "./events";
+import { QodanaState } from "./menuitems/QodanaState";
+import { BaselineToggle } from "./menuitems/BaselineToggle";
 
 export class QodanaExtension {
     public languageClient?: LanguageClient;
     private context?: vscode.ExtensionContext;
-    private recurringTimer?: NodeJS.Timer;
-    private qodanaStateBarItem?: vscode.StatusBarItem;
-    private baselineTogglerBarItem?: vscode.StatusBarItem;
     private auth?: Auth;
-    private warningBg = new vscode.ThemeColor('statusBarItem.warningBackground');
     private static _instance: QodanaExtension;
+    private statusIcon: QodanaState = QodanaState.instance;
+    private baselineFilterIcon: BaselineToggle = BaselineToggle.instance;
 
     private constructor() {
     }
@@ -46,118 +50,37 @@ export class QodanaExtension {
         this.languageClient = await getLanguageClient(this.context);
         this.languageClient.onDidChangeState(
             async (stateChangeEvent) => {
-                if (stateChangeEvent.newState === State.Running && this.context && this.languageClient && this.auth) {
-                    await this.context.workspaceState.update('openedreport', null);
-                    this.recurringTimer = await announceSarifFile(this.languageClient, this.context, this.auth);
-                    this.attachedToReport(this.context.workspaceState.get('reportId'));
-                } else if (stateChangeEvent.newState === State.Stopped && this.context) {
-                    this.recurringTimer && clearInterval(this.recurringTimer);
-                    await this.context.workspaceState.update('openedreport', null);
-                    this.notAttachedToReport();
-                }
+                Events.instance.fireServerStateChange(stateChangeEvent.newState);
             }
         );
 
+        this.statusIcon.notAttachedToReport();
+        this.baselineFilterIcon.toggle(this.context?.workspaceState.get(WS_BASELINE_ISSUES, false));
 
-        // create icon in the status bar
-        this.qodanaStateBarItem = this.createQodanaStateBarItem();
-        this.qodanaStateBarItem.show();
-        this.notAttachedToReport();
-
-        // create baseline toggler in the status bar
-        this.baselineTogglerBarItem = this.createBaselineTogglerBarItem();
-        this.baselineTogglerBarItem.show();
-        this.applyBaselineTogglerBarItemStatus();
-
-        if (await config.configIsValid(this.context, true)) {
-            await this.languageClient.start();
-        } else {
-            this.settingsNotValid();
+        if (!await config.configIsValid(this.context, true)) {
+            this.statusIcon.settingsNotValid();
         }
         config.sectionChangeHandler(this.languageClient, this.context);
-    }
-
-    attachedToReport(reportId: string | undefined) {
-        if (!this.qodanaStateBarItem) {
-            return;
-        }
-        this.qodanaStateBarItem.text = '$(eye) Qodana';
-        this.qodanaStateBarItem.command = 'qodana.toggleQodana';
-        this.qodanaStateBarItem.tooltip = 'Attached to report: ' + reportId;
-        this.qodanaStateBarItem.backgroundColor = undefined;
-    }
-
-    private notAttachedToReport() {
-        if (!this.qodanaStateBarItem) {
-            return;
-        }
-        this.qodanaStateBarItem.text = '$(eye-closed) Qodana';
-        this.qodanaStateBarItem.tooltip = 'Not attached to report';
-        this.qodanaStateBarItem.command = 'qodana.toggleQodana';
-        this.qodanaStateBarItem.backgroundColor = this.warningBg;
-    }
-
-    private settingsNotValid() {
-        if (!this.qodanaStateBarItem) {
-            return;
-        }
-        this.qodanaStateBarItem.text = '$(gear) Qodana';
-        this.qodanaStateBarItem.tooltip = 'Settings are not valid';
-        this.qodanaStateBarItem.command = 'qodana.openWorkspaceSettings';
-        this.qodanaStateBarItem.backgroundColor = undefined;
-    }
-
-    private createQodanaStateBarItem(): vscode.StatusBarItem {
-        return vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-    }
-
-    private createBaselineTogglerBarItem(): vscode.StatusBarItem {
-        return vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
-    }
-
-    private applyBaselineTogglerBarItemStatus() {
-        if (!this.baselineTogglerBarItem) {
-            return;
-        }
-        let showBaselineIssues = this.context?.workspaceState.get('baselineIssues', false);
-        if (showBaselineIssues) {
-            this.baselineTogglerBarItem.text = '$(filter-filled) All issues';
-            this.baselineTogglerBarItem.tooltip = '[Qodana] Baseline issues are shown';
-        } else {
-            this.baselineTogglerBarItem.text = '$(filter) New issues';
-            this.baselineTogglerBarItem.tooltip = '[Qodana] Baseline issues are hidden';
-        }
-        this.baselineTogglerBarItem.command = 'qodana.toggleBaseline';
+        onReportFile(this.languageClient, this.context);
+        onServerStateChange(this.context);
+        onBaselineStatusChange(this.languageClient, this.context);
+        onConfigChange(this.languageClient, this.context);
+        onTimerCallback(this.context, this.auth);
+        onUrlCallback(this.context, this.auth);
+        await this.languageClient.start();
     }
 
     async toggleBaseline() {
-        if (!this.context) {
-            return;
-        }
-        await this.context.workspaceState.update('baselineIssues', !this.context.workspaceState.get('baselineIssues', false));
-        this.applyBaselineTogglerBarItemStatus();
-        if (this.languageClient) {
-            if (this.languageClient.state === State.Running) {
-                let reportPath = this.context.workspaceState.get<string | undefined>('openedreport', undefined);
-                if (!reportPath) {
-                    return;
-                }
-                let sarifParams: SetSarifFileParams = {
-                    path: reportPath,
-                    showBaselineIssues: this.context.workspaceState.get('baselineIssues', false)
-                };
-                await this.languageClient.sendRequest("setSarifFile", sarifParams);
-            }
-        }
+        Events.instance.fireBaselineChange();
     }
 
     async toggleQodana() {
         if (this.languageClient) {
             if (this.languageClient.state === State.Running) {
-                await this.languageClient.stop().catch(() => {
+                await this.languageClient.stop(10).catch(() => {
                     // ignore
                 });
-            } else if (await config.configIsValid(this.context as vscode.ExtensionContext, false)) {
+            } else {
                 await this.languageClient.start().catch(() => {
                     // ignore
                 });
@@ -167,28 +90,24 @@ export class QodanaExtension {
 
     async resetToken() {
         if (this.languageClient && this.auth) {
-            if (this.languageClient.state === State.Running) {
-                await this.languageClient.stop().catch(() => {
-                    // ignore
-                });
-                await this.auth.resetTokens();
-            } else {
-                await this.auth.resetTokens();
-            }
+            await this.auth.resetTokens();
         }
     }
 
     async resetAllSettings() {
         await config.resetSettings(this.context as vscode.ExtensionContext);
         await this.resetToken();
-        this.settingsNotValid();
-        this.applyBaselineTogglerBarItemStatus();
+        this.statusIcon.settingsNotValid();
+        Events.instance.fireBaselineChange();
     }
 
-    openFreshReport() {
-        openReportOnce(this.languageClient as LanguageClient, this.context as vscode.ExtensionContext, this.auth as Auth).then(() => {
-            // ignore
-        });
+    async localRun() {
+        let cli = await getCli(this.context as vscode.ExtensionContext);
+        if (cli && this.context) {
+            let token = await obtainToken(this.context as vscode.ExtensionContext);
+            let tempDir = await runQodana(cli, token);
+            await showLocalReport(this.context, tempDir);
+        }
     }
 }
 

@@ -54,6 +54,15 @@ export async function activate(context: vscode.ExtensionContext) {
 		await extensionInstance.toggleBaseline();
 	}));
 
+	// add command to run qodana locally
+	context.subscriptions.push(vscode.commands.registerCommand('qodana.runLocally', async () => {
+		if (!extensionInstance) {
+			return;
+		}
+		telemetry.localRunRequested();
+		await extensionInstance.localRun();
+	}));
+
 	// remove settings if the extension is uninstalled
 	context.subscriptions.push(vscode.extensions.onDidChange(async () => {
 		if (!extensionInstance) {

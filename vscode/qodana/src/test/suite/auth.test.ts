@@ -2,14 +2,14 @@ import * as assert from 'assert';
 
 import * as vscode from 'vscode';
 import * as sinon from 'sinon';
-import { Auth, AuthState } from '../../core/auth';
+import {Auth, AuthState, SEC_EXPIRES, SEC_REFRESH_TOKEN, SEC_REFRESH_TOKEN_USED, SEC_TOKEN} from '../../core/auth';
 import { FAILED_TO_AUTHENTICATE, PROCEED } from '../../core/messages';
 import axios from 'axios';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
-describe('Authentification Test Suite', () => {
-    var sandbox: sinon.SinonSandbox;
+describe('Authentication Test Suite', () => {
+    let sandbox: sinon.SinonSandbox;
     let auth: Auth;
     let context: vscode.ExtensionContext;
     let secretStorage: vscode.SecretStorage;
@@ -46,10 +46,10 @@ describe('Authentification Test Suite', () => {
         it('should return TokenExpired if the token expiration time has passed and refresh token has not been used', async function () {
             const pastDate = new Date();
             pastDate.setFullYear(pastDate.getFullYear() - 1);
-            map.set('expires', pastDate.toString());
-            map.set('refreshTokenUsed', 'false');
-            map.set('token', 'any');
-            map.set('refreshToken', 'any');
+            map.set(SEC_EXPIRES, pastDate.toString());
+            map.set(SEC_REFRESH_TOKEN_USED, 'false');
+            map.set(SEC_TOKEN, 'any');
+            map.set(SEC_REFRESH_TOKEN, 'any');
             const result = await auth.getAuthState();
             assert.strictEqual(result, AuthState.TokenExpired);
         });
@@ -57,10 +57,10 @@ describe('Authentification Test Suite', () => {
         it('should return TokenPresent if all conditions are valid and refresh token has not been used', async function () {
             const futureDate = new Date();
             futureDate.setFullYear(futureDate.getFullYear() + 1); // Set expires to be 1 year from now
-            map.set('expires', futureDate.toString());
-            map.set('refreshTokenUsed', 'false');
-            map.set('token', 'any');
-            map.set('refreshToken', 'any');
+            map.set(SEC_EXPIRES, futureDate.toString());
+            map.set(SEC_REFRESH_TOKEN_USED, 'false');
+            map.set(SEC_TOKEN, 'any');
+            map.set(SEC_REFRESH_TOKEN, 'any');
             const result = await auth.getAuthState();
             assert.strictEqual(result, AuthState.TokenPresent);
         });
@@ -68,10 +68,10 @@ describe('Authentification Test Suite', () => {
         it('should return TokenPresent when refreshTokenUsed is true, but expiration time has not passed', async function () {
             const futureDate = new Date();
             futureDate.setFullYear(futureDate.getFullYear() + 1);
-            map.set('expires', futureDate.toString());
-            map.set('refreshTokenUsed', 'true');
-            map.set('token', 'any');
-            map.set('refreshToken', 'any');
+            map.set(SEC_EXPIRES, futureDate.toString());
+            map.set(SEC_REFRESH_TOKEN_USED, 'true');
+            map.set(SEC_TOKEN, 'any');
+            map.set(SEC_REFRESH_TOKEN, 'any');
             const result = await auth.getAuthState();
             assert.strictEqual(result, AuthState.TokenPresent);
         });
@@ -81,11 +81,11 @@ describe('Authentification Test Suite', () => {
         it('should call delete method for each token', async function () {
             await auth.resetTokens();
             let stub = context.secrets.delete as sinon.SinonStub;
-            assert.strictEqual(stub.callCount, 4);
-            assert.strictEqual(stub.calledWith('token'), true);
-            assert.strictEqual(stub.calledWith('refreshToken'), true);
-            assert.strictEqual(stub.calledWith('expires'), true);
-            assert.strictEqual(stub.calledWith('refreshTokenUsed'), true);
+            assert.strictEqual(stub.callCount, 5);
+            assert.strictEqual(stub.calledWith(SEC_TOKEN), true);
+            assert.strictEqual(stub.calledWith(SEC_REFRESH_TOKEN), true);
+            assert.strictEqual(stub.calledWith(SEC_EXPIRES), true);
+            assert.strictEqual(stub.calledWith(SEC_REFRESH_TOKEN_USED), true);
         });
     });
 
@@ -98,17 +98,17 @@ describe('Authentification Test Suite', () => {
             };
 
             await auth.storeAuthTokens(tokenData);
-            assert.strictEqual(map.get('token'), 'access');
-            assert.strictEqual(map.get('refreshToken'), 'refresh');
-            assert.strictEqual(map.get('expires'), 'expires_at');
-            assert.strictEqual(map.get('refreshTokenUsed'), 'false');
+            assert.strictEqual(map.get(SEC_TOKEN), 'access');
+            assert.strictEqual(map.get(SEC_REFRESH_TOKEN), 'refresh');
+            assert.strictEqual(map.get(SEC_EXPIRES), 'expires_at');
+            assert.strictEqual(map.get(SEC_REFRESH_TOKEN_USED), 'false');
         });
     });
 
     describe('#getTokenToCloud()', function () {
         it('should return token when AuthState is TokenPresent', async function () {
             sandbox.stub(auth, 'getAuthState').resolves(AuthState.TokenPresent);
-            map.set('token', 'token');
+            map.set(SEC_TOKEN, 'token');
 
             const token = await auth.getTokenToCloud();
             assert.strictEqual(token, 'token');
@@ -168,21 +168,9 @@ describe('Authentification Test Suite', () => {
             });
             let token = await auth.getTokenToCloud();
             assert.strictEqual(token, 'freshToken');
-            assert.strictEqual(map.get('token'), 'freshToken');
-            assert.strictEqual(map.get('refreshToken'), 'freshRefreshToken');
-            assert.strictEqual(map.get('expires'), '2021-01-01T00:00:00Z');
+            assert.strictEqual(map.get(SEC_TOKEN), 'freshToken');
+            assert.strictEqual(map.get(SEC_REFRESH_TOKEN), 'freshRefreshToken');
+            assert.strictEqual(map.get(SEC_EXPIRES), '2021-01-01T00:00:00Z');
         });
     });
-
-    async function getContext() {
-        let ext = vscode.extensions.getExtension('jetbrains.qodana-code');
-        if (!ext) {
-            assert.fail('Extension is not present');
-        }
-        let ctx = (await ext.activate()) as vscode.ExtensionContext;
-        if (!ctx) {
-            assert.fail('Context is not present');
-        }
-        return ctx;
-    }
 });

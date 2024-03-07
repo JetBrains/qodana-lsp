@@ -1,9 +1,42 @@
 import * as vscode from "vscode";
 import axios from 'axios';
 import * as fs from 'fs';
-import { failedToObtainData, noReportsFound, failedToObtainReportId, noFilesFound, failedToObtainReport, failedToDownloadReport, projectIdIsNotValid, failedToDownloadReportWithId } from "../messages";
+import { failedToObtainData, noReportsFound, failedToObtainReportId, noFilesFound, failedToObtainReport, failedToDownloadReport, projectIdIsNotValid, failedToDownloadReportWithId, YES, NEW_REPORT_AVAILABLE, NO } from "../messages";
 import { apiUrl, isValidString } from "../defaults";
 import telemetry from "../telemetry";
+import { Events } from "../events";
+import { WS_OPENED_REPORT, WS_REPORT_ID } from "../config";
+
+export async function openReportById(projectId: string, reportId: string, context: vscode.ExtensionContext, token: string) {
+    let handlerReportPath = await getReportFileById(context, token, projectId, reportId);
+    if (handlerReportPath) {
+        // no need to ask user confirmation, since it is triggered by URL handler
+        await openReportByPath(handlerReportPath, reportId, false, context);
+    }
+}
+
+export async function openReportByTimer(projectId: string, context: vscode.ExtensionContext, token: string) {
+    // need to ask user confirmation if opened report differs from the latest report
+    let latestReportId = await getReportId(token, projectId as string);
+    if (!latestReportId) {
+        return undefined;
+    }
+    await openReportById(projectId, latestReportId, context, token);
+}
+
+export async function openReportByPath(path: string, reportId: string, confirmation: boolean, context: vscode.ExtensionContext) {
+    let openedReport = context.workspaceState.get(WS_OPENED_REPORT);
+    if (!openedReport || openedReport !== path) {
+        // no report opened or different report opened
+        if (confirmation && openedReport) {
+            let answer = await vscode.window.showInformationMessage(NEW_REPORT_AVAILABLE, YES, NO);
+            if (answer !== YES) {
+                return;
+            }
+        }
+        Events.instance.fireReportFile({ reportFile: path, reportId: reportId });
+    }
+}
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -141,7 +174,7 @@ async function fetchReportFile(context: vscode.ExtensionContext, reportId: strin
 export async function getReportFileById(context: vscode.ExtensionContext, token: string, projectId: string, reportId: string): Promise<string | undefined> {
     try {
         // compare with the stored report id
-        let storedReportId = context.workspaceState.get('reportId');
+        let storedReportId = context.workspaceState.get(WS_REPORT_ID);
         if (storedReportId === reportId) {
             // return the stored file path
             let path = await reportPath(context, reportId);
@@ -165,7 +198,7 @@ export async function getReportFileById(context: vscode.ExtensionContext, token:
             return undefined;
         }
         // store the report id 
-        await context.workspaceState.update('reportId', reportId);
+        await context.workspaceState.update(WS_REPORT_ID, reportId);
         if (storedReportId) {
             // remove old report
             let storedReportPath = await reportPath(context, storedReportId as string);
@@ -183,41 +216,6 @@ export async function getReportFileById(context: vscode.ExtensionContext, token:
     } catch (e) {
         vscode.window.showErrorMessage(failedToDownloadReportWithId(projectId, reportId) + `: ${e}`);
         telemetry.errorReceived('#getReportById exception');
-        return undefined;
-    }
-}
-
-export async function getReportFile(context: vscode.ExtensionContext, token: string): Promise<string | undefined> {
-    // get project id from plugin settings
-    let projectId = vscode.workspace.getConfiguration().get('qodana.projectId');
-    if (!projectId) {
-        // should not happen
-        return undefined;
-    }
-    try {
-        let reportIdFromHandler = context.workspaceState.get<string | undefined>('handlerReportId');
-        if (reportIdFromHandler) {
-            // opening such a report should be a one time action
-            // it could be postponed (due to accepting the project id or auth, so we do in-place check here)
-            await context.workspaceState.update('handlerReportId', undefined);
-            let handlerReportPath = await getReportFileById(context, token, projectId as string, reportIdFromHandler);
-            if (handlerReportPath) {
-                if (context.workspaceState.get('openedreport') !== handlerReportPath) {
-                    // we need to remove openedreport from workspace state, so that report gets opened immediately
-                    await context.workspaceState.update('openedreport', undefined);
-                }
-                return handlerReportPath;
-            }
-            // probably wrong report id, try to get the latest report id
-        }
-        let latestReportId = await getReportId(token, projectId as string);
-        if (!latestReportId) {
-            return undefined;
-        }
-        return getReportFileById(context, token, projectId as string, latestReportId);
-    } catch (e) {
-        vscode.window.showErrorMessage(failedToDownloadReport(projectId as string) + `: ${e}`);
-        telemetry.errorReceived('#getReportFile exception');
         return undefined;
     }
 }

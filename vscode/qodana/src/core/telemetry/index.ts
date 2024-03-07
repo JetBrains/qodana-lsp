@@ -29,6 +29,8 @@ class TelemetryEvents {
         ISSUES_TOGGLED: 'issuesToggled',
         BASELINE_TOGGLED: 'baselineToggled',
         JBR_DOWNLOADED: 'jbrDownloaded',
+        CLI_DOWNLOADED: 'cliDownloaded',
+        LOCAL_RUN_REQUESTED: 'localRunRequested',
     };
 
     extensionStarted(context: vscode.ExtensionContext) {
@@ -66,6 +68,14 @@ class TelemetryEvents {
 
     jbrDownloaded() {
         this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.JBR_DOWNLOADED);
+    }
+
+    cliDownloaded() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.CLI_DOWNLOADED);
+    }
+
+    localRunRequested() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.LOCAL_RUN_REQUESTED);
     }
 
     errorReceived(error: string) {
