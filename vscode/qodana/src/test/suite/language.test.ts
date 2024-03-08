@@ -26,11 +26,11 @@ describe('Language/Linter Selection Tests', () => {
 
     it('1: getLanguagesInWorkspace should return correct languages', async () => {
         const langs = await getLanguagesInWorkspace();
-        assert.ok(setsAreEqual(langs, new Set(['Java', 'Kotlin', 'Python'])));
+        assert.ok(arraysAreEqual(langs, ['Java', 'Kotlin', 'Python']));
     });
 
     it('2: getLinters should segregate community and paid linters', () => {
-        const testLangs = new Set<string>(['Java', 'TypeScript']);
+        const testLangs = ['Java', 'TypeScript'];
         const { communityLinters, paidLinters } = getLinters(testLangs);
         assert.ok(arraysAreEqual(communityLinters, ['QDJVMC', 'QDANDC']));
         assert.ok(arraysAreEqual(paidLinters, ['QDJVM', 'QDJS']), paidLinters.toString());
@@ -87,14 +87,6 @@ describe('Language/Linter Selection Tests', () => {
         assert.equal(result, 'QDJVM');
         assert.equal(choiceStub.called, true);
     });
-
-    function setsAreEqual<T>(set1: Set<T>, set2: Set<T>): boolean {
-        if (set1.size !== set2.size) { return false; }
-        for (const item of set1) {
-            if (!set2.has(item)) { return false; }
-        }
-        return true;
-    }
 
     function arraysAreEqual<T>(arr1: T[], arr2: T[]): boolean {
         if (arr1.length !== arr2.length) { return false; }

@@ -47,22 +47,27 @@ productCodeToDockerImageMap.set('QDJVMC', 'jetbrains/qodana-jvm-community:');
 const versionPrefix = 'latest';
 
 export async function getLanguagesInWorkspace() {
-    const langs = new Set<string>();
-
+    const langsAndCounts = new Map<string, number>();
     const files = await vscode.workspace.findFiles('**/*.*', '', 1000);
     files.forEach(file => {
         const extension = vscode.workspace.asRelativePath(file).split('.').pop();
         if (extension) {
             let language = extensionToLanguageMap.get(extension);
             if (language) {
-                language.forEach(lang => langs.add(lang));
+                language.forEach(lang => {
+                    langsAndCounts.set(lang, (langsAndCounts.get(lang) || 0) + 1);
+                });
             }
         }
     });
-    return langs;
+    // sort by count and return only the list of languages
+    langsAndCounts[Symbol.iterator] = function* () {
+        yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
+    };
+    return Array.from(langsAndCounts.keys());
 }
 
-export function getLinters(langs: Set<string>): { communityLinters: string[]; paidLinters: string[] }{
+export function getLinters(langs: string[]): { communityLinters: string[]; paidLinters: string[] }{
     const linters = new Set<string>();
     for (const lang of langs) {
         if (languageToProductCodeMap.has(lang)) {
@@ -103,12 +108,9 @@ export async function selectLinter(token: string | undefined, communityLinters: 
         let language = Array.from(languageToProductCodeMap.keys()).find(key => languageToProductCodeMap.get(key)?.includes(linter));
         let isCommunity = communityLinters.includes(linter);
         let communityPrefix = isCommunity ? 'Community ' : '';
-        return `${linter} (${communityPrefix}${language})`;
+        return {label: linter, description: `${linter} (${communityPrefix}${language})`};
     });
 
-    let choice = await vscode.window.showInformationMessage('Choose a linter', ...choices);
-    if (choice === undefined) {
-        return undefined;
-    }
-    return allLinters[choices.indexOf(choice)];
+    let choice = await vscode.window.showQuickPick(choices, {placeHolder: 'Select a linter'});
+    return choice?.label;
 }

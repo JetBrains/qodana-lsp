@@ -19,6 +19,7 @@ export async function showLocalReport(context: vscode.ExtensionContext, reportBa
         await context.workspaceState.update(WS_REPORT_ID, LOCAL_REPORT);
         Events.instance.fireReportFile({ reportFile: reportPath, reportId: LOCAL_REPORT});
     } catch (e) {
+        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(reportBasePath), true);
         vscode.window.showInformationMessage(NO_REPORT_FOUND);
     }
 }

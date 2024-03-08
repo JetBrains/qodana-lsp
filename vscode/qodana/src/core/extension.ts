@@ -82,23 +82,42 @@ export class QodanaExtension {
             reportFile: undefined,
             reportId: undefined
         });
-        await this.languageClient?.sendRequest("closeReport");
+        await this.restartLanguageServer();
     }
 
     async toggleBaseline() {
         Events.instance.fireBaselineChange();
     }
 
+    async restartLanguageServer() {
+        if (this.languageClient && this.languageClient.isRunning()) {
+            let client = this.languageClient;
+            return new Promise(resolve => {
+                let dispose = client.onDidChangeState(
+                    async (stateChangeEvent) => {
+                        if (stateChangeEvent.oldState === State.Starting && stateChangeEvent.newState === State.Running) {
+                            dispose.dispose();
+                            resolve(true);
+                        }
+                    }
+                );
+                client.restart();
+            });
+        }
+    }
+
     async toggleQodana() {
         if (this.languageClient) {
-            if (this.languageClient.state === State.Running) {
-                await this.languageClient.stop(10).catch(() => {
+            if (this.languageClient.isRunning()) {
+                await this.languageClient.stop().catch(() => {
                     // ignore
                 });
             } else {
-                await this.languageClient.start().catch(() => {
-                    // ignore
-                });
+                if (this.languageClient.state === State.Stopped) {
+                    await this.languageClient.start().catch(() => {
+                        // ignore
+                    });
+                }
             }
         }
     };
