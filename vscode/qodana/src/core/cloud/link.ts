@@ -4,8 +4,10 @@ import {CONF_PROJ_ID} from "../config";
 export class LinkService {
     private likedProjectId: string | undefined;
     private isLinked: boolean = false;
+    private readonly closeReport: () => void;
 
-    constructor() {
+    constructor(closeReport: () => void) {
+        this.closeReport = closeReport;
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration('qodana')) {
                 this.selectAndLink();
@@ -37,7 +39,7 @@ export class LinkService {
     unlinkProject() {
         this.isLinked = false;
         vscode.commands.executeCommand("setContext", "qodana.linked", false);
-        vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Workspace);
+        this.closeReport();
     }
 
     getLinkedProjectId(): string | undefined {

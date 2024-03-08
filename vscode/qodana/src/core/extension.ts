@@ -9,7 +9,15 @@ import { getLanguageClient } from "./client";
 import config, {WS_BASELINE_ISSUES} from "./config";
 
 
-import { onBaselineStatusChange, onConfigChange, onReportFile, onServerStateChange, onTimerCallback, onUrlCallback } from "./client/activities";
+import {
+    onBaselineStatusChange,
+    onConfigChange, onReportClosed,
+    onReportFile,
+    onReportOpened,
+    onServerStateChange,
+    onTimerCallback,
+    onUrlCallback
+} from "./client/activities";
 import { Auth } from './auth';
 import { runQodana, showLocalReport } from "./cli/executor";
 import { getCli } from "./cli/cliDownloader";
@@ -51,7 +59,7 @@ export class QodanaExtension {
         }
         this.auth = await Auth.create(this.context);
 
-        this.linkService = new LinkService();
+        this.linkService = new LinkService(() => this.closeReport());
         this.localRunService = new LocalRunsService(this.context);
 
         this.languageClient = await getLanguageClient(this.context);
@@ -73,16 +81,9 @@ export class QodanaExtension {
         onConfigChange(this.languageClient, this.context);
         onTimerCallback(this.context, this.auth);
         onUrlCallback(this.context, this.auth);
+        onReportOpened();
+        onReportClosed();
         await this.languageClient.start();
-    }
-
-    async closeReport() {
-        //todo refactor
-        Events.instance.fireReportFile({
-            reportFile: undefined,
-            reportId: undefined
-        });
-        await this.restartLanguageServer();
     }
 
     async toggleBaseline() {
@@ -104,6 +105,16 @@ export class QodanaExtension {
                 client.restart();
             });
         }
+    }
+
+    async closeReport() {
+        //todo refactor
+        Events.instance.fireReportFile({
+            reportFile: undefined,
+            reportId: undefined
+        });
+        Events.instance.fireReportClosed();
+        await this.restartLanguageServer();
     }
 
     async toggleQodana() {

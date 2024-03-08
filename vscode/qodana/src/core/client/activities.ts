@@ -123,6 +123,18 @@ export async function sendReportToLanguageClient(client: LanguageClient, context
     });
 }
 
+export function onReportClosed() {
+    Events.instance.onReportClosed(() => {
+        vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Workspace);
+        vscode.commands.executeCommand("setContext", "qodana.report-opened", false);
+    });
+}
+export function onReportOpened() {
+    Events.instance.onReportOpened(() => {
+        vscode.commands.executeCommand("setContext", "qodana.report-opened", true);
+    });
+}
+
 export interface SetSourceLocationParams {
     path: string;
 }

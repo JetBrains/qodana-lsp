@@ -185,7 +185,12 @@
         {
           "id": "qodana.login-view",
           "name": "",
-          "when": "!qodana.signed-in && !qodana.authorizing"
+          "when": "!qodana.signed-in && !qodana.authorizing && !qodana.report-opened"
+        },
+        {
+          "id": "qodana.login-view-report-opened",
+          "name": "",
+          "when": "!qodana.signed-in && !qodana.authorizing && qodana.report-opened"
         },
         {
           "id": "qodana.authorizing-view",
@@ -206,7 +211,12 @@
         {
           "id": "qodana.settings",
           "name": "Settings",
-          "when": "qodana.signed-in"
+          "when": "qodana.signed-in && !qodana.report-opened"
+        },
+        {
+          "id": "qodana.settings-report-opened",
+          "name": "Settings",
+          "when": "qodana.signed-in && qodana.report-opened"
         }
       ]
     },
@@ -214,6 +224,10 @@
       {
         "view": "qodana.login-view",
         "contents": "Log In to Qodana\n[Log In](command:qodana.login)\n[Qodana Self-Hosted](command:qodana.loginCustomServer)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)"
+      },
+      {
+        "view": "qodana.login-view-report-opened",
+        "contents": "Log In to Qodana\n[Log In](command:qodana.login)\n[Qodana Self-Hosted](command:qodana.loginCustomServer)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)\n[Close Report](command:qodana.closeReport)"
       },
       {
         "view": "qodana.authorizing-view",
@@ -227,6 +241,11 @@
         "view": "qodana.settings",
         "name": "Settings",
         "contents": "[Log Out](command:qodana.logout)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)"
+      },
+      {
+        "view": "qodana.settings-report-opened",
+        "name": "Settings",
+        "contents": "[Log Out](command:qodana.logout)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)\n[Close Report](command:qodana.closeReport)"
       }
     ],
     "menus": {

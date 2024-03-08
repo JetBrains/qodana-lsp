@@ -26,7 +26,8 @@ export class LocalRunsService {
     openLocalReportAction() {
         vscode.window.showQuickPick([... this.localReports]).then(async (selection) => {
             if (selection) {
-                await showLocalReport(this.context, selection.path);
+                let path = selection.path.replace("qodana.sarif.json", "");
+                await showLocalReport(this.context, path);
             }
         });
     }

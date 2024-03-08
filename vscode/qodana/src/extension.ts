@@ -194,6 +194,11 @@ function initLocalRunService(context: vscode.ExtensionContext) {
 			extensionInstance.localRunService?.openLocalReportAction();
 		})
 	);
+	context.subscriptions.push(
+		vscode.commands.registerCommand("qodana.closeReport", async () => {
+			await extensionInstance.closeReport();
+		})
+	);
 }
 
 // This method is called when your extension is deactivated
