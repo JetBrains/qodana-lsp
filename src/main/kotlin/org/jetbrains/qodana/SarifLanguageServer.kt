@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.merge
 import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Path
+import java.util.concurrent.ConcurrentHashMap
 
 @OptIn(FlowPreview::class)
 class SarifLanguageServer: ExtendedLanguageServer, LanguageClientAware {
@@ -136,7 +137,7 @@ class SarifLanguageServer: ExtendedLanguageServer, LanguageClientAware {
                            var sarifRevision: Lazy<String?>? = null,
                            var repoFolder: Path? = null,
                            var gitLocator: Lazy<GitLocator?>? = null,
-                           val openFileCache: MutableMap<String, String> = mutableMapOf(),
+                           val openFileCache: MutableMap<String, String> = ConcurrentHashMap(),
                            var repositoryFileCache: MutableMap<String, String>? = null
     )
 }
