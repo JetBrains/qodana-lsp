@@ -69,7 +69,7 @@ describe('Language/Linter Selection Tests', () => {
     });
 
     it('7: selectLinter should handle user cancellation correctly', async () => {
-        const choiceStub = sandbox.stub(vscode.window, 'showInformationMessage').resolves(undefined);
+        const choiceStub = sandbox.stub(vscode.window, 'showQuickPick').resolves(undefined);
         const communityLinters = ['QDJVMC'];
         const paidLinters = ['QDJS'];
 
@@ -79,7 +79,7 @@ describe('Language/Linter Selection Tests', () => {
     });
 
     it('8: selectLinter should return correct linter when there are multiple linters', async () => {
-        const choiceStub = sandbox.stub(vscode.window, 'showInformationMessage').resolves('QDJVM (Java)' as any);
+        const choiceStub = sandbox.stub(vscode.window, 'showQuickPick').resolves({label: 'QDJVM'} as any);
         const communityLinters = ['QDJVMC', 'QDANDC'];
         const paidLinters = ['QDJVM', 'QDJS'];
 

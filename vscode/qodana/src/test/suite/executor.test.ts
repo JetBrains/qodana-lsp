@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import assert = require('assert');
 import { launchTerminal, prepareRun, runQodana } from '../../core/cli/executor';
 
-describe('Language/Linter Selection Tests', () => {
+describe('CLI Executor Tests', () => {
     const sandbox = sinon.createSandbox();
     
     beforeEach(() => {
@@ -80,7 +80,7 @@ describe('Language/Linter Selection Tests', () => {
             stat: sandbox.stub().resolves(null),
         });
 
-        const choiceStub = sandbox.stub(vscode.window, 'showInformationMessage').resolves('QDJVM (Java)' as any);
+        const choiceStub = sandbox.stub(vscode.window, 'showQuickPick').resolves({label: 'QDJVM'} as any);
         let result = await prepareRun('token');
         assert.equal(result, true);
         assert.equal(choiceStub.called, true);
