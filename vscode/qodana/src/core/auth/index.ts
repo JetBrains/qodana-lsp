@@ -6,7 +6,7 @@ import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
 import {AuthorizingImpl} from "./AuthorizingImpl";
 import {AuthorizedImpl} from "./AuthorizedImpl";
 import {CloudEnvironment} from "../cloud";
-import {getGitRepository} from "../git";
+import {convertHttpToSsh, convertSshToHttp, getRemoteOrigin} from "../git";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -142,15 +142,16 @@ export class Auth {
     }
 
     async getProjects(): Promise<MatchingProject[] | undefined> {
-        let repository = getGitRepository();
-        let remote = await repository?.getConfig('remote.origin.url');
+        let remote = getRemoteOrigin();
         if (!remote) {
             return undefined;
         }
+        let httpRemote = convertSshToHttp(remote);
+        let sshRemote = convertHttpToSsh(httpRemote);
         let authorized = this.lastState as AuthorizedImpl;
         if (authorized) {
-            let withoutSuffix = remote.replace(/\.git$/, '');
-            let promises =  [withoutSuffix, `${withoutSuffix}.git`].flatMap( async(repoUrl) => {
+            let withoutSuffix = httpRemote.replace(/\.git$/, '');
+            let promises =  [withoutSuffix, `${withoutSuffix}.git`, sshRemote].flatMap( async(repoUrl) => {
                 let response = await authorized.qodanaCloudUserApi((api) => {
                     return api.getProjectsByOriginUrl(repoUrl);
                 });

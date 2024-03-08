@@ -9,17 +9,6 @@ export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
 
     constructor(getProjects: () => Promise<MatchingProject[] | undefined>) {
         this.getProjects = getProjects;
-        vscode.commands.registerCommand('qodanaTreeItem.other-item', async (otherItem: vscode.TreeItem) => {
-            const userInput = await vscode.window.showInputBox({
-                prompt: "Input Qodana Project ID",
-            });
-            if (userInput !== undefined) {
-                // todo handle error
-                otherItem.label = "Other project: " + userInput;
-                this._onDidChangeTreeData.fire(otherItem);
-                vscode.commands.executeCommand("qodanaLinkView.selectNode", userInput);
-            }
-        });
     }
 
     async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
@@ -50,6 +39,10 @@ export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
 
     refresh() {
         this._onDidChangeTreeData.fire(undefined);
+    }
+
+    refreshItem(item: vscode.TreeItem) {
+        this._onDidChangeTreeData.fire(item);
     }
 }
 

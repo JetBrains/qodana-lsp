@@ -21,9 +21,6 @@ export class LocalRunsService {
                 });
             }
         });
-        vscode.commands.registerCommand("qodana.openLocalReport", () => {
-            this.openLocalReportAction();
-        });
     }
 
     openLocalReportAction() {

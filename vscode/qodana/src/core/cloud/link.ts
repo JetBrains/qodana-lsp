@@ -5,13 +5,7 @@ export class LinkService {
     private likedProjectId: string | undefined;
     private isLinked: boolean = false;
 
-    constructor(onUnlink: () => {}) {
-        vscode.commands.registerCommand('qodanaLinkView.selectNode', (id) => this.selectProject(id));
-        vscode.commands.registerCommand('qodanaLinkView.link', () => this.linkProject());
-        vscode.commands.registerCommand('qodanaLinkView.unlink', () => {
-            this.unlinkProject();
-            onUnlink();
-        });
+    constructor() {
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration('qodana')) {
                 this.selectAndLink();
