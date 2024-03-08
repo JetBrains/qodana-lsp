@@ -127,6 +127,7 @@ export class Auth {
                 vscode.commands.executeCommand("setContext", "qodana.signed-in", false);
             } else if (state instanceof AuthorizingImpl) {
                 vscode.commands.executeCommand("setContext", "qodana.authorizing", true);
+                vscode.commands.executeCommand("setContext", "qodana.signed-in", false);
                 state.startOauth();
             } else if (state instanceof AuthorizedImpl) {
                 vscode.commands.executeCommand("setContext", "qodana.authorizing", false);
