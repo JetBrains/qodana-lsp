@@ -92,17 +92,13 @@ export class QodanaExtension {
 
     async restartLanguageServer() {
         if (this.languageClient && this.languageClient.isRunning()) {
-            let client = this.languageClient;
-            return new Promise(resolve => {
-                let dispose = client.onDidChangeState(
-                    async (stateChangeEvent) => {
-                        if (stateChangeEvent.oldState === State.Starting && stateChangeEvent.newState === State.Running) {
-                            dispose.dispose();
-                            resolve(true);
-                        }
-                    }
-                );
-                client.restart();
+            await this.languageClient.stop().catch(() => {
+                // ignore
+            });
+            // stop handler needs some pause, since otherwise it clashes with initializer
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await this.languageClient.start().catch(() => {
+                // ignore
             });
         }
     }

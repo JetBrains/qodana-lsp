@@ -200,7 +200,9 @@
         {
           "id": "qodana.link-view",
           "name": "Link project",
-          "titleActions": ["qodanaLinkView.refresh"],
+          "titleActions": [
+            "qodanaLinkView.refresh"
+          ],
           "when": "qodana.signed-in && !qodana.linked"
         },
         {
@@ -297,6 +299,6 @@
     "adm-zip": "^0.5.10",
     "axios": "^1.6.0",
     "tar": "^6.2.0",
-    "vscode-languageclient": "^8.1.0"
+    "vscode-languageclient": "^9.0.1"
   }
 }

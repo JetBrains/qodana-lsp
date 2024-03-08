@@ -74,10 +74,12 @@ export function onBaselineStatusChange(client: LanguageClient, context: vscode.E
 }
 
 export function onServerStateChange(context: vscode.ExtensionContext) {
-    Events.instance.onServerStateChange((_: State) => {
-        let reportId = context.workspaceState.get<string>(WS_REPORT_ID);
-        let reportPath = context.workspaceState.get<string>(WS_OPENED_REPORT);
-        Events.instance.fireReportFile({ reportFile: reportPath, reportId: reportId });
+    Events.instance.onServerStateChange((state: State) => {
+        if (state === State.Running) {
+            let reportId = context.workspaceState.get<string>(WS_REPORT_ID);
+            let reportPath = context.workspaceState.get<string>(WS_OPENED_REPORT);
+            Events.instance.fireReportFile({ reportFile: reportPath, reportId: reportId });
+        }
     });
 }
 
