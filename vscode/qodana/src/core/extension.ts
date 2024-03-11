@@ -59,7 +59,7 @@ export class QodanaExtension {
         }
         this.auth = await Auth.create(this.context);
 
-        this.linkService = new LinkService(() => this.closeReport());
+        this.linkService = new LinkService(this.context, () => this.closeReport());
         this.localRunService = new LocalRunsService(this.context);
 
         this.languageClient = await getLanguageClient(this.context);

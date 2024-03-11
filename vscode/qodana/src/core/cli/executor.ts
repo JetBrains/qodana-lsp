@@ -108,7 +108,7 @@ async function getLinterFromQodanaYaml() {
 
 async function createQodanaYaml(linter: string) {
     let rootPath = vscode.workspace.workspaceFolders![0].uri.fsPath; // existence of this path is checked before in extension
-    let yamlContent = `linter: ${linter}`;
+    let yamlContent = `linter: ${linter}`; // todo template
     let yamlFile = vscode.Uri.file(rootPath + '/qodana.yaml');
     if (await vscode.workspace.fs.stat(yamlFile)) {
         let existingContent = await vscode.workspace.fs.readFile(yamlFile);

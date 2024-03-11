@@ -9,7 +9,7 @@ import {
     CloudProjectsByOriginUrlResponse,
     Files, PaginatedResponse,
     QodanaCloudFileResponse, QodanaCloudReportResponse,
-    QodanaCloudUserApi
+    QodanaCloudUserApi, QodanaCloudUserInfoResponse
 } from "./api";
 
 export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
@@ -30,7 +30,10 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
     }
 
     async getProjectProperties(projectId: string): Promise<CloudProjectResponse | undefined> {
-        return this.doRequest(`projects/${projectId}`, () => {});
+        return this.doRequest(`projects/${projectId}`, () => {
+            vscode.window.showErrorMessage(failedToObtainData(projectId));
+            telemetry.errorReceived('#getProjectProperties no data');
+        });
     }
 
     async getReport(reportId: string, projectId: string): Promise<Files<QodanaCloudFileResponse> | undefined> {
@@ -87,6 +90,10 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
         return timeline.items[0].reportId;
     }
 
+    async getUserInfo(): Promise<QodanaCloudUserInfoResponse | undefined> {
+        return this.doRequest('users/me', () => {});
+    }
+
     private async doRequest<T>(url: string, errorHandler: () => void): Promise<T | undefined> {
         let token = await this.tokenRetriever();
         let host = await this.environment.getBackendUrlForVersion(this.version);
@@ -99,8 +106,13 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
                 'Authorization': 'Bearer ' + token
             }
         };
-        let res = await axios(config);
-        if (!res.data) {
+        let res;
+        try {
+            res = await axios(config);
+        } catch (e) {
+            res = undefined;
+        }
+        if (!res?.data) {
             errorHandler();
             return undefined;
         }

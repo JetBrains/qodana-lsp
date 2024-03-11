@@ -5,7 +5,9 @@ import { extensionInstance } from './core/extension';
 import { ShowMarkerHandler } from './core/handler';
 import telemetry from './core/telemetry';
 import {ProjectsView} from "./core/ui/projectsView";
-import {openReportByProjectId} from "./core/report";
+import {LinkedView} from "./core/ui/linkedView";
+import {LogInView} from "./core/ui/loginView";
+import {SettingsView} from "./core/ui/settingsView";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -156,28 +158,25 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 			extensionInstance.auth?.cancelAuthorization();
 		})
 	);
+
+	const loginView = new LogInView(context.extensionUri);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(LogInView.viewType, loginView)
+	);
+
+
+	const settingsView = new SettingsView(context.extensionUri);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(SettingsView.viewType, settingsView)
+	);
 }
 
 function initLinkService(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaLinkView.open-report', () => {
-			let projectId = extensionInstance.linkService?.getLinkedProjectId();
-			if (projectId === undefined || extensionInstance.languageClient === undefined || extensionInstance.auth === undefined || context === undefined) {
-				return;
-			}
-			let authorized = extensionInstance.auth.getAuthorized();
-			if (authorized) {
-				openReportByProjectId(projectId, context, authorized);
-				vscode.commands.executeCommand("workbench.action.problems.focus");
-			}
-		})
-	);
-
-	context.subscriptions.push(
 		vscode.commands.registerCommand('qodanaLinkView.selectNode', (id) => extensionInstance.linkService?.selectProject(id))
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaLinkView.link', () => extensionInstance.linkService?.linkProject())
+		vscode.commands.registerCommand('qodanaLinkView.link', async () => await extensionInstance.linkService?.linkProject())
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('qodanaLinkView.unlink', async () => {
@@ -185,12 +184,15 @@ function initLinkService(context: vscode.ExtensionContext) {
 			await extensionInstance.closeReport();
 		})
 	);
+	const linkedView = new LinkedView(context.extensionUri);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(LinkedView.viewType, linkedView)
+	);
 }
 
 function initLocalRunService(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("qodana.openLocalReport", async () => {
-			await extensionInstance.closeReport();
 			extensionInstance.localRunService?.openLocalReportAction();
 		})
 	);

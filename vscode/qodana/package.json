@@ -75,10 +75,6 @@
         "title": "Unlink"
       },
       {
-        "command": "qodanaLinkView.open-report",
-        "title": "OpenReport"
-      },
-      {
         "command": "qodanaLinkView.selectNode",
         "title": "Select node"
       },
@@ -183,14 +179,10 @@
     "views": {
       "qodanaView": [
         {
+          "type": "webview",
           "id": "qodana.login-view",
-          "name": "",
-          "when": "!qodana.signed-in && !qodana.authorizing && !qodana.report-opened"
-        },
-        {
-          "id": "qodana.login-view-report-opened",
-          "name": "",
-          "when": "!qodana.signed-in && !qodana.authorizing && qodana.report-opened"
+          "name": "Log In",
+          "when": "!qodana.signed-in && !qodana.authorizing"
         },
         {
           "id": "qodana.authorizing-view",
@@ -206,48 +198,23 @@
           "when": "qodana.signed-in && !qodana.linked"
         },
         {
+          "type": "webview",
           "id": "qodana.linked",
-          "name": "Qodana Linked View",
+          "name": "Linked",
           "when": "qodana.signed-in && qodana.linked"
         },
         {
+          "type": "webview",
           "id": "qodana.settings",
           "name": "Settings",
-          "when": "qodana.signed-in && !qodana.report-opened"
-        },
-        {
-          "id": "qodana.settings-report-opened",
-          "name": "Settings",
-          "when": "qodana.signed-in && qodana.report-opened"
+          "when": "qodana.signed-in"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "qodana.login-view",
-        "contents": "Log In to Qodana\n[Log In](command:qodana.login)\n[Qodana Self-Hosted](command:qodana.loginCustomServer)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)"
-      },
-      {
-        "view": "qodana.login-view-report-opened",
-        "contents": "Log In to Qodana\n[Log In](command:qodana.login)\n[Qodana Self-Hosted](command:qodana.loginCustomServer)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)\n[Close Report](command:qodana.closeReport)"
-      },
-      {
         "view": "qodana.authorizing-view",
         "contents": "Authorizing\n[Cancel](command:qodana.cancel-authorization)"
-      },
-      {
-        "view": "qodana.linked",
-        "contents": "[Unlink](command:qodanaLinkView.unlink)\n[Open report](command:qodanaLinkView.open-report)"
-      },
-      {
-        "view": "qodana.settings",
-        "name": "Settings",
-        "contents": "[Log Out](command:qodana.logout)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)"
-      },
-      {
-        "view": "qodana.settings-report-opened",
-        "name": "Settings",
-        "contents": "[Log Out](command:qodana.logout)\n[Run Locally](command:qodana.runLocally)\n[Open Local Report](command:qodana.openLocalReport)\n[Close Report](command:qodana.closeReport)"
       }
     ],
     "menus": {

@@ -7,6 +7,7 @@ export class Events {
   private _onReportFile: vscode.EventEmitter<ReportFileEvent> = new vscode.EventEmitter<ReportFileEvent>();
   private _onReportOpened: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
   private _onReportClosed: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
+  private _onProjectLinked: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
   private _onConfigChange: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
   private _onBaselineChange: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
   private _onServerStateChange: vscode.EventEmitter<State> = new vscode.EventEmitter<State>();
@@ -37,6 +38,14 @@ export class Events {
 
   public fireReportClosed() {
     this._onReportClosed.fire();
+  }
+
+  get onProjectLinked(): vscode.Event<void> {
+    return this._onProjectLinked.event;
+  }
+
+  public fireProjectLinked() {
+    this._onProjectLinked.fire();
   }
 
   get onReportFile(): vscode.Event<ReportFileEvent> {

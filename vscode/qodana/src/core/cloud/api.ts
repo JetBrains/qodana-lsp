@@ -20,6 +20,8 @@ export interface QodanaCloudUserApi {
     getReport(reportId: string, projectId: string): Promise<Files<QodanaCloudFileResponse> | undefined>
 
     getReportId(projectId: string): Promise<string | undefined>
+
+    getUserInfo(): Promise<QodanaCloudUserInfoResponse | undefined>
 }
 
 export function qodanaCloudUnauthorizedApi(environment: CloudEnvironment) {
@@ -85,4 +87,10 @@ export interface Files<T> {
 export interface QodanaCloudFileResponse {
     file: string;
     url: string;
+}
+
+export interface QodanaCloudUserInfoResponse {
+    id: string;
+    fullName?: string;
+    username?: string;
 }
