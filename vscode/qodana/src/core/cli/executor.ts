@@ -88,7 +88,7 @@ export async function prepareRun(token: string | undefined): Promise<boolean> {
 }
 
 async function getLinterFromQodanaYaml() {
-    let yamlFiles = await vscode.workspace.findFiles('**/qodana.yaml', '', 1);
+    let yamlFiles = await vscode.workspace.findFiles('qodana.yaml', '', 1);
     if (yamlFiles.length === 1) {
         let yamlFile = yamlFiles[0];
         let yamlContent = await vscode.workspace.fs.readFile(yamlFile);
@@ -110,9 +110,12 @@ async function createQodanaYaml(linter: string) {
     let rootPath = vscode.workspace.workspaceFolders![0].uri.fsPath; // existence of this path is checked before in extension
     let yamlContent = `linter: ${linter}`; // todo template
     let yamlFile = vscode.Uri.file(rootPath + '/qodana.yaml');
-    if (await vscode.workspace.fs.stat(yamlFile)) {
+    try {
+        await vscode.workspace.fs.stat(yamlFile);
         let existingContent = await vscode.workspace.fs.readFile(yamlFile);
         yamlContent = new TextDecoder().decode(existingContent) + '\n' + yamlContent;
+    } catch (e) {
+        // ignore, file does not exist
     }
     await vscode.workspace.fs.writeFile(yamlFile, Buffer.from(yamlContent));
 }
