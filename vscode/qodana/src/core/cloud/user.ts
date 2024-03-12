@@ -91,7 +91,9 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
     }
 
     async getUserInfo(): Promise<QodanaCloudUserInfoResponse | undefined> {
-        return this.doRequest('users/me', () => {});
+        return this.doRequest('users/me', () => {
+            telemetry.errorReceived('#getUserInfo no data');
+        });
     }
 
     private async doRequest<T>(url: string, errorHandler: () => void): Promise<T | undefined> {
@@ -116,6 +118,6 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             errorHandler();
             return undefined;
         }
-        return res.data as T;
+        return res?.data as T;
     }
 }

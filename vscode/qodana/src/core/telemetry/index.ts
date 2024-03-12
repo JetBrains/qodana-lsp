@@ -24,6 +24,7 @@ class TelemetryEvents {
         EXTENSION_REMOVED: 'extensionRemoved',
         OPENED_FROM_CLOUD: 'openedFromCloud',
         REPORT_OPENED: 'reportOpened',
+        REPORT_CLOSED: 'reportClosed',
         AUTHENTICATION_RESETTED: 'authenticationResetted',
         SETTINGS_RESETTED: 'settingsResetted',
         ISSUES_TOGGLED: 'issuesToggled',
@@ -31,6 +32,8 @@ class TelemetryEvents {
         JBR_DOWNLOADED: 'jbrDownloaded',
         CLI_DOWNLOADED: 'cliDownloaded',
         LOCAL_RUN_REQUESTED: 'localRunRequested',
+        PROJECT_LINKED: 'projectLinked',
+        PROJECT_UNLINKED: 'projectUnlinked',
     };
 
     extensionStarted(context: vscode.ExtensionContext) {
@@ -48,6 +51,10 @@ class TelemetryEvents {
 
     reportOpened() {
         this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.REPORT_OPENED);
+    }
+
+    reportClosed() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.REPORT_CLOSED);
     }
 
     authenticationResetted() {
@@ -80,6 +87,14 @@ class TelemetryEvents {
 
     errorReceived(error: string) {
         this.telemetryReporter.sendTelemetryErrorEvent(error);
+    }
+
+    projectLinked() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.PROJECT_LINKED);
+    }
+
+    projectUnlinked() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.PROJECT_UNLINKED);
     }
 }
 

@@ -8,6 +8,20 @@ import {ProjectsView} from "./core/ui/projectsView";
 import {LinkedView} from "./core/ui/linkedView";
 import {LogInView} from "./core/ui/loginView";
 import {SettingsView} from "./core/ui/settingsView";
+import {
+	COMMAND_CANCEL_AUTHORIZATION,
+	COMMAND_CLOSE_REPORT,
+	COMMAND_LINK,
+	COMMAND_LOG_IN,
+	COMMAND_LOG_IN_CUSTOM_SERVER,
+	COMMAND_LOG_OUT,
+	COMMAND_OPEN_LOCAL_REPORT,
+	COMMAND_REFRESH_PROJECTS,
+	COMMAND_RUN_LOCALLY,
+	COMMAND_SELECT_NODE,
+	COMMAND_UNLINK
+} from "./core/config";
+import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from "./core/messages";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -64,7 +78,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	}));
 
 	// add command to run qodana locally
-	context.subscriptions.push(vscode.commands.registerCommand('qodana.runLocally', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand(COMMAND_RUN_LOCALLY, async () => {
 		if (!extensionInstance) {
 			return;
 		}
@@ -108,18 +122,17 @@ function initProjectsView(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaLinkView.refresh', () => projectsView.refresh())
+		vscode.commands.registerCommand(COMMAND_REFRESH_PROJECTS, () => projectsView.refresh())
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand('qodanaTreeItem.other-item', async (otherItem: vscode.TreeItem) => {
 			const userInput = await vscode.window.showInputBox({
-				prompt: "Input Qodana Project ID",
+				prompt: OTHER_PROJECT_TOOLTIP,
 			});
 			if (userInput !== undefined) {
-				// todo handle error
 				otherItem.label = "Other project: " + userInput;
 				projectsView.refreshItem(otherItem);
-				vscode.commands.executeCommand("qodanaLinkView.selectNode", userInput);
+				vscode.commands.executeCommand(COMMAND_SELECT_NODE, userInput);
 			}
 		})
 	);
@@ -130,14 +143,14 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 		return;
 	}
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodana.login', async () => {
+		vscode.commands.registerCommand(COMMAND_LOG_IN, async () => {
 			extensionInstance.auth?.handleUnauthorizedState();
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodana.loginCustomServer', async () => {
+		vscode.commands.registerCommand(COMMAND_LOG_IN_CUSTOM_SERVER, async () => {
 			const userInput = await vscode.window.showInputBox({
-				prompt: "Input Qodana Self-Hosted Url"
+				prompt: SELF_HOSTED_TOOLTIP
 			});
 			if (userInput !== undefined) {
 				extensionInstance.auth?.handleUnauthorizedState(userInput);
@@ -147,14 +160,14 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodana.logout', async () => {
-			await extensionInstance.closeReport();
+		vscode.commands.registerCommand(COMMAND_LOG_OUT, () => {
+			extensionInstance.closeReport();
 			extensionInstance.auth?.logOut();
 		})
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodana.cancel-authorization', async () => {
+		vscode.commands.registerCommand(COMMAND_CANCEL_AUTHORIZATION, async () => {
 			extensionInstance.auth?.cancelAuthorization();
 		})
 	);
@@ -173,13 +186,13 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 
 function initLinkService(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaLinkView.selectNode', (id) => extensionInstance.linkService?.selectProject(id))
+		vscode.commands.registerCommand(COMMAND_SELECT_NODE, (id) => extensionInstance.linkService?.selectProject(id))
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaLinkView.link', async () => await extensionInstance.linkService?.linkProject())
+		vscode.commands.registerCommand(COMMAND_LINK, async () => await extensionInstance.linkService?.linkProject())
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaLinkView.unlink', async () => {
+		vscode.commands.registerCommand(COMMAND_UNLINK, async () => {
 			extensionInstance.linkService?.unlinkProject();
 			await extensionInstance.closeReport();
 		})
@@ -192,12 +205,12 @@ function initLinkService(context: vscode.ExtensionContext) {
 
 function initLocalRunService(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand("qodana.openLocalReport", async () => {
+		vscode.commands.registerCommand(COMMAND_OPEN_LOCAL_REPORT, async () => {
 			extensionInstance.localRunService?.openLocalReportAction();
 		})
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand("qodana.closeReport", async () => {
+		vscode.commands.registerCommand(COMMAND_CLOSE_REPORT, async () => {
 			await extensionInstance.closeReport();
 		})
 	);

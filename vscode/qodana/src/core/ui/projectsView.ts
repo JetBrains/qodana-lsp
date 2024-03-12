@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import {MatchingProject} from "../cloud/api";
+import {COMMAND_SELECT_NODE} from "../config";
+import {LAST_RUN, LINK_OTHER_PROJECT, OTHER_PROJECT, problemsCountString, SELECT_PROJECT} from "../messages";
 
 export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
     protected _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>();
@@ -23,10 +25,10 @@ export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
         let projectsSet = [... new Set(idToProject.values())].sort();
         let projectItems: vscode.TreeItem[] = projectsSet.map((project => new LinkTreeItem(project)));
 
-        const otherItem = new vscode.TreeItem("Other project");
+        const otherItem = new vscode.TreeItem(OTHER_PROJECT);
         otherItem.command = {
             command: 'qodanaTreeItem.other-item',
-            title: "Link other project",
+            title: LINK_OTHER_PROJECT,
             arguments: [otherItem]
         };
         projectItems.push(otherItem);
@@ -53,21 +55,21 @@ class LinkTreeItem extends vscode.TreeItem {
         let problemsCount = project?.reportInfo?.problems?.total;
         let time = project.reportInfo.lastChecked;
         let tooltipText: string;
-        if (problemsCount) {
-            tooltipText = `${problemsCount} problems.`;
+        if (problemsCount !== undefined && problemsCount > 0) {
+            tooltipText = problemsCountString(problemsCount?.toString());
         } else {
-            tooltipText = "No problems.";
+            tooltipText = problemsCountString(undefined);
         }
         if (time) {
             let date = new Date(time);
-            tooltipText += ` Last run: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+            tooltipText += ` ${LAST_RUN} ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
         }
         this.tooltip = tooltipText;
         this.description = project.teamName;
         this.project = project;
         this.command = {
-            command: 'qodanaLinkView.selectNode',
-            title: "Select Project",
+            command: COMMAND_SELECT_NODE,
+            title: SELECT_PROJECT,
             arguments: [this.project.projectId]
         };
     }

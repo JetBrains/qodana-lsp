@@ -27,6 +27,7 @@ import { QodanaState } from "./menuitems/QodanaState";
 import { BaselineToggle } from "./menuitems/BaselineToggle";
 import { LinkService } from "./cloud/link";
 import {LocalRunsService} from "./localRun";
+import telemetry from "./telemetry";
 
 export class QodanaExtension {
     public languageClient?: LanguageClient;
@@ -110,6 +111,7 @@ export class QodanaExtension {
             reportId: undefined
         });
         Events.instance.fireReportClosed();
+        telemetry.reportClosed();
         await this.restartLanguageServer();
     }
 
@@ -146,6 +148,9 @@ export class QodanaExtension {
         let cli = await getCli(this.context as vscode.ExtensionContext);
         if (cli && this.context) {
             let token = await obtainToken(this.context as vscode.ExtensionContext);
+            if (token === undefined) {
+                return;
+            }
             let tempDir = await runQodana(cli, token);
             await showLocalReport(this.context, tempDir);
         }

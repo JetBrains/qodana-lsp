@@ -17,6 +17,31 @@ export const GS_CLI_SETTING = 'cliExecutablePath';
 export const GS_JAVA_EXECUTABLE_PATH = 'javaExecutablePath';
 export const CONF_PROJ_ID = 'qodana.projectId';
 export const CONF_PATH_PREFIX = 'qodana.pathPrefix';
+export const SERVER = 'qodana.server';
+export const USER_ID = 'qodana.userId';
+export const USER_FULL_NAME = 'qodana.userFullName';
+export const USER_NAME = 'qodana.userName';
+
+export const STATE_SIGNED_IN = 'qodana.signed-in';
+export const STATE_AUTHORIZING = 'qodana.authorizing';
+export const STATE_LINKED = 'qodana.linked';
+
+export const COMMAND_LOG_IN = 'qodana.login';
+export const COMMAND_LOG_IN_CUSTOM_SERVER = 'qodana.loginCustomServer';
+export const COMMAND_LOG_OUT = 'qodana.logout';
+export const COMMAND_CANCEL_AUTHORIZATION = 'qodana.cancel-authorization';
+export const COMMAND_RUN_LOCALLY = 'qodana.runLocally';
+export const COMMAND_OPEN_LOCAL_REPORT = 'qodana.openLocalReport';
+export const COMMAND_CLOSE_REPORT = 'qodana.closeReport';
+export const COMMAND_LINK = 'qodana.link';
+export const COMMAND_UNLINK = 'qodana.unlink';
+export const COMMAND_SELECT_NODE = 'qodana.selectNode';
+export const COMMAND_REFRESH_PROJECTS = 'qodana.refreshProjects';
+
+export const COMMANDS = new Set ([
+    COMMAND_LOG_IN, COMMAND_LOG_IN_CUSTOM_SERVER, COMMAND_LOG_OUT, COMMAND_CANCEL_AUTHORIZATION, COMMAND_RUN_LOCALLY,
+    COMMAND_OPEN_LOCAL_REPORT, COMMAND_CLOSE_REPORT, COMMAND_LINK, COMMAND_UNLINK, COMMAND_SELECT_NODE
+]);
 
 class ConfigurationHelper {
     private static _instance: ConfigurationHelper;

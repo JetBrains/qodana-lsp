@@ -2,7 +2,7 @@ import {
     Auth,
     Authorized,
     AuthState_,
-    NotAuthorized,
+    NotAuthorized, SEC_EXPIRES, SEC_REFRESH_TOKEN, SEC_REFRESH_TOKEN_USED, SEC_TOKEN,
     TokenExpired,
     TokenPresent,
     Unauthorized
@@ -12,12 +12,13 @@ import * as vscode from "vscode";
 import {
     AuthorizationResponseData,
     qodanaCloudUnauthorizedApi,
-    QodanaCloudUserApi,
+    QodanaCloudUserApi, QodanaCloudUserInfoResponse,
 } from "../cloud/api";
 import {FAILED_TO_AUTHENTICATE, FAILED_TO_RENEW_TOKEN} from "../messages";
 import telemetry from "../telemetry";
 import {CloudEnvironment} from "../cloud";
 import {QodanaCloudUserApiImpl} from "../cloud/user";
+import {SERVER, USER_FULL_NAME, USER_ID, USER_NAME} from "../config";
 
 export class AuthorizedImpl implements Authorized {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;
@@ -27,12 +28,17 @@ export class AuthorizedImpl implements Authorized {
     constructor(context: vscode.ExtensionContext,
                 stateEmitter: vscode.EventEmitter<AuthState_>,
                 environment: CloudEnvironment,
-                auth: AuthorizationResponseData) {
+                auth: AuthorizationResponseData,
+                readonly userInfo?: QodanaCloudUserInfoResponse) {
         this.stateEmitter = stateEmitter;
         this.context = context;
         this.environment = environment;
         this.getToken = this.getToken.bind(this);
         this.storeAuthTokens(auth);
+        this.context.globalState.update(SERVER, environment.frontendUrl);
+        this.context.globalState.update(USER_ID, userInfo?.id);
+        this.context.globalState.update(USER_FULL_NAME, userInfo?.fullName);
+        this.context.globalState.update(USER_NAME, userInfo?.username);
     }
 
     async qodanaCloudUserApi<T>(request: (api: QodanaCloudUserApi) => Promise<T>): Promise<T> {
@@ -66,25 +72,24 @@ export class AuthorizedImpl implements Authorized {
         }
     }
 
-
     async handleTokenExpiredState(): Promise<string | undefined> {
-        let refreshToken = await this.context.secrets.get('refreshToken');
+        let refreshToken = await this.context.secrets.get(SEC_REFRESH_TOKEN);
         let auth = await qodanaCloudUnauthorizedApi(this.environment).refreshOauthToken(refreshToken);
         if (!auth) {
             vscode.window.showErrorMessage(FAILED_TO_RENEW_TOKEN);
             telemetry.errorReceived('#handleTokenExpiredState no auth');
             return undefined;
         }
-        await this.context.secrets.store('refreshTokenUsed', 'true');
+        await this.context.secrets.store(SEC_REFRESH_TOKEN_USED, 'true');
         await this.storeAuthTokens(auth);
         return auth.access;
     }
 
     async storeAuthTokens(auth: AuthorizationResponseData) {
-        await this.context.secrets.store('token', auth.access);
-        await this.context.secrets.store('refreshToken', auth.refresh);
-        await this.context.secrets.store('expires', auth.expires_at);
-        await this.context.secrets.store('refreshTokenUsed', 'false');
+        await this.context.secrets.store(SEC_TOKEN, auth.access);
+        await this.context.secrets.store(SEC_REFRESH_TOKEN, auth.refresh);
+        await this.context.secrets.store(SEC_EXPIRES, auth.expires_at);
+        await this.context.secrets.store(SEC_REFRESH_TOKEN_USED, 'false');
     }
 
     logOut(): NotAuthorized {
@@ -95,10 +100,13 @@ export class AuthorizedImpl implements Authorized {
     }
 
     async resetTokens(): Promise<void> {
-        await this.context.secrets.delete('token');
-        await this.context.secrets.delete('refreshToken');
-        await this.context.secrets.delete('expires');
-        await this.context.secrets.delete('refreshTokenUsed');
-        this.context.globalState.update('qodanaServer', undefined);
+        await this.context.secrets.delete(SEC_TOKEN);
+        await this.context.secrets.delete(SEC_REFRESH_TOKEN);
+        await this.context.secrets.delete(SEC_EXPIRES);
+        await this.context.secrets.delete(SEC_REFRESH_TOKEN_USED);
+        this.context.globalState.update(SERVER, undefined);
+        this.context.globalState.update(USER_ID, undefined);
+        this.context.globalState.update(USER_FULL_NAME, undefined);
+        this.context.globalState.update(USER_NAME, undefined);
     }
 }

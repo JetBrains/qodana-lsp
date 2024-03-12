@@ -15,6 +15,8 @@ export const CANCEL = vscode.l10n.t('Cancel');
 export const FAILED_TO_OBTAIN_TOKEN = vscode.l10n.t('[Qodana] Failed to obtain token. Try "Qodana: Reset authentication" command and re-connect your project.');
 export const FAILED_TO_RENEW_TOKEN = vscode.l10n.t('[Qodana] Failed to renew token. Try "Qodana: Reset authentication" command and re-connect your project.');
 export const FAILED_TO_AUTHENTICATE = vscode.l10n.t('[Qodana] Authentication to Qodana Cloud failed: ');
+export const SELF_HOSTED_TOOLTIP = vscode.l10n.t('Input Qodana Self-Hosted Url');
+export function loggedInAs(username: string | undefined) { return vscode.l10n.t('Logged in as {0}', username || 'unknown'); }
 
 // ACTIVITIES
 
@@ -109,3 +111,13 @@ export const QS_STATUS_NOT_ATTACHED = vscode.l10n.t('$(eye-closed) Qodana');
 export const QS_TIP_NOT_ATTACHED = vscode.l10n.t('Not attached to report');
 export const QS_STATUS_SETTINGS_INVALID = vscode.l10n.t('$(gear) Qodana');
 export const QS_TIP_SETTINGS_INVALID = vscode.l10n.t('Settings are not valid');
+
+
+// LINK
+export const OTHER_PROJECT_TOOLTIP = vscode.l10n.t('Input Qodana Project ID');
+export function problemsCountString(problemsCount: string | undefined) { return vscode.l10n.t('{0} Problems.', problemsCount || 'No'); }
+export const LAST_RUN = vscode.l10n.t('Last run:');
+export const SELECT_PROJECT = vscode.l10n.t('Select Project');
+export const LINK_OTHER_PROJECT = vscode.l10n.t('Link other project');
+export const OTHER_PROJECT = vscode.l10n.t('Other project');
+export function linkedToProject(projectName: string | undefined) { return vscode.l10n.t('Linked to project {0}', projectName || '[Error while getting name]'); }

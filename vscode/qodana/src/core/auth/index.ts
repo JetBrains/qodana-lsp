@@ -1,12 +1,13 @@
 import * as vscode from "vscode";
 import {
-    AuthorizationResponseData, MatchingProject, QodanaCloudUserApi
+    AuthorizationResponseData, MatchingProject, QodanaCloudUserApi, QodanaCloudUserInfoResponse
 } from "../cloud/api";
 import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
 import {AuthorizingImpl} from "./AuthorizingImpl";
 import {AuthorizedImpl} from "./AuthorizedImpl";
 import {CloudEnvironment} from "../cloud";
 import {convertHttpToSsh, convertSshToHttp, getRemoteOrigin} from "../git";
+import {SERVER, STATE_AUTHORIZING, STATE_SIGNED_IN, USER_FULL_NAME, USER_ID, USER_NAME} from "../config";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -64,8 +65,12 @@ export interface Authorizing extends AuthState_ {
 }
 
 export interface Authorized extends AuthState_ {
+    userInfo?: QodanaCloudUserInfoResponse
+
     getToken(): Promise<string | undefined>
+
     logOut(): NotAuthorized
+
     qodanaCloudUserApi<T>(request: (apiObj: QodanaCloudUserApi) => Promise<T>): Promise<T>
 }
 
@@ -78,7 +83,7 @@ export class Auth {
 
     static async create(context: vscode.ExtensionContext): Promise<Auth> {
         let instance = new Auth(context);
-        let savedServer = context.globalState.get('qodanaServer') as string;
+        let savedServer = context.globalState.get(SERVER) as string;
         let authState = await Auth.getAuthState(context);
         let newState: AuthState_;
         if (authState instanceof Unauthorized) {
@@ -89,7 +94,15 @@ export class Auth {
             let auth: AuthorizationResponseData = {
                 access: state.token, expires_at: state.expires, refresh: state.refreshToken
             };
-            newState = new AuthorizedImpl(context, instance.stateEmitter, environment, auth);
+            let id = context.globalState.get(USER_ID) as string;
+            let fullName = context.globalState.get(USER_FULL_NAME) as string;
+            let userName = context.globalState.get(USER_NAME) as string;
+            let userInfo = {
+                id: id,
+                fullName: fullName,
+                username: userName,
+            };
+            newState = new AuthorizedImpl(context, instance.stateEmitter, environment, auth, userInfo);
         }
         instance.stateEmitter.fire(newState);
         return instance;
@@ -123,15 +136,15 @@ export class Auth {
         this.stateEmitter.event(state => {
             this.lastState = state;
             if (state instanceof NotAuthorizedImpl) {
-                vscode.commands.executeCommand("setContext", "qodana.authorizing", false);
-                vscode.commands.executeCommand("setContext", "qodana.signed-in", false);
+                vscode.commands.executeCommand('setContext', STATE_AUTHORIZING, false);
+                vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, false);
             } else if (state instanceof AuthorizingImpl) {
-                vscode.commands.executeCommand("setContext", "qodana.authorizing", true);
-                vscode.commands.executeCommand("setContext", "qodana.signed-in", false);
+                vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, true);
+                vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, false);
                 state.startOauth();
             } else if (state instanceof AuthorizedImpl) {
-                vscode.commands.executeCommand("setContext", "qodana.authorizing", false);
-                vscode.commands.executeCommand("setContext", "qodana.signed-in", true);
+                vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, false);
+                vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, true);
             }
         });
     }

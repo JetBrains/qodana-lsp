@@ -1,5 +1,6 @@
 import {BackendUrls, CloudEnvironment} from "./index";
 import {QodanaCloudUnauthorizedApiImpl} from "./unauthorized";
+import {QodanaCloudUserApiImpl} from "./user";
 
 
 export interface QodanaCloudUnauthorizedApi {
@@ -26,6 +27,10 @@ export interface QodanaCloudUserApi {
 
 export function qodanaCloudUnauthorizedApi(environment: CloudEnvironment) {
     return new QodanaCloudUnauthorizedApiImpl(environment);
+}
+
+export function qodanaCloudUserApi(environment: CloudEnvironment, tokenRetriever: () => Promise<string | undefined>) {
+    return new QodanaCloudUserApiImpl(environment, tokenRetriever);
 }
 
 

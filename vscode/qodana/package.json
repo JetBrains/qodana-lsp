@@ -61,26 +61,25 @@
         "title": "Log In to Qodana"
       },
       {
-        "command": "qodanaLinkView.refresh",
+        "command": "qodana.refreshProjects",
         "title": "Refresh",
         "icon": "$(refresh)"
       },
       {
-        "command": "qodanaLinkView.link",
-        "title": "Link",
-        "icon": "$(eye)"
+        "command": "qodana.link",
+        "title": "Link"
       },
       {
-        "command": "qodanaLinkView.unlink",
+        "command": "qodana.unlink",
         "title": "Unlink"
       },
       {
-        "command": "qodanaLinkView.selectNode",
+        "command": "qodana.selectNode",
         "title": "Select node"
       },
       {
         "command": "qodanaTreeNode.other-item",
-        "title": "Link other project2"
+        "title": "Link other project"
       }
     ],
     "walkthroughs": [
@@ -193,7 +192,7 @@
           "id": "qodana.link-view",
           "name": "Link project",
           "titleActions": [
-            "qodanaLinkView.refresh"
+            "qodana.refresh"
           ],
           "when": "qodana.signed-in && !qodana.linked"
         },
@@ -220,12 +219,12 @@
     "menus": {
       "view/title": [
         {
-          "command": "qodanaLinkView.refresh",
+          "command": "qodana.refreshProjects",
           "when": "view == qodana.link-view",
           "group": "navigation"
         },
         {
-          "command": "qodanaLinkView.link",
+          "command": "qodana.link",
           "when": "view == qodana.link-view",
           "group": "navigation"
         }

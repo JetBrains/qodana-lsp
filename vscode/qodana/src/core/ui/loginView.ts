@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import {CancellationToken, WebviewView, WebviewViewResolveContext} from "vscode";
 import {Events} from "../events";
 import {buildHtml} from "./util";
+import {COMMANDS} from "../config";
 
 export class LogInView implements vscode.WebviewViewProvider {
     public static readonly viewType = 'qodana.login-view';
@@ -28,33 +29,8 @@ export class LogInView implements vscode.WebviewViewProvider {
         };
         webviewView.webview.html = this.getHtml(webviewView.webview);
         webviewView.webview.onDidReceiveMessage(data => {
-            console.log(data);
-            switch (data.type) {
-                case 'login':
-                {
-                    vscode.commands.executeCommand('qodana.login');
-                    break;
-                }
-                case 'loginCustomServer':
-                {
-                    vscode.commands.executeCommand('qodana.loginCustomServer');
-                    break;
-                }
-                case 'runLocally':
-                {
-                    vscode.commands.executeCommand('qodana.runLocally');
-                    break;
-                }
-                case 'openLocalReport':
-                {
-                    vscode.commands.executeCommand('qodana.openLocalReport');
-                    break;
-                }
-                case 'closeReport':
-                {
-                    vscode.commands.executeCommand('qodana.closeReport');
-                    break;
-                }
+            if (COMMANDS.has(data.type)) {
+                vscode.commands.executeCommand(data.type);
             }
         });
         this._view?.webview.postMessage({type: 'hide', data: '.close-report-button', visible: false});
@@ -67,7 +43,7 @@ export class LogInView implements vscode.WebviewViewProvider {
               <button class="self-hosted-button">Qodana Self-Hosted</button>
               <button class="run-locally-button">Run Locally</button>
               <button class="open-local-report-button">Open Local Report</button>
-              <button class="close-report-button">Close Report</button>`
+              <button class="close-report-button hide-element">Close Report</button>`
         );
     }
 }

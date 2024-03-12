@@ -53,7 +53,7 @@ describe('Language/Linter Selection Tests', () => {
         const communityLinters = ['QDJVMC'];
         const paidLinters: string[] = [];
 
-        const result = await selectLinter(undefined, communityLinters, paidLinters);
+        const result = await selectLinter('', communityLinters, paidLinters);
         assert.equal(result, 'QDJVMC');
         assert.equal(choiceStub.called, false);
     });
@@ -63,7 +63,7 @@ describe('Language/Linter Selection Tests', () => {
         const communityLinters: string[] = [];
         const paidLinters: string[] = [];
 
-        const result = await selectLinter(undefined, communityLinters, paidLinters);
+        const result = await selectLinter('', communityLinters, paidLinters);
         assert.equal(result, undefined);
         assert.equal(choiceStub.called, false);
     });

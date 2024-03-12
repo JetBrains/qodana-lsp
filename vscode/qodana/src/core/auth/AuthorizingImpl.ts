@@ -6,9 +6,10 @@ import telemetry from "../telemetry";
 import {cloudWebsite} from "../defaults";
 import * as net from "net";
 import * as http from "http";
-import {qodanaCloudUnauthorizedApi} from "../cloud/api";
+import {qodanaCloudUnauthorizedApi, qodanaCloudUserApi} from "../cloud/api";
 import {AuthorizedImpl} from "./AuthorizedImpl";
 import {CloudEnvironment} from "../cloud";
+import {STATE_AUTHORIZING} from "../config";
 
 export class AuthorizingImpl implements Authorizing {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;
@@ -42,7 +43,10 @@ export class AuthorizingImpl implements Authorizing {
             this.stateEmitter.fire(newState);
             return;
         }
-        let newState = new AuthorizedImpl(this.context, this.stateEmitter, this.environment, auth);
+        let userInfo = await qodanaCloudUserApi(this.environment, async () => {
+            return auth?.access;
+        }).getUserInfo();
+        let newState = new AuthorizedImpl(this.context, this.stateEmitter, this.environment, auth, userInfo);
         this.stateEmitter.fire(newState);
     }
 
@@ -56,7 +60,7 @@ export class AuthorizingImpl implements Authorizing {
             }
             return await this.makeOAuthRequest(authUrl, server, portNumber);
         } catch (error) {
-            vscode.commands.executeCommand("setContext", "qodana.authorizing", false);
+            vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, false);
             vscode.window.showErrorMessage(`${FAILED_TO_AUTHENTICATE} ${error}`);
             telemetry.errorReceived('#getCodeFromOAuth exception');
         } finally {

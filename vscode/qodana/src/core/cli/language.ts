@@ -92,7 +92,7 @@ export function getLinterByCode(code: string): string| undefined {
 }
 
 
-export async function selectLinter(token: string | undefined, communityLinters: string[], paidLinters: string[]): Promise<string | undefined> {
+export async function selectLinter(token: string, communityLinters: string[], paidLinters: string[]): Promise<string | undefined> {
     let allLinters: string[] = communityLinters;
     if (token) {
         allLinters = paidLinters.concat(communityLinters);

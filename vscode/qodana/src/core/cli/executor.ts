@@ -19,12 +19,12 @@ export async function showLocalReport(context: vscode.ExtensionContext, reportBa
         await context.workspaceState.update(WS_REPORT_ID, LOCAL_REPORT);
         Events.instance.fireReportFile({ reportFile: reportPath, reportId: LOCAL_REPORT});
     } catch (e) {
-        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(reportBasePath), true);
         vscode.window.showInformationMessage(NO_REPORT_FOUND);
     }
 }
 
-export async function runQodana(cli: string, token: string | undefined): Promise<string | undefined> {
+export async function
+runQodana(cli: string, token: string): Promise<string | undefined> {
     let isPrepared = await prepareRun(token);
     if (isPrepared) {
         let tempDir = path.join(os.tmpdir(), Math.random().toString(36).substring(7));
@@ -63,7 +63,7 @@ export async function launchTerminal(cli: string, cwd: string, tempDir: string, 
 }
 
 
-export async function prepareRun(token: string | undefined): Promise<boolean> {
+export async function prepareRun(token: string): Promise<boolean> {
     let linter = await getLinterFromQodanaYaml();
     if (linter !== undefined) {
         return true;
@@ -108,14 +108,49 @@ async function getLinterFromQodanaYaml() {
 
 async function createQodanaYaml(linter: string) {
     let rootPath = vscode.workspace.workspaceFolders![0].uri.fsPath; // existence of this path is checked before in extension
-    let yamlContent = `linter: ${linter}`; // todo template
+    let linterString = `linter: ${linter}`;
+    let yamlContent = getTemplate(linterString);
     let yamlFile = vscode.Uri.file(rootPath + '/qodana.yaml');
     try {
         await vscode.workspace.fs.stat(yamlFile);
         let existingContent = await vscode.workspace.fs.readFile(yamlFile);
-        yamlContent = new TextDecoder().decode(existingContent) + '\n' + yamlContent;
+        yamlContent = new TextDecoder().decode(existingContent) + '\n' + linterString;
     } catch (e) {
         // ignore, file does not exist
     }
     await vscode.workspace.fs.writeFile(yamlFile, Buffer.from(yamlContent));
 }
+
+function getTemplate(linterString: string) {
+    return TEMPLATE + '\n' + linterString;
+}
+
+const TEMPLATE = `
+#-------------------------------------------------------------------------------#
+#               Qodana analysis is configured by qodana.yaml file               #
+#             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
+#-------------------------------------------------------------------------------#
+version: "1.0"
+
+#Specify inspection profile for code analysis
+profile:
+  name: qodana.starter
+
+#Enable inspections
+#include:
+#  - name: <SomeEnabledInspectionId>
+
+#Disable inspections
+#exclude:
+#  - name: <SomeDisabledInspectionId>
+#    paths:
+#      - <path/where/not/run/inspection>
+
+#Execute shell command before Qodana execution (Applied in CI/CD pipeline)
+#bootstrap: sh ./prepare-qodana.sh
+
+#Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
+#plugins:
+#  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
+
+#Specify Qodana linter for analysis (Applied in CI/CD pipeline)`.trim();

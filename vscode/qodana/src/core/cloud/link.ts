@@ -1,9 +1,10 @@
 import * as vscode from "vscode";
-import {CONF_PROJ_ID} from "../config";
+import {CONF_PROJ_ID, STATE_LINKED} from "../config";
 import {extensionInstance} from "../extension";
 import {CloudProjectResponse} from "./api";
 import {openReportByProjectId} from "../report";
 import {Events} from "../events";
+import telemetry from "../telemetry";
 
 export class LinkService {
     private linkedProjectId: string | undefined;
@@ -48,15 +49,17 @@ export class LinkService {
         }
         this.projectProperties = projectProperties;
         this.isLinked = true;
-        vscode.commands.executeCommand("setContext", "qodana.linked", true);
         vscode.workspace.getConfiguration().update(CONF_PROJ_ID, this.linkedProjectId, vscode.ConfigurationTarget.Workspace);
+        vscode.commands.executeCommand('setContext', STATE_LINKED, true);
+        telemetry.projectLinked();
         Events.instance.fireProjectLinked();
     }
 
     unlinkProject() {
         this.isLinked = false;
         this.projectProperties = undefined;
-        vscode.commands.executeCommand("setContext", "qodana.linked", false);
+        vscode.commands.executeCommand('setContext', STATE_LINKED, false);
+        telemetry.projectUnlinked();
         this.closeReport();
     }
 

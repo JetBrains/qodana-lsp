@@ -19,7 +19,6 @@ export class LocalRunsService {
                     return;
                 }
                 let time = new Date(Date.now());
-                console.log(e.reportFile);
                 this.localReports.add({
                     path: e.reportFile,
                     label: `${time.toLocaleDateString()} ${time.toLocaleTimeString()}`
