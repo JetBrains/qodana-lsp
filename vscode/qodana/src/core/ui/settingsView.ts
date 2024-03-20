@@ -45,10 +45,9 @@ export class SettingsView implements vscode.WebviewViewProvider {
         return buildHtml(webview, this._extensionUri, 'settings.js', `
               <p>${loggedInAs(username)}</p>
               <br>
-              <button class="logout-button">Log Out</button>
-              <button class="run-locally-button">Run Locally</button>
-              <button class="open-local-report-button">Open Local Report</button>
-              <button class="close-report-button hide-element">Close Report</button>`
+              
+              <button class="close-report-button secondary hide-element">Turn Analysis Off</button>
+              <button class="logout-button secondary">Log Out</button>`
         );
     }
 }

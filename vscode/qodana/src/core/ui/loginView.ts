@@ -39,11 +39,9 @@ export class LogInView implements vscode.WebviewViewProvider {
 
     private getHtml(webview: vscode.Webview) {
         return buildHtml(webview, this._extensionUri, 'login.js', `
-              <button class="login-button">Log In</button>
-              <button class="self-hosted-button">Qodana Self-Hosted</button>
-              <button class="run-locally-button">Run Locally</button>
-              <button class="open-local-report-button">Open Local Report</button>
-              <button class="close-report-button hide-element">Close Report</button>`
+              <button class="login-button">Log In to Cloud</button>
+              <button class="self-hosted-button secondary">Log In to Self-Hosted</button>
+              <button class="close-report-button secondary hide-element">Turn Analysis Off</button>`
         );
     }
 }

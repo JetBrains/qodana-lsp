@@ -22,6 +22,7 @@ import {
 	COMMAND_UNLINK
 } from "./core/config";
 import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from "./core/messages";
+import {RunLocallyView} from "./core/ui/runLocallyView";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -213,6 +214,10 @@ function initLocalRunService(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(COMMAND_CLOSE_REPORT, async () => {
 			await extensionInstance.closeReport();
 		})
+	);
+	const runLocallyView = new RunLocallyView(context.extensionUri);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(RunLocallyView.viewType, runLocallyView)
 	);
 }
 

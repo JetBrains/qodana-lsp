@@ -9,14 +9,6 @@
         vscode.postMessage({ type: 'qodana.logout' });
     });
 
-    document.querySelector('.run-locally-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.runLocally' });
-    });
-
-    document.querySelector('.open-local-report-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.openLocalReport' });
-    });
-
     document.querySelector('.close-report-button').addEventListener('click', () => {
         vscode.postMessage({ type: 'qodana.closeReport' });
     });

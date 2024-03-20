@@ -49,8 +49,8 @@ export class LinkedView implements vscode.WebviewViewProvider {
         return buildHtml(webview, this._extensionUri, 'link.js', `
               <p>${linkedToProject(extensionInstance.linkService?.getLinkedProjectName())}</p>
               <br>
-              <button class="unlink-button">Unlink</button>
-              <button class="open-report-button">Open Report</button>`
+              <button class="unlink-button secondary">Unlink Project</button>
+              <button class="open-report-button secondary">Open Report</button>`
         );
     }
 
