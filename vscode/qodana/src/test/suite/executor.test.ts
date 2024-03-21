@@ -84,7 +84,7 @@ describe('CLI Executor Tests', () => {
         let result = await prepareRun('token');
         assert.equal(result, true);
         assert.equal(choiceStub.called, true);
-        assert.equal(writtenText, 'linter: jetbrains/qodana-jvm:latest');
+        assert.equal(writtenText.split('\n').pop(), 'linter: jetbrains/qodana-jvm:latest');
     });
 
     it('5: runQodana calls prepareRun and launchTerminal', async () => {

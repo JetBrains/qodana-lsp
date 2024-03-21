@@ -25,7 +25,7 @@ export interface QodanaCloudUserApi {
     getUserInfo(): Promise<QodanaCloudUserInfoResponse | undefined>
 }
 
-export function qodanaCloudUnauthorizedApi(environment: CloudEnvironment) {
+export function qodanaCloudUnauthorizedApi(environment: CloudEnvironment) : QodanaCloudUnauthorizedApi {
     return new QodanaCloudUnauthorizedApiImpl(environment);
 }
 

@@ -17,13 +17,9 @@ export const SEC_REFRESH_TOKEN = 'refreshToken';
 export const SEC_EXPIRES = 'expires';
 export const SEC_REFRESH_TOKEN_USED = 'refreshTokenUsed';
 
-export interface AuthState {
-}
+export interface AuthState {}
 
-
-export class Unauthorized implements AuthState {
-
-}
+export class Unauthorized implements AuthState {}
 
 //todo refactor
 export interface InternalAuthorized extends AuthState {
@@ -150,6 +146,7 @@ export class Auth {
     }
 
     async resetTokens(): Promise<void> {
+        console.log(this.lastState);
         if (this.lastState instanceof AuthorizedImpl) {
             await this.lastState.resetTokens();
         }
@@ -186,7 +183,7 @@ export class Auth {
     }
 
 
-    async handleUnauthorizedState(frontendUrl?: string): Promise<string | undefined> {
+    async logIn(frontendUrl?: string): Promise<string | undefined> {
         if (this.lastState instanceof NotAuthorizedImpl) {
             this.lastState.authorize(frontendUrl);
         }

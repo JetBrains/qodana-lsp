@@ -27,27 +27,32 @@ export class AuthorizingImpl implements Authorizing {
 
     async startOauth() {
         // authorize
-        let code = await this.getCodeFromOAuth();
-        if (!code) {
-            vscode.window.showErrorMessage(AUTH_FAILED);
-            telemetry.errorReceived('#handleUnauthorizedState no code');
-            return;
-        }
+        try {
+            let code = await this.getCodeFromOAuth();
+            if (!code) {
+                vscode.window.showErrorMessage(AUTH_FAILED);
+                telemetry.errorReceived('#handleUnauthorizedState no code');
+                return;
+            }
 
-        // do a post request to get token, refresh token and expires
-        let auth = await qodanaCloudUnauthorizedApi(this.environment).getOauthToken(code);
-        if (!auth) {
-            vscode.window.showErrorMessage(FAILED_TO_OBTAIN_TOKEN);
-            telemetry.errorReceived('#handleUnauthorizedState no auth');
+            // do a post request to get token, refresh token and expires
+            let auth = await qodanaCloudUnauthorizedApi(this.environment).getOauthToken(code);
+            if (!auth) {
+                vscode.window.showErrorMessage(FAILED_TO_OBTAIN_TOKEN);
+                telemetry.errorReceived('#handleUnauthorizedState no auth');
+                let newState = new NotAuthorizedImpl(this.context, this.stateEmitter);
+                this.stateEmitter.fire(newState);
+                return;
+            }
+            let userInfo = await qodanaCloudUserApi(this.environment, async () => {
+                return auth?.access;
+            }).getUserInfo();
+            let newState = new AuthorizedImpl(this.context, this.stateEmitter, this.environment, auth, userInfo);
+            this.stateEmitter.fire(newState);
+        } catch (error) {
             let newState = new NotAuthorizedImpl(this.context, this.stateEmitter);
             this.stateEmitter.fire(newState);
-            return;
         }
-        let userInfo = await qodanaCloudUserApi(this.environment, async () => {
-            return auth?.access;
-        }).getUserInfo();
-        let newState = new AuthorizedImpl(this.context, this.stateEmitter, this.environment, auth, userInfo);
-        this.stateEmitter.fire(newState);
     }
 
     async getCodeFromOAuth(): Promise<string | undefined> {
@@ -56,13 +61,13 @@ export class AuthorizingImpl implements Authorizing {
         try {
             let authUrl = (await qodanaCloudUnauthorizedApi(this.environment).getOauthProviderData())?.oauthUrl;
             if (authUrl === undefined) {
-                return;
+                return undefined;
             }
             return await this.makeOAuthRequest(authUrl, server, portNumber);
         } catch (error) {
-            vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, false);
             vscode.window.showErrorMessage(`${FAILED_TO_AUTHENTICATE} ${error}`);
             telemetry.errorReceived('#getCodeFromOAuth exception');
+            return undefined;
         } finally {
             server.close();
         }

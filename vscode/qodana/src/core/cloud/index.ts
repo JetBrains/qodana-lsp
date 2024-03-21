@@ -1,5 +1,4 @@
 import {cloudWebsite} from "../defaults";
-import * as vscode from "vscode";
 import {qodanaCloudUnauthorizedApi} from "./api";
 
 
@@ -9,18 +8,21 @@ export class CloudEnvironment {
     constructor(readonly frontendUrl?: string) {}
 
     async getBackendUrlForVersion(version: String) {
-        let newTask: Promise<BackendUrls | undefined> = new Promise (async (resolve, reject) => {
-            let url = this.frontendUrl ? this.frontendUrl : cloudWebsite();
-            let urls = await qodanaCloudUnauthorizedApi(this).getBackendUrls(url);
-            if (urls !== undefined) {
-                resolve(urls);
-                return;
-            }
-            this.lastBackendUrlsRequest = undefined;
-            reject();
-        });
         if (this.lastBackendUrlsRequest === undefined) {
-            this.lastBackendUrlsRequest = newTask;
+            this.lastBackendUrlsRequest = new Promise (async (resolve, reject) => {
+                try {
+                    let url = this.frontendUrl ? this.frontendUrl : cloudWebsite();
+                    let urls = await qodanaCloudUnauthorizedApi(this).getBackendUrls(url);
+                    if (urls !== undefined) {
+                        resolve(urls);
+                        return;
+                    }
+                    this.lastBackendUrlsRequest = undefined;
+                    reject();
+                } catch (error) {
+                    reject(error);
+                }
+            });
         }
         let urls = await this.lastBackendUrlsRequest;
         return urls?.api?.versions?.find(

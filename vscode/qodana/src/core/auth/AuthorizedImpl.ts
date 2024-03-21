@@ -55,7 +55,7 @@ export class AuthorizedImpl implements Authorized {
                 this.logOut();
                 return undefined;
             } else if (authState instanceof TokenExpired) {
-                let token = this.handleTokenExpiredState();
+                let token = await this.handleTokenExpiredState();
                 if (token === undefined) {
                     this.logOut();
                 }

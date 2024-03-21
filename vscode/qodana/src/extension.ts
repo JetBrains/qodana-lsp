@@ -145,7 +145,7 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 	}
 	context.subscriptions.push(
 		vscode.commands.registerCommand(COMMAND_LOG_IN, async () => {
-			extensionInstance.auth?.handleUnauthorizedState();
+			extensionInstance.auth?.logIn();
 		})
 	);
 	context.subscriptions.push(
@@ -154,7 +154,7 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 				prompt: SELF_HOSTED_TOOLTIP
 			});
 			if (userInput !== undefined) {
-				extensionInstance.auth?.handleUnauthorizedState(userInput);
+				extensionInstance.auth?.logIn(userInput);
 			}
 			// todo handle error
 		})
