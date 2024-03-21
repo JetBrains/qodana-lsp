@@ -14,6 +14,9 @@ interface ExtendedLanguageServer : LanguageServer {
 
     @JsonRequest
     fun setSarifFile(params: SetSarifFileParams) : CompletableFuture<Unit>
+
+    @JsonRequest
+    fun closeReport() : CompletableFuture<Unit>
 }
 
 data class SetSourceLocationParams(val path: String)

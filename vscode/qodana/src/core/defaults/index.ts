@@ -1,23 +1,3 @@
-export function apiUrl() {
-    if (process.env.QODANA_API_URL) {
-        if (process.env.QODANA_API_URL.endsWith('/') && isValidURL(process.env.QODANA_API_URL)) {
-            return process.env.QODANA_API_URL.slice(0, -1);
-        }
-        return process.env.QODANA_API_URL;
-    }
-    return 'https://api.qodana.cloud';
-}
-
-export function authUrl() {
-    if (process.env.QODANA_AUTH_URL) {
-        if (process.env.QODANA_AUTH_URL.endsWith('/') && isValidURL(process.env.QODANA_AUTH_URL)) {
-            return process.env.QODANA_AUTH_URL.slice(0, -1);
-        }
-        return process.env.QODANA_AUTH_URL;
-    }
-    return 'https://oauth.account.jetbrains.com/oauth2/auth';
-}
-
 export function cloudWebsite() {
     if (process.env.QODANA_CLOUD_WEBSITE) {
         if (process.env.QODANA_CLOUD_WEBSITE.endsWith('/') && isValidURL(process.env.QODANA_CLOUD_WEBSITE)) {
