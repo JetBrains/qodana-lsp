@@ -28,7 +28,7 @@ export class RunLocallyView implements vscode.WebviewViewProvider {
     }
 
     private getHtml(webview: vscode.Webview) {
-        return buildHtml(webview, this._extensionUri, 'settings.js', `
+        return buildHtml(webview, this._extensionUri, 'runLocally.js', `
               <button class="run-locally-button">Run Locally</button>
               <button class="view-history-button secondary">View History</button>`
         );
