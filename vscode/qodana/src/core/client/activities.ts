@@ -5,7 +5,7 @@ import { Auth } from "../auth";
 import { openReportById, openReportByProjectId } from "../report";
 import { CLOUD_REPORT_LOADED, SHOW_PROBLEMS } from "../messages";
 import config, {
-    CONF_PROJ_ID,
+    CONF_PROJ_ID, IS_DEBUG,
     WS_BASELINE_ISSUES,
     WS_COMPUTED_PREFIX,
     WS_OPENED_REPORT,
@@ -94,6 +94,7 @@ export function onReportFile(client: LanguageClient, context: vscode.ExtensionCo
             Events.instance.fireReportOpened();
         } else {
             QodanaState.instance.notAttachedToReport();
+            Events.instance.fireReportClosed();
         }
     });
 }
@@ -118,16 +119,17 @@ export async function sendReportToLanguageClient(client: LanguageClient, context
         showBaselineIssues: context.workspaceState.get<boolean>(WS_BASELINE_ISSUES, false)
     };
     await client.sendRequest("setSarifFile", sarifParams);
-    vscode.window.showInformationMessage(CLOUD_REPORT_LOADED, SHOW_PROBLEMS).then((value) => {
-        if (value === SHOW_PROBLEMS) {
-            vscode.commands.executeCommand("workbench.action.problems.focus");
-        }
-    });
+    if (IS_DEBUG) {
+        vscode.window.showInformationMessage(CLOUD_REPORT_LOADED, SHOW_PROBLEMS).then((value) => {
+            if (value === SHOW_PROBLEMS) {
+                vscode.commands.executeCommand("workbench.action.problems.focus");
+            }
+        });
+    }
 }
 
 export function onReportClosed() {
     Events.instance.onReportClosed(() => {
-        vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Workspace);
         vscode.commands.executeCommand("setContext", "qodana.report-opened", false);
     });
 }

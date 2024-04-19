@@ -9,11 +9,9 @@ import telemetry from "../telemetry";
 export class LinkService {
     private linkedProjectId: string | undefined;
     private isLinked: boolean = false;
-    private readonly closeReport: () => void;
     private projectProperties: CloudProjectResponse | undefined;
 
-    constructor(private context: vscode.ExtensionContext, closeReport: () => void) {
-        this.closeReport = closeReport;
+    constructor(private context: vscode.ExtensionContext) {
         vscode.workspace.onDidChangeConfiguration(async (e) => {
             if (e.affectsConfiguration('qodana')) {
                 await this.selectAndLink();
@@ -28,7 +26,7 @@ export class LinkService {
             this.selectProject(projectId);
             await this.linkProject();
         } else {
-            this.unlinkProject();
+            await this.unlinkProject();
         }
     }
 
@@ -55,12 +53,13 @@ export class LinkService {
         Events.instance.fireProjectLinked();
     }
 
-    unlinkProject() {
+    async unlinkProject() {
         this.isLinked = false;
         this.projectProperties = undefined;
+        vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Workspace);
         vscode.commands.executeCommand('setContext', STATE_LINKED, false);
         telemetry.projectUnlinked();
-        this.closeReport();
+        await extensionInstance.closeReport();
     }
 
     getLinkedProjectId(): string | undefined {

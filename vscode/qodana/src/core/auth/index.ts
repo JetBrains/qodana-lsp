@@ -146,7 +146,6 @@ export class Auth {
     }
 
     async resetTokens(): Promise<void> {
-        console.log(this.lastState);
         if (this.lastState instanceof AuthorizedImpl) {
             await this.lastState.resetTokens();
         }

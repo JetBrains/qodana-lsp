@@ -60,7 +60,7 @@ export class QodanaExtension {
         }
         this.auth = await Auth.create(this.context);
 
-        this.linkService = new LinkService(this.context, () => this.closeReport());
+        this.linkService = new LinkService(this.context);
         this.localRunService = new LocalRunsService(this.context);
 
         this.languageClient = await getLanguageClient(this.context);
@@ -110,7 +110,6 @@ export class QodanaExtension {
             reportFile: undefined,
             reportId: undefined
         });
-        Events.instance.fireReportClosed();
         telemetry.reportClosed();
         await this.restartLanguageServer();
     }
@@ -152,6 +151,7 @@ export class QodanaExtension {
                 return;
             }
             let tempDir = await runQodana(cli, token);
+            await this.closeReport();
             await showLocalReport(this.context, tempDir);
         }
     }

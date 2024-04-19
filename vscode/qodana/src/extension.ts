@@ -173,13 +173,13 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 		})
 	);
 
-	const loginView = new LogInView(context.extensionUri);
+	const loginView = new LogInView(context);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(LogInView.viewType, loginView)
 	);
 
 
-	const settingsView = new SettingsView(context.extensionUri);
+	const settingsView = new SettingsView(context);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(SettingsView.viewType, settingsView)
 	);
@@ -194,8 +194,7 @@ function initLinkService(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(COMMAND_UNLINK, async () => {
-			extensionInstance.linkService?.unlinkProject();
-			await extensionInstance.closeReport();
+			await extensionInstance.linkService?.unlinkProject();
 		})
 	);
 	const linkedView = new LinkedView(context.extensionUri);

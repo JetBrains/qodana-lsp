@@ -8,6 +8,8 @@ import telemetry from "../telemetry";
 import { Events } from "../events";
 
 
+export const IS_DEBUG = process.env.EXTENSION_DEBUG === 'true';
+
 export const LOCAL_REPORT = 'LOCAL';
 export const WS_BASELINE_ISSUES = 'baselineIssues';
 export const WS_REPORT_ID = 'reportId';
@@ -55,7 +57,14 @@ class ConfigurationHelper {
     }
 
     private settings = [
-        { id: CONF_PROJ_ID, message: PROJECT_ID_NOT_SET, checker: async (value: unknown) => value !== '' },
+        { id: CONF_PROJ_ID, message: PROJECT_ID_NOT_SET, checker: async (value: unknown) => {
+                if (IS_DEBUG) {
+                    return value !== '';
+                } else {
+                    return true;
+                }
+            }
+        },
         {
             id: CONF_PATH_PREFIX, message: PATH_PREFIX_NOT_SET, checker: async (value: unknown) => {
                 if (!value) { return true; }
@@ -160,9 +169,11 @@ class ConfigurationHelper {
     }
 
     private async reloadWorkspace() {
-        let value = await vscode.window.showInformationMessage(RELOAD_TO_APPLY, RELOAD);
-        if (value === RELOAD) {
-            await vscode.commands.executeCommand("workbench.action.reloadWindow");
+        if (IS_DEBUG) {
+            let value = await vscode.window.showInformationMessage(RELOAD_TO_APPLY, RELOAD);
+            if (value === RELOAD) {
+                await vscode.commands.executeCommand("workbench.action.reloadWindow");
+            }
         }
     }
 }
