@@ -28,7 +28,6 @@ export class AuthorizingImpl implements Authorizing {
         try {
             let code = await this.getCodeFromOAuth();
             if (!code) {
-                vscode.window.showErrorMessage(AUTH_FAILED);
                 telemetry.errorReceived('#handleUnauthorizedState no code');
                 return;
             }
