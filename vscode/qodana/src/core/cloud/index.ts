@@ -4,15 +4,17 @@ import {qodanaCloudUnauthorizedApi} from "./api";
 
 export class CloudEnvironment {
     private lastBackendUrlsRequest: Promise<BackendUrls | undefined> | undefined = undefined;
+    public frontendUrl: string;
 
-    constructor(readonly frontendUrl?: string) {}
+    constructor(frontendUrl?: string) {
+        this.frontendUrl = frontendUrl ? frontendUrl : cloudWebsite();
+    }
 
     async getBackendUrlForVersion(version: String) {
         if (this.lastBackendUrlsRequest === undefined) {
             this.lastBackendUrlsRequest = new Promise (async (resolve, reject) => {
                 try {
-                    let url = this.frontendUrl ? this.frontendUrl : cloudWebsite();
-                    let urls = await qodanaCloudUnauthorizedApi(this).getBackendUrls(url);
+                    let urls = await qodanaCloudUnauthorizedApi(this).getBackendUrls(this.frontendUrl);
                     if (urls !== undefined) {
                         resolve(urls);
                         return;

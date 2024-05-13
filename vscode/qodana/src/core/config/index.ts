@@ -57,14 +57,7 @@ class ConfigurationHelper {
     }
 
     private settings = [
-        { id: CONF_PROJ_ID, message: PROJECT_ID_NOT_SET, checker: async (value: unknown) => {
-                if (IS_DEBUG) {
-                    return value !== '';
-                } else {
-                    return true;
-                }
-            }
-        },
+        { id: CONF_PROJ_ID, message: PROJECT_ID_NOT_SET, checker: async (value: unknown) => value !== ''},
         {
             id: CONF_PATH_PREFIX, message: PATH_PREFIX_NOT_SET, checker: async (value: unknown) => {
                 if (!value) { return true; }
@@ -157,7 +150,8 @@ class ConfigurationHelper {
         }
 
         // ok, it's not a global settings change, check if workspace settings are valid
-        let isValid = await this.configIsValid(context, false);
+        let silent = !IS_DEBUG;
+        let isValid = await this.configIsValid(context, silent);
         await this.updateClientState(isValid, client);
     }
 

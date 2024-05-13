@@ -184,7 +184,7 @@ export class Auth {
 
     async logIn(frontendUrl?: string): Promise<string | undefined> {
         if (this.lastState instanceof NotAuthorizedImpl) {
-            this.lastState.authorize(frontendUrl);
+            this.lastState.authorize(this.normalizeUrl(frontendUrl));
         }
         return undefined;
     }
@@ -199,5 +199,19 @@ export class Auth {
         if (this.lastState instanceof AuthorizingImpl) {
             this.lastState.cancelAuthorization();
         }
+    }
+
+    private normalizeUrl(serverName?: string): string | undefined {
+        if (!serverName) {
+            return serverName;
+        }
+        let result: string;
+        if (serverName.startsWith("https://") || serverName.startsWith("http://")) {
+            result = serverName;
+        } else {
+            result = `https://${serverName}`;
+        }
+
+        return result.endsWith('/') ? result.slice(0, -1) : result;
     }
 }

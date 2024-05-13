@@ -3,13 +3,11 @@ import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
 import * as vscode from "vscode";
 import {AUTH_FAILED, FAILED_TO_AUTHENTICATE, FAILED_TO_OBTAIN_TOKEN} from "../messages";
 import telemetry from "../telemetry";
-import {cloudWebsite} from "../defaults";
 import * as net from "net";
 import * as http from "http";
 import {qodanaCloudUnauthorizedApi, qodanaCloudUserApi} from "../cloud/api";
 import {AuthorizedImpl} from "./AuthorizedImpl";
 import {CloudEnvironment} from "../cloud";
-import {STATE_AUTHORIZING} from "../config";
 
 export class AuthorizingImpl implements Authorizing {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;
@@ -102,7 +100,7 @@ export class AuthorizingImpl implements Authorizing {
                     }
                 }
                 // redirect to the page with the message
-                res.writeHead(302, { 'Location': `${cloudWebsite()}/ideauth` });
+                res.writeHead(302, {'Location': `${this.environment.frontendUrl}/ideauth`});
                 res.end();
             });
         });
