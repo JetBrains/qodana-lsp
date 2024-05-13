@@ -87,6 +87,7 @@ export const GET_TOKEN = vscode.l10n.t('[Qodana] Enter Qodana token.');
 // SELECTION 
 
 export const NO_LINTERS_FOUND = vscode.l10n.t('[Qodana] No supported linters found in the workspace.');
+export const NO_WORKSPACE_OPENED = vscode.l10n.t('[Qodana] No workspace is currently opened.');
 
 // CLI EXECUTION 
 

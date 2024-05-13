@@ -4,7 +4,7 @@ import { getLanguagesInWorkspace, getLinterByCode as getLinterImageByCode, getLi
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
-import {NO_LINTERS_FOUND, NO_REPORT_FOUND, scanFinished} from '../messages';
+import {NO_LINTERS_FOUND, NO_REPORT_FOUND, NO_WORKSPACE_OPENED, scanFinished} from '../messages';
 import { Events } from '../events';
 import {LOCAL_REPORT, WS_REPORT_ID} from '../config';
 
@@ -72,7 +72,11 @@ export async function prepareRun(token: string): Promise<boolean> {
     let langs = await getLanguagesInWorkspace();
     let { communityLinters, paidLinters } = getLinters(langs);
     if (communityLinters.length === 0 && paidLinters.length === 0) {
-        vscode.window.showErrorMessage(NO_LINTERS_FOUND);
+        if (vscode.workspace.workspaceFolders === undefined) {
+            vscode.window.showErrorMessage(NO_WORKSPACE_OPENED);
+        } else {
+            vscode.window.showErrorMessage(NO_LINTERS_FOUND);
+        }
         return false;
     }
 
