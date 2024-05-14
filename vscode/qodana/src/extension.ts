@@ -19,7 +19,7 @@ import {
 	COMMAND_REFRESH_PROJECTS,
 	COMMAND_RUN_LOCALLY,
 	COMMAND_SELECT_NODE,
-	COMMAND_UNLINK
+	COMMAND_UNLINK, LOCAL_REPORT, WS_REPORT_ID
 } from "./core/config";
 import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from "./core/messages";
 import {RunLocallyView} from "./core/ui/runLocallyView";
@@ -211,7 +211,12 @@ function initLocalRunService(context: vscode.ExtensionContext) {
 	);
 	context.subscriptions.push(
 		vscode.commands.registerCommand(COMMAND_CLOSE_REPORT, async () => {
-			await extensionInstance.closeReport();
+			let isLocal = await context.workspaceState.get(WS_REPORT_ID) === LOCAL_REPORT;
+			if (isLocal) {
+				await extensionInstance.closeReport();
+			} else {
+				await extensionInstance.linkService?.unlinkProject();
+			}
 		})
 	);
 	const runLocallyView = new RunLocallyView(context.extensionUri);
