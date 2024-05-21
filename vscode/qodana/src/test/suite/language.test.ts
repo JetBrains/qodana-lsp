@@ -4,7 +4,8 @@ import {
     getLanguagesInWorkspace,
     getLinters,
     getLinterByCode,
-    selectLinter
+    selectLinter,
+    versionPrefix
 } from '../../core/cli/language'; // Update this path
 import assert = require('assert');
 
@@ -36,10 +37,10 @@ describe('Language/Linter Selection Tests', () => {
         assert.ok(arraysAreEqual(paidLinters, ['QDJVM', 'QDJS']), paidLinters.toString());
     });
 
-    it('3: getLinterByCode should return correct Docker image with latest tag', () => {
+    it('3: getLinterByCode should return correct Docker image with versioned prefix tag', () => {
         const linterCode = 'QDPY';
         const linterImage = getLinterByCode(linterCode);
-        assert.equal(linterImage, 'jetbrains/qodana-python:latest');
+        assert.equal(linterImage, 'jetbrains/qodana-python:' + versionPrefix);
     });
 
     it('4: getLinterByCode should return undefined for invalid code', () => {

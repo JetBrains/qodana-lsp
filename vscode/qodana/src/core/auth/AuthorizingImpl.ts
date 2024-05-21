@@ -101,6 +101,7 @@ export class AuthorizingImpl implements Authorizing {
                     }
                 }
                 // redirect to the page with the message
+                /* eslint-disable @typescript-eslint/naming-convention */
                 res.writeHead(302, {'Location': `${this.environment.frontendUrl}/ideauth`});
                 res.end();
             });

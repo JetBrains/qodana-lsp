@@ -37,6 +37,7 @@ export function qodanaCloudUserApi(environment: CloudEnvironment, tokenRetriever
 export interface AuthorizationResponseData {
     access: string,
     refresh: string,
+    /* eslint-disable @typescript-eslint/naming-convention */
     expires_at: string
 }
 

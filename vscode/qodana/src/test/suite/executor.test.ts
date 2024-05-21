@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 import assert = require('assert');
 import { launchTerminal, prepareRun, runQodana } from '../../core/cli/executor';
+import { versionPrefix } from '../../core/cli/language';
 
 describe('CLI Executor Tests', () => {
     const sandbox = sinon.createSandbox();
@@ -38,7 +39,7 @@ describe('CLI Executor Tests', () => {
         assert.equal(opts.cwd, 'cwd');
         assert.equal(commands.length, 2);
         assert.equal(commands[0], 'cli scan --results-dir tempDir --user root');
-        assert.equal(commands[1], '; exit');
+        assert.equal(commands[1], '; sleep 3; exit');
     });
 
     it('2: prepareRun returns true if linter is found in qodana.yaml', async () => {
@@ -84,7 +85,7 @@ describe('CLI Executor Tests', () => {
         let result = await prepareRun('token');
         assert.equal(result, true);
         assert.equal(choiceStub.called, true);
-        assert.equal(writtenText.split('\n').pop(), 'linter: jetbrains/qodana-jvm:latest');
+        assert.equal(writtenText.split('\n').pop(), 'linter: jetbrains/qodana-jvm:' + versionPrefix);
     });
 
     it('5: runQodana calls prepareRun and launchTerminal', async () => {

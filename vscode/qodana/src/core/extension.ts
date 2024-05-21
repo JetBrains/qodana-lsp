@@ -104,6 +104,16 @@ export class QodanaExtension {
         }
     }
 
+    async stopLanguageServer() {
+        if (this.languageClient && this.languageClient.isRunning()) {
+            await this.languageClient.stop().catch(() => {
+                // ignore
+            });
+            // stop handler needs some pause, since otherwise it clashes with initializer
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
+
     async closeReport() {
         //todo refactor
         Events.instance.fireReportFile({

@@ -1,0 +1,61 @@
+{
+    "version": "17.0.9",
+    "links": [
+        {
+            "name": "linux-aarch64",
+            "links": {
+                "fileName": "jbr-17.0.9-linux-aarch64-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-linux-aarch64-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "linux-x64",
+            "links": {
+                "fileName": "jbr-17.0.9-linux-x64-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-linux-x64-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "linux-x86",
+            "links": {
+                "fileName": "jbr-17.0.9-linux-x86-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-linux-x86-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "osx-aarch64",
+            "links": {
+                "fileName": "jbr-17.0.9-osx-aarch64-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-osx-aarch64-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "osx-x64",
+            "links": {
+                "fileName": "jbr-17.0.9-osx-x64-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-osx-x64-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "windows-aarch64",
+            "links": {
+                "fileName": "jbr-17.0.9-windows-aarch64-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-windows-aarch64-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "windows-x64",
+            "links": {
+                "fileName": "jbr-17.0.9-windows-x64-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-windows-x64-b1000.46.tar.gz"
+            }
+        },
+        {
+            "name": "windows-x86",
+            "links": {
+                "fileName": "jbr-17.0.9-windows-x86-b1000.46.tar.gz",
+                "fileUrl": "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-17.0.9-windows-x86-b1000.46.tar.gz"
+            }
+        }
+    ]
+}

@@ -1,4 +1,3 @@
-import * as https from 'https';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import {
@@ -9,6 +8,7 @@ import {
     successfullyExtracted,
     failedToExtractJbr
 } from '../messages';
+import { links } from "./jdk.json";
 import telemetry from '../telemetry';
 import * as tar from 'tar';
 import * as os from 'os';
@@ -17,7 +17,7 @@ import { downloadFile } from '../report';
 import {GS_JAVA_EXECUTABLE_PATH} from "../config";
 
 
-export function getJbrReleases(): Promise<Map<string, Release>> {
+/*export function getJbrReleases(): Promise<Map<string, Release>> {
     return new Promise((resolve, reject) => {
         let options = {
             hostname: 'api.github.com',
@@ -45,7 +45,7 @@ export function getJbrReleases(): Promise<Map<string, Release>> {
         req.on('error', reject);
         req.end();
     });
-}
+}*/
 
 export async function fetchJbr(url: string, filePath: string): Promise<string | undefined> {
     try {
@@ -78,10 +78,9 @@ export async function extractJbr(filePath: string, releaseName: string, extractP
 
 export async function getMatchingReleaseUrl(): Promise<Release | undefined> {
     let { osType, osArch } = getOsAndArch();
-    let releases = await getJbrReleases();
-    let release = releases.get(`${osType}-${osArch}`);
+    let release = links.find(x => x.name === `${osType}-${osArch}`);
     if (release) {
-        return release;
+        return release.links;
     }
 }
 
@@ -213,7 +212,7 @@ export async function getJavaForExecution(context: vscode.ExtensionContext): Pro
 }
 
 
-function parseData(data: string) {
+/*function parseData(data: string) {
     // regular expression to find Markdown table row data
     const re = /\| (.*?) \| .*? \| \[(.*?)]\((.*?)\)/g;
     let match;
@@ -236,7 +235,7 @@ function parseData(data: string) {
         map.set(platformArch, { fileName, fileUrl });
     }
     return map;
-}
+}*/
 
 interface Release {
     fileName: string;

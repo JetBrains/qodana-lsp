@@ -227,4 +227,6 @@ function initLocalRunService(context: vscode.ExtensionContext) {
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export async function deactivate() {
+	await extensionInstance.stopLanguageServer();
+}

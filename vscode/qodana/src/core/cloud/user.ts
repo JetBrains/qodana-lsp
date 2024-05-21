@@ -73,7 +73,9 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             url: (new URL(`${host}/projects/${projectId}/timeline`)).toString(),
             method: 'get',
             headers: {
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'Content-Type': 'application/json',
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'Authorization': 'Bearer ' + token
             },
             data: pagination
@@ -107,7 +109,9 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             url: finalUrl,
             method: 'get',
             headers: {
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'Content-Type': 'application/json',
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'Authorization': 'Bearer ' + token
             }
         };

@@ -18,6 +18,7 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
         return this.requestToken(
             new URL(`${host}/idea/auth/token/`).toString(),
             { 'code': code },
+            /* eslint-disable @typescript-eslint/naming-convention */
             { headers: { 'Content-Type': 'application/json' } });
     }
 
@@ -26,6 +27,7 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
         return this.requestToken(
             new URL(`${host}/idea/auth/refresh/`).toString(),
             null,
+            /* eslint-disable @typescript-eslint/naming-convention */
             { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + refreshToken } });
     }
 

@@ -12,12 +12,15 @@ extensionToLanguageMap.set('go', ['Go']);
 extensionToLanguageMap.set('cs', ['C#', 'F#', 'Visual Basic .NET']);
 extensionToLanguageMap.set('fs', ['C#', 'F#', 'Visual Basic .NET']);
 extensionToLanguageMap.set('vb', ['C#', 'F#', 'Visual Basic .NET']);
+extensionToLanguageMap.set('c', ['C/C++']);
+extensionToLanguageMap.set('cpp', ['C/C++']);
 
 let languageToProductCodeMap = new Map<string, string[]>();
-languageToProductCodeMap.set('Java', ['QDJVMC', 'QDJVM', 'QDANDC']);
-languageToProductCodeMap.set('Kotlin', ['QDJVMC', 'QDJVM', 'QDANDC']);
+languageToProductCodeMap.set('C/C++', ['QDCL', 'QDNET', 'QDCLC']);
+languageToProductCodeMap.set('Java', ['QDJVM', 'QDJVMC', 'QDANDC']);
+languageToProductCodeMap.set('Kotlin', ['QDJVM', 'QDJVMC', 'QDANDC']);
 languageToProductCodeMap.set('PHP', ['QDPHP']);
-languageToProductCodeMap.set('Python', ['QDPYC', 'QDPY']);
+languageToProductCodeMap.set('Python', ['QDPY', 'QDPYC']);
 languageToProductCodeMap.set('JavaScript', ['QDJS']);
 languageToProductCodeMap.set('TypeScript', ['QDJS']);
 languageToProductCodeMap.set('Go', ['QDGO']);
@@ -31,6 +34,11 @@ communityCodes.add('QDPYC');
 communityCodes.add('QDJVMC');
 communityCodes.add('QDANDC');
 communityCodes.add('QDNETC');
+communityCodes.add('QDCLC');
+
+let eapCodes = new Set<string>();
+eapCodes.add('QDNETC');
+eapCodes.add('QDCLC');
 
 let productCodeToDockerImageMap = new Map<string, string>();
 productCodeToDockerImageMap.set('QDANDC', 'jetbrains/qodana-jvm-android:');
@@ -38,13 +46,16 @@ productCodeToDockerImageMap.set('QDPHP', 'jetbrains/qodana-php:');
 productCodeToDockerImageMap.set('QDJS', 'jetbrains/qodana-js:');
 productCodeToDockerImageMap.set('QDNET', 'jetbrains/qodana-dotnet:');
 productCodeToDockerImageMap.set('QDNETC', 'jetbrains/qodana-cdnet:');
+productCodeToDockerImageMap.set('QDCL', 'jetbrains/qodana-clang:');
+productCodeToDockerImageMap.set('QDCLC', 'jetbrains/qodana-clang:');
 productCodeToDockerImageMap.set('QDPY', 'jetbrains/qodana-python:');
 productCodeToDockerImageMap.set('QDPYC', 'jetbrains/qodana-python-community:');
 productCodeToDockerImageMap.set('QDGO', 'jetbrains/qodana-go:');
 productCodeToDockerImageMap.set('QDJVM', 'jetbrains/qodana-jvm:');
 productCodeToDockerImageMap.set('QDJVMC', 'jetbrains/qodana-jvm-community:');
 
-const versionPrefix = 'latest';
+export const versionPrefix = '2024.1';
+const eapPrefix = '-eap';
 
 export async function getLanguagesInWorkspace() {
     const langsAndCounts = new Map<string, number>();
@@ -86,6 +97,9 @@ export function getLinters(langs: string[]): { communityLinters: string[]; paidL
 export function getLinterByCode(code: string): string| undefined {
     let linter = productCodeToDockerImageMap.get(code);
     if (linter) {
+        if (eapCodes.has(code)) {
+            return linter + versionPrefix + eapPrefix;
+        }
         return linter + versionPrefix;
     }
     return undefined;
