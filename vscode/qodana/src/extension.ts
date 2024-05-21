@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { extensionInstance } from './core/extension';
 import { ShowMarkerHandler } from './core/handler';
 import telemetry from './core/telemetry';
-import {ProjectsView} from "./core/ui/projectsView";
+import {OtherTreeItem, ProjectsView} from "./core/ui/projectsView";
 import {LinkedView} from "./core/ui/linkedView";
 import {LogInView} from "./core/ui/loginView";
 import {SettingsView} from "./core/ui/settingsView";
@@ -126,15 +126,16 @@ function initProjectsView(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(COMMAND_REFRESH_PROJECTS, () => projectsView.refresh())
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaTreeItem.other-item', async (otherItem: vscode.TreeItem) => {
+		vscode.commands.registerCommand('qodanaTreeItem.other-item', async (otherItem: OtherTreeItem) => {
 			const userInput = await vscode.window.showInputBox({
 				prompt: OTHER_PROJECT_TOOLTIP,
 			});
 			if (userInput !== undefined) {
 				otherItem.label = "Other project: " + userInput;
+				otherItem.projectId = userInput;
 				projectsView.refreshItem(otherItem);
-				vscode.commands.executeCommand(COMMAND_SELECT_NODE, userInput);
 			}
+			vscode.commands.executeCommand(COMMAND_SELECT_NODE, otherItem.projectId);
 		})
 	);
 }

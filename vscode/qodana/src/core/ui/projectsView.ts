@@ -25,7 +25,7 @@ export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
         let projectsSet = [... new Set(idToProject.values())].sort();
         let projectItems: vscode.TreeItem[] = projectsSet.map((project => new LinkTreeItem(project)));
 
-        const otherItem = new vscode.TreeItem(OTHER_PROJECT);
+        const otherItem = new OtherTreeItem(OTHER_PROJECT);
         otherItem.command = {
             command: 'qodanaTreeItem.other-item',
             title: LINK_OTHER_PROJECT,
@@ -73,4 +73,8 @@ class LinkTreeItem extends vscode.TreeItem {
             arguments: [this.project.projectId]
         };
     }
+}
+
+export class OtherTreeItem extends vscode.TreeItem {
+    projectId: string = '';
 }

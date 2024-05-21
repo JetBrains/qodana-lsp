@@ -8,6 +8,7 @@ import {AuthorizedImpl} from "./AuthorizedImpl";
 import {CloudEnvironment} from "../cloud";
 import {convertHttpToSsh, convertSshToHttp, getRemoteOrigin} from "../git";
 import {SERVER, STATE_AUTHORIZING, STATE_SIGNED_IN, USER_FULL_NAME, USER_ID, USER_NAME} from "../config";
+import {extensionInstance} from "../extension";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -53,7 +54,7 @@ export class TokenExpired implements InternalAuthorized {
 export interface AuthState_ {}
 
 export interface NotAuthorized extends AuthState_ {
-    authorize(frontendUrl?: string): Authorizing
+    authorize(frontendUrl?: string): Promise<NotAuthorized | Authorized>
 }
 
 export interface Authorizing extends AuthState_ {
@@ -62,6 +63,8 @@ export interface Authorizing extends AuthState_ {
 
 export interface Authorized extends AuthState_ {
     userInfo?: QodanaCloudUserInfoResponse
+
+    environment: CloudEnvironment;
 
     getToken(): Promise<string | undefined>
 
@@ -137,10 +140,10 @@ export class Auth {
             } else if (state instanceof AuthorizingImpl) {
                 vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, true);
                 vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, false);
-                state.startOauth();
             } else if (state instanceof AuthorizedImpl) {
                 vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, false);
                 vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, true);
+                extensionInstance.linkService?.getProjectProperties(undefined, false);
             }
         });
     }
@@ -182,11 +185,9 @@ export class Auth {
     }
 
 
-    async logIn(frontendUrl?: string): Promise<string | undefined> {
-        if (this.lastState instanceof NotAuthorizedImpl) {
-            this.lastState.authorize(this.normalizeUrl(frontendUrl));
-        }
-        return undefined;
+    async logIn(frontendUrl?: string): Promise<AuthState_ | null> {
+        let lastState = this.lastState;
+        return lastState instanceof NotAuthorizedImpl ? await lastState.authorize(normalizeUrl(frontendUrl)) : lastState;
     }
 
     logOut() {
@@ -200,18 +201,18 @@ export class Auth {
             this.lastState.cancelAuthorization();
         }
     }
+}
 
-    private normalizeUrl(serverName?: string): string | undefined {
-        if (!serverName) {
-            return serverName;
-        }
-        let result: string;
-        if (serverName.startsWith("https://") || serverName.startsWith("http://")) {
-            result = serverName;
-        } else {
-            result = `https://${serverName}`;
-        }
-
-        return result.endsWith('/') ? result.slice(0, -1) : result;
+export function normalizeUrl(serverName?: string): string | undefined {
+    if (!serverName) {
+        return serverName;
     }
+    let result: string;
+    if (serverName.startsWith("https://") || serverName.startsWith("http://")) {
+        result = serverName;
+    } else {
+        result = `https://${serverName}`;
+    }
+
+    return result.endsWith('/') ? result.slice(0, -1) : result;
 }

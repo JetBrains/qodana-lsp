@@ -39,9 +39,7 @@ export class LinkService {
         if (projectId === undefined) {
             return;
         }
-        let projectProperties = await extensionInstance.auth?.getAuthorized()?.qodanaCloudUserApi((api) => {
-            return api.getProjectProperties(projectId!);
-        });
+        let projectProperties = await this.getProjectProperties(projectId);
         if (!projectProperties) {
             return;
         }
@@ -83,5 +81,19 @@ export class LinkService {
             await openReportByProjectId(projectId, this.context, authorized);
             vscode.commands.executeCommand("workbench.action.problems.focus");
         }
+    }
+
+    async getProjectProperties(projectId?: string, withError: boolean = true) {
+        let id = projectId ? projectId : this.linkedProjectId;
+        if (!id) {
+            return undefined;
+        }
+        let projectProperties = await extensionInstance.auth?.getAuthorized()?.qodanaCloudUserApi((api) => {
+            return api.getProjectProperties(id!, withError);
+        });
+        if (!projectProperties) {
+            await this.unlinkProject();
+        }
+        return projectProperties;
     }
 }

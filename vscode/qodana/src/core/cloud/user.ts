@@ -29,8 +29,11 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             () => "");
     }
 
-    async getProjectProperties(projectId: string): Promise<CloudProjectResponse | undefined> {
+    async getProjectProperties(projectId: string, withError: boolean = true): Promise<CloudProjectResponse | undefined> {
         return this.doRequest(`projects/${projectId}`, () => {
+            if (!withError) {
+                return;
+            }
             vscode.window.showErrorMessage(failedToObtainData(projectId));
             telemetry.errorReceived('#getProjectProperties no data');
         });

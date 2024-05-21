@@ -1,7 +1,7 @@
-import {Authorizing, AuthState_, NotAuthorized} from "./index";
+import {Authorized, Authorizing, AuthState_, NotAuthorized} from "./index";
 import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
 import * as vscode from "vscode";
-import {AUTH_FAILED, FAILED_TO_AUTHENTICATE, FAILED_TO_OBTAIN_TOKEN} from "../messages";
+import {FAILED_TO_AUTHENTICATE, FAILED_TO_OBTAIN_TOKEN} from "../messages";
 import telemetry from "../telemetry";
 import * as net from "net";
 import * as http from "http";
@@ -23,13 +23,15 @@ export class AuthorizingImpl implements Authorizing {
         this.environment = new CloudEnvironment(this.initialFrontendUrl);
     }
 
-    async startOauth() {
+    async startOauth() : Promise<Authorized | NotAuthorized> {
         // authorize
+        let notAuthorized = new NotAuthorizedImpl(this.context, this.stateEmitter);
         try {
             let code = await this.getCodeFromOAuth();
             if (!code) {
                 telemetry.errorReceived('#handleUnauthorizedState no code');
-                return;
+                this.stateEmitter.fire(notAuthorized);
+                return notAuthorized;
             }
 
             // do a post request to get token, refresh token and expires
@@ -37,18 +39,18 @@ export class AuthorizingImpl implements Authorizing {
             if (!auth) {
                 vscode.window.showErrorMessage(FAILED_TO_OBTAIN_TOKEN);
                 telemetry.errorReceived('#handleUnauthorizedState no auth');
-                let newState = new NotAuthorizedImpl(this.context, this.stateEmitter);
-                this.stateEmitter.fire(newState);
-                return;
+                this.stateEmitter.fire(notAuthorized);
+                return notAuthorized;
             }
             let userInfo = await qodanaCloudUserApi(this.environment, async () => {
                 return auth?.access;
             }).getUserInfo();
             let newState = new AuthorizedImpl(this.context, this.stateEmitter, this.environment, auth, userInfo);
             this.stateEmitter.fire(newState);
+            return newState;
         } catch (error) {
-            let newState = new NotAuthorizedImpl(this.context, this.stateEmitter);
-            this.stateEmitter.fire(newState);
+            this.stateEmitter.fire(notAuthorized);
+            return notAuthorized;
         }
     }
 

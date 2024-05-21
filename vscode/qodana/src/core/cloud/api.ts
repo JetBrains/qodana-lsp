@@ -16,7 +16,7 @@ export interface QodanaCloudUnauthorizedApi {
 export interface QodanaCloudUserApi {
     getProjectsByOriginUrl(originUrl: string): Promise<CloudProjectsByOriginUrlResponse | undefined>
 
-    getProjectProperties(projectId: string): Promise<CloudProjectResponse | undefined>
+    getProjectProperties(projectId: string, withError: boolean): Promise<CloudProjectResponse | undefined>
 
     getReport(reportId: string, projectId: string): Promise<Files<QodanaCloudFileResponse> | undefined>
 

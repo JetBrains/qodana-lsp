@@ -5,6 +5,9 @@ import config, {CONF_PROJ_ID} from '../config';
 import { join } from 'node:path';
 import telemetry from '../telemetry';
 import { Events } from '../events';
+import {extensionInstance} from "../extension";
+import {cloudWebsite} from "../defaults";
+import {normalizeUrl} from "../auth";
 
 
 export class ShowMarkerHandler implements UriHandler {
@@ -57,6 +60,20 @@ export class ShowMarkerHandler implements UriHandler {
                 telemetry.errorReceived('#handleUri no projectId');
                 return;
             }
+            let cloudHostArg = query.find((value) => {
+                return value.startsWith('cloud_host=');
+            });
+            if (cloudHostArg) {
+                let authorized = extensionInstance.auth?.getAuthorized();
+                let cloudHost = cloudHostArg.split('=')[1];
+                if (!authorized || !hostsEqual(authorized.environment?.frontendUrl, cloudHost)) {
+                    extensionInstance.auth?.logOut();
+                    let newAuthorized = await extensionInstance.auth?.logIn(cloudHost);
+                    if (!newAuthorized) {
+                        return;
+                    }
+                }
+            }
             let cloudProjectId = cloudProjectIdArg.split('=')[1];
             let projectIdAccepted = await this.projectIdNotSet(cloudProjectId);
             if (!projectIdAccepted) {
@@ -99,4 +116,18 @@ export class ShowMarkerHandler implements UriHandler {
             }
         }
     }
+}
+
+function hostsEqual(url1: string | undefined, url2: string | undefined): boolean {
+    if (url1 === undefined || url2 === undefined) {
+        return url1 === url2 || url1 === cloudWebsite() || url2 === cloudWebsite();
+    }
+
+    const normalizedUrl1 = normalizeUrl(url1);
+    const normalizedUrl2 = normalizeUrl(url2);
+
+    const host1 = new URL(normalizedUrl1 ? normalizedUrl1 : url1);
+    const host2 = new URL(normalizedUrl2 ? normalizedUrl2 : url2);
+
+    return host1.host === host2.host;
 }

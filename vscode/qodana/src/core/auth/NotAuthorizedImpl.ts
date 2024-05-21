@@ -1,4 +1,4 @@
-import {Authorizing, AuthState_, NotAuthorized} from "./index";
+import {Authorized, AuthState_, NotAuthorized} from "./index";
 import {AuthorizingImpl} from "./AuthorizingImpl";
 import * as vscode from "vscode";
 
@@ -13,9 +13,9 @@ export class NotAuthorizedImpl implements NotAuthorized {
         this.context = context;
     }
 
-    authorize(frontendUrl?: string): Authorizing {
+    async authorize(frontendUrl?: string): Promise<NotAuthorized | Authorized> {
         let newState = new AuthorizingImpl(this.context, this.stateEmitter, frontendUrl);
         this.stateEmitter.fire(newState);
-        return newState;
+        return (await newState.startOauth());
     }
 }

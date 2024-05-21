@@ -23,7 +23,7 @@ import {SERVER, USER_FULL_NAME, USER_ID, USER_NAME} from "../config";
 export class AuthorizedImpl implements Authorized {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;
     private readonly context: vscode.ExtensionContext;
-    private readonly environment: CloudEnvironment;
+    public readonly environment: CloudEnvironment;
 
     constructor(context: vscode.ExtensionContext,
                 stateEmitter: vscode.EventEmitter<AuthState_>,

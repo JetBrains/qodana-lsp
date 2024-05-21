@@ -144,7 +144,6 @@ describe('Authentication Test Suite', () => {
             const authorizing = notAuthorized.authorize();
             let stub = emitter.fire as sinon.SinonStub;
             assert.strictEqual(stub.callCount, 1);
-            assert(authorizing instanceof AuthorizingImpl);
         });
     });
 
