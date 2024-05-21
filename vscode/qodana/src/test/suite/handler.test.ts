@@ -112,6 +112,7 @@ describe('URL Handler Test Suite', () => {
         const tokenData = {
             access: 'access',
             refresh: 'refresh',
+            /* eslint-disable @typescript-eslint/naming-convention */
             expires_at: 'expires_at'
         };
         let emitter = new vscode.EventEmitter<AuthState>();
@@ -169,6 +170,7 @@ describe('URL Handler Test Suite', () => {
         const tokenData = {
             access: 'access',
             refresh: 'refresh',
+            /* eslint-disable @typescript-eslint/naming-convention */
             expires_at: 'expires_at'
         };
         let emitter = new vscode.EventEmitter<AuthState>();
