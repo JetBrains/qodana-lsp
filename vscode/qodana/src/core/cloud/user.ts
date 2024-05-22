@@ -74,6 +74,8 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             method: 'get',
             headers: {
                 /* eslint-disable @typescript-eslint/naming-convention */
+                'User-Agent': 'qodana-lsp',
+                /* eslint-disable @typescript-eslint/naming-convention */
                 'Content-Type': 'application/json',
                 /* eslint-disable @typescript-eslint/naming-convention */
                 'Authorization': 'Bearer ' + token
@@ -109,6 +111,7 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             url: finalUrl,
             method: 'get',
             headers: {
+                'User-Agent': 'qodana-lsp',
                 /* eslint-disable @typescript-eslint/naming-convention */
                 'Content-Type': 'application/json',
                 /* eslint-disable @typescript-eslint/naming-convention */

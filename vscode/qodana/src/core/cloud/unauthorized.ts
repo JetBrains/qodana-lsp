@@ -19,7 +19,7 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
             new URL(`${host}/idea/auth/token/`).toString(),
             { 'code': code },
             /* eslint-disable @typescript-eslint/naming-convention */
-            { headers: { 'Content-Type': 'application/json' } });
+            { headers: { 'User-Agent': 'qodana-lsp', 'Content-Type': 'application/json' } });
     }
 
     async refreshOauthToken(refreshToken: string | undefined) {
@@ -28,13 +28,22 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
             new URL(`${host}/idea/auth/refresh/`).toString(),
             null,
             /* eslint-disable @typescript-eslint/naming-convention */
-            { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + refreshToken } });
+            {
+                headers: {
+                    'User-Agent': 'qodana-lsp',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + refreshToken
+                }
+            });
     }
 
     async getOauthProviderData() {
         let host = await this.environment.getBackendUrlForVersion(this.version);
         const url = new URL(`${host}/oauth/configurations`).toString();
-        let res = await axios.get(url);
+        let config = {
+            headers: { 'User-Agent': 'qodana-lsp' }
+        };
+        let res = await axios.get(url, config);
         if (res.data) {
             return res.data as QodanaOauthProviderData;
         }
@@ -58,7 +67,10 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
 
     async getBackendUrls(frontendUrl: string): Promise<BackendUrls | undefined> {
         const url = new URL("api/versions", frontendUrl).toString();
-        let res = await axios.get(url);
+        let config = {
+            headers: { 'User-Agent': 'qodana-lsp' }
+        };
+        let res = await axios.get(url, config);
         if (res.data) {
             return (res.data as BackendUrls);
         }
