@@ -13,7 +13,7 @@ export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
         this.getProjects = getProjects;
     }
 
-    async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
+    async getChildren(_element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
         let projects = await this.getProjects();
         let idToProject = new Map<string, MatchingProject>;
         projects?.forEach(project => {

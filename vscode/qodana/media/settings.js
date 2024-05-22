@@ -9,6 +9,7 @@
         vscode.postMessage({ type: 'qodana.logout' });
     });
 
+    // noinspection DuplicatedCode
     document.querySelector('.close-report-button').addEventListener('click', () => {
         vscode.postMessage({ type: 'qodana.closeReport' });
     });

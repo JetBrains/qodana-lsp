@@ -18,7 +18,7 @@ export class LogInView implements vscode.WebviewViewProvider {
         });
     }
 
-    resolveWebviewView(webviewView: WebviewView, context: WebviewViewResolveContext, token: CancellationToken): Thenable<void> | void {
+    resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken): Thenable<void> | void {
         this._view = webviewView;
 
         webviewView.webview.options = {

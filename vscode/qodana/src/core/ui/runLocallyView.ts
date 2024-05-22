@@ -10,7 +10,7 @@ export class RunLocallyView implements vscode.WebviewViewProvider {
 
     constructor(private readonly _extensionUri: vscode.Uri) {}
 
-    resolveWebviewView(webviewView: WebviewView, context: WebviewViewResolveContext, token: CancellationToken): Thenable<void> | void {
+    resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken): Thenable<void> | void {
         this._view = webviewView;
 
         webviewView.webview.options = {

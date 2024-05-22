@@ -34,7 +34,7 @@ export class AuthorizedImpl implements Authorized {
         this.context = context;
         this.environment = environment;
         this.getToken = this.getToken.bind(this);
-        this.storeAuthTokens(auth);
+        this.storeAuthTokens(auth).then();
         this.context.globalState.update(SERVER, environment.frontendUrl);
         this.context.globalState.update(USER_ID, userInfo?.id);
         this.context.globalState.update(USER_FULL_NAME, userInfo?.fullName);
@@ -94,7 +94,7 @@ export class AuthorizedImpl implements Authorized {
 
     logOut(): NotAuthorized {
         let newState = new NotAuthorizedImpl(this.context, this.stateEmitter);
-        this.resetTokens();
+        this.resetTokens().then();
         this.stateEmitter.fire(newState);
         return newState;
     }

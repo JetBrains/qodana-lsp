@@ -163,7 +163,7 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(COMMAND_LOG_OUT, () => {
-			extensionInstance.closeReport();
+			extensionInstance.closeReport().then();
 			extensionInstance.auth?.logOut();
 		})
 	);

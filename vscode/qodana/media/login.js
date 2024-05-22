@@ -13,6 +13,7 @@
         vscode.postMessage({ type: 'qodana.loginCustomServer' });
     });
 
+    // noinspection DuplicatedCode
     document.querySelector('.close-report-button').addEventListener('click', () => {
         vscode.postMessage({ type: 'qodana.closeReport' });
     });

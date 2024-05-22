@@ -17,7 +17,7 @@ export class LinkService {
                 await this.selectAndLink();
             }
         });
-        this.selectAndLink();
+        this.selectAndLink().then();
     }
 
     private async selectAndLink() {
