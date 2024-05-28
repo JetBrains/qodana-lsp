@@ -43,8 +43,8 @@ export function convertSshToHttp(url: string) {
 
 export function convertHttpToSsh(url: string) {
     if (url.startsWith("git@")) {
-        return url;
+        return [url];
     }
     const [_, host,user, repo] = url.match(/^https?:\/\/([^/]+)\/([^/]+)\/([^/]+)/) || [];
-    return `git@${host}:${user}/${repo}`;
+    return [`git@${host}:${user}/${repo}`, `git@${host}/${user}/${repo}`]; // workaround for host/user case
 }

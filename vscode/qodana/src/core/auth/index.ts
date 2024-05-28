@@ -164,9 +164,10 @@ export class Auth {
         if (authorized) {
             let withoutSuffix = httpRemote.replace(/\.git$/, '');
             let sshRemoteWithoutSuffix = convertHttpToSsh(httpRemote);
+            const createUrls = (url: string) => [url, `ssh://${url}`, `${url}.git`, `ssh://${url}.git`];
             let promises =
-                [withoutSuffix, `${withoutSuffix}.git`, sshRemoteWithoutSuffix, `ssh://${sshRemoteWithoutSuffix}`,
-                 `${sshRemoteWithoutSuffix}.git`, `ssh://${sshRemoteWithoutSuffix}.git`].flatMap( async(repoUrl) => {
+                [withoutSuffix, `${withoutSuffix}.git`, ...createUrls(sshRemoteWithoutSuffix[0]),
+                    ...createUrls(sshRemoteWithoutSuffix[1])].flatMap( async(repoUrl) => {
                 let response = await authorized.qodanaCloudUserApi((api) => {
                     return api.getProjectsByOriginUrl(repoUrl);
                 });
