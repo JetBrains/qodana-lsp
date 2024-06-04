@@ -45,18 +45,18 @@ export class AuthorizingImpl implements Authorizing {
             let userInfo = await qodanaCloudUserApi(this.environment, async () => {
                 return auth?.access;
             }).getUserInfo();
-            let newState = new AuthorizedImpl(this.context, this.stateEmitter, this.environment, auth, userInfo);
+            let newState = await AuthorizedImpl.create(this.context, this.stateEmitter, this.environment, auth, userInfo);
             this.stateEmitter.fire(newState);
             return newState;
         } catch (error) {
             this.stateEmitter.fire(notAuthorized);
+            telemetry.loginFailed();
             return notAuthorized;
         }
     }
 
     async getCodeFromOAuth(): Promise<string | undefined> {
-        const portNumber = await this.freePortNumber(); // race condition here
-        const server: http.Server = http.createServer().listen(portNumber, 'localhost');
+        const { server, portNumber } = await this.getServerAndPortNumber(); // race condition here
         try {
             let authUrl = (await qodanaCloudUnauthorizedApi(this.environment).getOauthProviderData())?.oauthUrl;
             if (authUrl === undefined) {
@@ -108,24 +108,20 @@ export class AuthorizingImpl implements Authorizing {
         });
     }
 
-    async freePortNumber(): Promise<number> {
+    async getServerAndPortNumber(): Promise<ServerAndPortNumber> {
+        const server = http.createServer();
+        server.listen(0, 'localhost');
         return new Promise((resolve, reject) => {
-            const server = net.createServer();
-            server.listen(0, '127.0.0.1');
-            server.on('listening', function () {
+            server.once('listening', function () {
                 try {
                     const address = server.address();
                     if (address) {
                         const portNumber = (address as net.AddressInfo).port;
-                        server.once('close', function () {
-                            resolve(portNumber);
-                        });
+                        resolve({ server, portNumber });
                     }
                 } catch (error) {
                     telemetry.errorReceived('#freePortNumber exception');
                     reject(error);
-                } finally {
-                    server.close();
                 }
             });
         });
@@ -136,4 +132,10 @@ export class AuthorizingImpl implements Authorizing {
         this.stateEmitter.fire(newState);
         return newState;
     }
+}
+
+
+interface ServerAndPortNumber {
+    server: http.Server
+    portNumber: number;
 }

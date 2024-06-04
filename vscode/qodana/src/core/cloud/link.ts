@@ -11,13 +11,18 @@ export class LinkService {
     private isLinked: boolean = false;
     private projectProperties: CloudProjectResponse | undefined;
 
-    constructor(private context: vscode.ExtensionContext) {
+    static async create(context: vscode.ExtensionContext) {
+        let service = new LinkService(context);
+        await service.selectAndLink();
+        return service;
+    }
+
+    private constructor(private context: vscode.ExtensionContext) {
         vscode.workspace.onDidChangeConfiguration(async (e) => {
             if (e.affectsConfiguration('qodana')) {
                 await this.selectAndLink();
             }
         });
-        this.selectAndLink().then();
     }
 
     private async selectAndLink() {

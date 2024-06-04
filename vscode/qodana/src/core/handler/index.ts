@@ -67,7 +67,7 @@ export class ShowMarkerHandler implements UriHandler {
                 let authorized = extensionInstance.auth?.getAuthorized();
                 let cloudHost = cloudHostArg.split('=')[1];
                 if (!authorized || !hostsEqual(authorized.environment?.frontendUrl, cloudHost)) {
-                    extensionInstance.auth?.logOut();
+                    await extensionInstance.auth?.logOut();
                     let newAuthorized = await extensionInstance.auth?.logIn(cloudHost);
                     if (!newAuthorized) {
                         return;

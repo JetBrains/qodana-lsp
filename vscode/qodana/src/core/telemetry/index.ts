@@ -34,6 +34,7 @@ class TelemetryEvents {
         LOCAL_RUN_REQUESTED: 'localRunRequested',
         PROJECT_LINKED: 'projectLinked',
         PROJECT_UNLINKED: 'projectUnlinked',
+        LOGIN_FAILED: 'loginFailed',
     };
 
     extensionStarted(context: vscode.ExtensionContext) {
@@ -95,6 +96,10 @@ class TelemetryEvents {
 
     projectUnlinked() {
         this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.PROJECT_UNLINKED);
+    }
+
+    loginFailed() {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvents.eventNames.LOGIN_FAILED);
     }
 }
 

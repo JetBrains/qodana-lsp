@@ -25,16 +25,24 @@ export class AuthorizedImpl implements Authorized {
     private readonly context: vscode.ExtensionContext;
     public readonly environment: CloudEnvironment;
 
-    constructor(context: vscode.ExtensionContext,
-                stateEmitter: vscode.EventEmitter<AuthState_>,
-                environment: CloudEnvironment,
-                auth: AuthorizationResponseData,
-                readonly userInfo?: QodanaCloudUserInfoResponse) {
+    static async create(context: vscode.ExtensionContext,
+                        stateEmitter: vscode.EventEmitter<AuthState_>,
+                        environment: CloudEnvironment,
+                        auth: AuthorizationResponseData,
+                        userInfo?: QodanaCloudUserInfoResponse): Promise<AuthorizedImpl> {
+        let authorized = new AuthorizedImpl(context, stateEmitter, environment, userInfo);
+        await authorized.storeAuthTokens(auth);
+        return authorized;
+    }
+
+    private constructor(context: vscode.ExtensionContext,
+                        stateEmitter: vscode.EventEmitter<AuthState_>,
+                        environment: CloudEnvironment,
+                        readonly userInfo?: QodanaCloudUserInfoResponse) {
         this.stateEmitter = stateEmitter;
         this.context = context;
         this.environment = environment;
         this.getToken = this.getToken.bind(this);
-        this.storeAuthTokens(auth).then();
         this.context.globalState.update(SERVER, environment.frontendUrl);
         this.context.globalState.update(USER_ID, userInfo?.id);
         this.context.globalState.update(USER_FULL_NAME, userInfo?.fullName);
@@ -52,12 +60,12 @@ export class AuthorizedImpl implements Authorized {
             const authState = await Auth.getAuthState(this.context);
             // if we are unauthorized, we need to authorize
             if (authState instanceof Unauthorized) {
-                this.logOut();
+                await this.logOut();
                 return undefined;
             } else if (authState instanceof TokenExpired) {
                 let token = await this.handleTokenExpiredState();
                 if (token === undefined) {
-                    this.logOut();
+                    await this.logOut();
                 }
                 return token;
             } else if (authState instanceof TokenPresent) {
@@ -67,7 +75,7 @@ export class AuthorizedImpl implements Authorized {
         } catch (error) {
             vscode.window.showErrorMessage(`${FAILED_TO_AUTHENTICATE} ${error}`);
             telemetry.errorReceived('#getTokenToCloud exception');
-            this.logOut();
+            await this.logOut();
             return undefined;
         }
     }
@@ -92,9 +100,9 @@ export class AuthorizedImpl implements Authorized {
         await this.context.secrets.store(SEC_REFRESH_TOKEN_USED, 'false');
     }
 
-    logOut(): NotAuthorized {
+    async logOut(): Promise<NotAuthorized> {
         let newState = new NotAuthorizedImpl(this.context, this.stateEmitter);
-        this.resetTokens().then();
+        await this.resetTokens();
         this.stateEmitter.fire(newState);
         return newState;
     }

@@ -117,9 +117,9 @@ describe('URL Handler Test Suite', () => {
         };
         let emitter = new vscode.EventEmitter<AuthState>();
         sandbox.stub(emitter, 'fire').value(
-            sandbox.stub().callsFake(async (key: string) => { return; })
+            sandbox.stub().callsFake(async (_: string) => { return; })
         );
-        let authorized = new AuthorizedImpl(context, emitter, new CloudEnvironment(), tokenData);
+        let authorized = await AuthorizedImpl.create(context, emitter, new CloudEnvironment(), tokenData);
 
         let login = sandbox.stub(auth, 'logIn').resolves(authorized);
         await showMarkerHandler.handleUri(uris[2]);
@@ -175,12 +175,12 @@ describe('URL Handler Test Suite', () => {
         };
         let emitter = new vscode.EventEmitter<AuthState>();
         sandbox.stub(emitter, 'fire').value(
-            sandbox.stub().callsFake(async (key: string) => { return; })
+            sandbox.stub().callsFake(async (_: string) => { return; })
         );
-        let authorized = new AuthorizedImpl(context, emitter, new CloudEnvironment('new.host'), tokenData);
+        let authorized = await AuthorizedImpl.create(context, emitter, new CloudEnvironment('new.host'), tokenData);
 
         sandbox.stub(auth, 'getAuthorized').callsFake(() => authorized);
-        let logout = sandbox.stub(auth, 'logOut').callsFake(() => authorized);
+        let logout = sandbox.stub(auth, 'logOut').resolves();
         let login = sandbox.stub(auth, 'logIn').resolves(null);
         await showMarkerHandler.handleUri(uris[2]);
         assert.strictEqual(called, true);

@@ -162,9 +162,10 @@ function initAuthMethods(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand(COMMAND_LOG_OUT, () => {
-			extensionInstance.closeReport().then();
-			extensionInstance.auth?.logOut();
+		vscode.commands.registerCommand(COMMAND_LOG_OUT, async () => {
+			// noinspection ES6MissingAwait
+			extensionInstance.closeReport();
+			await extensionInstance.auth?.logOut();
 		})
 	);
 

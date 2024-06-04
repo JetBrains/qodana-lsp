@@ -101,7 +101,7 @@ describe('Authentication Test Suite', () => {
 
     describe('#resetTokens()', function () {
         it('should call delete method for each token', async function () {
-            let authorized = new AuthorizedImpl(context, new vscode.EventEmitter, new CloudEnvironment(), {
+            let authorized = await AuthorizedImpl.create(context, new vscode.EventEmitter, new CloudEnvironment(), {
                 access: 'access',
                 refresh: 'refresh',
                 expires_at: 'expires'
@@ -124,7 +124,7 @@ describe('Authentication Test Suite', () => {
                 expires_at: 'expires_at'
             };
 
-            let authorized = new AuthorizedImpl(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
+            let authorized = await AuthorizedImpl.create(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
             await authorized.storeAuthTokens(tokenData);
             assert.strictEqual(map.get(SEC_TOKEN), 'access');
             assert.strictEqual(map.get(SEC_REFRESH_TOKEN), 'refresh');
@@ -141,7 +141,8 @@ describe('Authentication Test Suite', () => {
             );
             let notAuthorized = new NotAuthorizedImpl(context, emitter);
 
-            const authorizing = notAuthorized.authorize();
+            // noinspection ES6MissingAwait
+            notAuthorized.authorize();
             let stub = emitter.fire as sinon.SinonStub;
             assert.strictEqual(stub.callCount, 1);
         });
@@ -206,9 +207,9 @@ describe('Authentication Test Suite', () => {
             };
             let emitter = new vscode.EventEmitter<AuthState>();
             sandbox.stub(emitter, 'fire').value(
-               sandbox.stub().callsFake(async (key: string) => { return 'data'; })
+               sandbox.stub().callsFake(async (_: string) => { return 'data'; })
             );
-            let authorized = new AuthorizedImpl(context, emitter, new CloudEnvironment(), tokenData);
+            let authorized = await AuthorizedImpl.create(context, emitter, new CloudEnvironment(), tokenData);
 
             sandbox.stub(Auth, 'getAuthState').resolves(new Unauthorized());
 
@@ -224,7 +225,7 @@ describe('Authentication Test Suite', () => {
                 refresh: 'refresh',
                 expires_at: 'expires_at'
             };
-            let authorized = new AuthorizedImpl(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
+            let authorized = await AuthorizedImpl.create(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
 
             sandbox.stub(Auth, 'getAuthState').resolves(new TokenExpired('old_token', 'refresh', 'access'));
             setupAxiosPostRequest();
@@ -245,9 +246,9 @@ describe('Authentication Test Suite', () => {
             };
             let emitter = new vscode.EventEmitter<AuthState>();
             sandbox.stub(emitter, 'fire').value(
-                sandbox.stub().callsFake(async (key: string) => { return; })
+                sandbox.stub().callsFake(async (_: string) => { return; })
             );
-            let authorized = new AuthorizedImpl(context, emitter, new CloudEnvironment(), tokenData);
+            let authorized = await AuthorizedImpl.create(context, emitter, new CloudEnvironment(), tokenData);
 
             sandbox.stub(Auth, 'getAuthState').resolves(new TokenExpired('old_token', 'refresh', 'access'));
             sandbox.stub(authorized, 'handleTokenExpiredState').resolves(undefined);
@@ -264,7 +265,7 @@ describe('Authentication Test Suite', () => {
                 refresh: 'refresh',
                 expires_at: 'expires_at'
             };
-            let authorized = new AuthorizedImpl(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
+            let authorized = await AuthorizedImpl.create(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
 
             sandbox.stub(Auth, 'getAuthState').resolves(new TokenPresent('old_token', 'refresh', 'access'));
             sandbox.stub(authorized, 'handleTokenExpiredState').resolves(undefined);
@@ -282,7 +283,7 @@ describe('Authentication Test Suite', () => {
                 expires_at: 'expires_at'
             };
 
-            let authorized = new AuthorizedImpl(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
+            let authorized = await AuthorizedImpl.create(context, new vscode.EventEmitter, new CloudEnvironment(), tokenData);
 
             sandbox.stub(Auth, 'getAuthState').resolves(new TokenPresent('token', 'refresh', 'expires'));
             map.set(SEC_TOKEN, 'token');

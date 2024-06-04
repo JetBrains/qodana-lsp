@@ -68,7 +68,7 @@ export interface Authorized extends AuthState_ {
 
     getToken(): Promise<string | undefined>
 
-    logOut(): NotAuthorized
+    logOut(): Promise<NotAuthorized>
 
     qodanaCloudUserApi<T>(request: (apiObj: QodanaCloudUserApi) => Promise<T>): Promise<T>
 }
@@ -101,7 +101,7 @@ export class Auth {
                 fullName: fullName,
                 username: userName,
             };
-            newState = new AuthorizedImpl(context, instance.stateEmitter, environment, auth, userInfo);
+            newState = await AuthorizedImpl.create(context, instance.stateEmitter, environment, auth, userInfo);
         }
         instance.stateEmitter.fire(newState);
         return instance;
@@ -191,9 +191,9 @@ export class Auth {
         return lastState instanceof NotAuthorizedImpl ? await lastState.authorize(normalizeUrl(frontendUrl)) : lastState;
     }
 
-    logOut() {
+    async logOut() {
         if (this.lastState instanceof AuthorizedImpl) {
-            this.lastState.logOut();
+            await this.lastState.logOut();
         }
     }
 
