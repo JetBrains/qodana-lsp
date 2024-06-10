@@ -8,6 +8,7 @@ export function buildHtml(webview: vscode.Webview, extensionUri: Uri, scriptName
     const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'reset.css'));
     const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'vscode.css'));
     const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'main.css'));
+    const constantsFilePathOnDisk = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'constants.js'));
     const nonce = getNonce();
     return  `
             <!DOCTYPE html>
@@ -24,6 +25,7 @@ export function buildHtml(webview: vscode.Webview, extensionUri: Uri, scriptName
               <title>Test Webview</title>
             </head>
             <body>
+              <script nonce="${nonce}" src="${constantsFilePathOnDisk}"></script>
               ${body}
               <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>

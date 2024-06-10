@@ -165,6 +165,10 @@ export class QodanaExtension {
             await showLocalReport(this.context, tempDir);
         }
     }
+
+    getVersion(): string {
+       return this.context?.extension.packageJSON.version;
+    }
 }
 
 export const extensionInstance = QodanaExtension.instance;

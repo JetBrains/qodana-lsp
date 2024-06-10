@@ -6,16 +6,16 @@
     const vscode = acquireVsCodeApi();
 
     document.querySelector('.login-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.login' });
+        vscode.postMessage({ type: myConstants.COMMAND_LOG_IN });
     });
 
     document.querySelector('.self-hosted-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.loginCustomServer' });
+        vscode.postMessage({ type: myConstants.COMMAND_LOG_IN_CUSTOM_SERVER });
     });
 
     // noinspection DuplicatedCode
     document.querySelector('.close-report-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.closeReport' });
+        vscode.postMessage({ type: myConstants.COMMAND_CLOSE_REPORT });
     });
 
     window.addEventListener('message', event => {

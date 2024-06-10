@@ -40,8 +40,6 @@ export async function openReportByPath(path: string, reportId: string, confirmat
     }
 }
 
-/* eslint-disable @typescript-eslint/naming-convention */
-
 // fetch the report file to the temporary location
 async function fetchReportFileUrl(authorized: Authorized, reportId: string, projectId: string): Promise<string | undefined> {
     try {

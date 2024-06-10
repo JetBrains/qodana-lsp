@@ -39,6 +39,7 @@ export const COMMAND_LINK = 'qodana.link';
 export const COMMAND_UNLINK = 'qodana.unlink';
 export const COMMAND_SELECT_NODE = 'qodana.selectNode';
 export const COMMAND_REFRESH_PROJECTS = 'qodana.refreshProjects';
+export const COMMAND_TREE_OTHER_ITEM = 'qodanaTreeItem.other-item';
 
 export const COMMANDS = new Set ([
     COMMAND_LOG_IN, COMMAND_LOG_IN_CUSTOM_SERVER, COMMAND_LOG_OUT, COMMAND_CANCEL_AUTHORIZATION, COMMAND_RUN_LOCALLY,
@@ -78,6 +79,10 @@ class ConfigurationHelper {
         await context.workspaceState.update(WS_BASELINE_ISSUES, false);
         await context.globalState.update(GS_JAVA_EXECUTABLE_PATH, null);
         await context.globalState.update(GS_CLI_SETTING, null);
+        await context.globalState.update(SERVER, undefined);
+        await context.globalState.update(USER_ID, undefined);
+        await context.globalState.update(USER_FULL_NAME, undefined);
+        await context.globalState.update(USER_NAME, undefined);
         // reset workspace settings
         await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Workspace);
         await vscode.workspace.getConfiguration().update(CONF_PATH_PREFIX, undefined, vscode.ConfigurationTarget.Workspace);

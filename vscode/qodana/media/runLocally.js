@@ -6,10 +6,10 @@
     const vscode = acquireVsCodeApi();
 
     document.querySelector('.run-locally-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.runLocally' });
+        vscode.postMessage({ type: myConstants.COMMAND_RUN_LOCALLY });
     });
 
     document.querySelector('.view-history-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.openLocalReport' });
+        vscode.postMessage({ type: myConstants.COMMAND_OPEN_LOCAL_REPORT });
     });
 }());

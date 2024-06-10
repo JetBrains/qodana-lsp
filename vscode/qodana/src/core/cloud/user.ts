@@ -1,4 +1,4 @@
-import {CloudEnvironment} from "./index";
+import {CloudEnvironment, getHeaders} from "./index";
 import {isValidString} from "../defaults";
 import telemetry from "../telemetry";
 import * as vscode from "vscode";
@@ -72,14 +72,7 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
         const config = {
             url: (new URL(`${host}/projects/${projectId}/timeline`)).toString(),
             method: 'get',
-            headers: {
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'User-Agent': 'qodana-lsp',
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'Content-Type': 'application/json',
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'Authorization': 'Bearer ' + token
-            },
+            headers: getHeaders(token),
             data: pagination
         };
         let res = await axios(config);
@@ -110,13 +103,7 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
         const config = {
             url: finalUrl,
             method: 'get',
-            headers: {
-                'User-Agent': 'qodana-lsp',
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'Content-Type': 'application/json',
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'Authorization': 'Bearer ' + token
-            }
+            headers: getHeaders(token)
         };
         let res;
         try {

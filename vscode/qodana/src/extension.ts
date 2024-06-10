@@ -18,7 +18,7 @@ import {
 	COMMAND_OPEN_LOCAL_REPORT,
 	COMMAND_REFRESH_PROJECTS,
 	COMMAND_RUN_LOCALLY,
-	COMMAND_SELECT_NODE,
+	COMMAND_SELECT_NODE, COMMAND_TREE_OTHER_ITEM,
 	COMMAND_UNLINK, LOCAL_REPORT, WS_REPORT_ID
 } from "./core/config";
 import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from "./core/messages";
@@ -126,7 +126,7 @@ function initProjectsView(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(COMMAND_REFRESH_PROJECTS, () => projectsView.refresh())
 	);
 	context.subscriptions.push(
-		vscode.commands.registerCommand('qodanaTreeItem.other-item', async (otherItem: OtherTreeItem) => {
+		vscode.commands.registerCommand(COMMAND_TREE_OTHER_ITEM, async (otherItem: OtherTreeItem) => {
 			const userInput = await vscode.window.showInputBox({
 				prompt: OTHER_PROJECT_TOOLTIP,
 			});

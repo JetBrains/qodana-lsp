@@ -6,12 +6,12 @@
     const vscode = acquireVsCodeApi();
 
     document.querySelector('.logout-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.logout' });
+        vscode.postMessage({ type: myConstants.COMMAND_LOG_OUT });
     });
 
     // noinspection DuplicatedCode
     document.querySelector('.close-report-button').addEventListener('click', () => {
-        vscode.postMessage({ type: 'qodana.closeReport' });
+        vscode.postMessage({ type: myConstants.COMMAND_CLOSE_REPORT });
     });
 
     window.addEventListener('message', event => {

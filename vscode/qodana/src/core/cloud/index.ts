@@ -1,5 +1,6 @@
 import {cloudWebsite} from "../defaults";
 import {qodanaCloudUnauthorizedApi} from "./api";
+import {extensionInstance} from "../extension";
 
 
 export class CloudEnvironment {
@@ -48,3 +49,19 @@ interface VersionUrl {
     url: string
 }
 
+export function getHeaders(token: string | undefined = undefined, customHeaders: { [key: string]: string } = {}): {
+    [key: string]: string
+} {
+    let version = extensionInstance.getVersion();
+    let headers: { [key: string]: string } = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'User-Agent': 'Qodana_VSCode_Plugin:' + version,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        ...customHeaders
+    };
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+    }
+    return headers;
+}

@@ -1,5 +1,5 @@
 import {AuthorizationResponseData, QodanaCloudUnauthorizedApi, QodanaOauthProviderData} from "./api";
-import {BackendUrls, CloudEnvironment} from "./index";
+import {BackendUrls, CloudEnvironment, getHeaders} from "./index";
 import axios, {AxiosRequestConfig} from "axios";
 import * as vscode from "vscode";
 import {FAILED_TO_AUTHENTICATE} from "../messages";
@@ -18,8 +18,7 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
         return this.requestToken(
             new URL(`${host}/idea/auth/token/`).toString(),
             { 'code': code },
-            /* eslint-disable @typescript-eslint/naming-convention */
-            { headers: { 'User-Agent': 'qodana-lsp', 'Content-Type': 'application/json' } });
+            { headers: getHeaders() });
     }
 
     async refreshOauthToken(refreshToken: string | undefined) {
@@ -27,21 +26,15 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
         return this.requestToken(
             new URL(`${host}/idea/auth/refresh/`).toString(),
             null,
-            /* eslint-disable @typescript-eslint/naming-convention */
-            {
-                headers: {
-                    'User-Agent': 'qodana-lsp',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + refreshToken
-                }
-            });
+            { headers: getHeaders(refreshToken) }
+        );
     }
 
     async getOauthProviderData() {
         let host = await this.environment.getBackendUrlForVersion(this.version);
         const url = new URL(`${host}/oauth/configurations`).toString();
         let config = {
-            headers: { 'User-Agent': 'qodana-lsp' }
+            headers: getHeaders()
         };
         let res = await axios.get(url, config);
         if (res.data) {
@@ -68,7 +61,7 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
     async getBackendUrls(frontendUrl: string): Promise<BackendUrls | undefined> {
         const url = new URL("api/versions", frontendUrl).toString();
         let config = {
-            headers: { 'User-Agent': 'qodana-lsp' }
+            headers: getHeaders()
         };
         let res = await axios.get(url, config);
         if (res.data) {

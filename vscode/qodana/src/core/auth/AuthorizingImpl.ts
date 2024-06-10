@@ -56,7 +56,7 @@ export class AuthorizingImpl implements Authorizing {
     }
 
     async getCodeFromOAuth(): Promise<string | undefined> {
-        const { server, portNumber } = await this.getServerAndPortNumber(); // race condition here
+        const { server, portNumber } = await this.getServerAndPortNumber();
         try {
             let authUrl = (await qodanaCloudUnauthorizedApi(this.environment).getOauthProviderData())?.oauthUrl;
             if (authUrl === undefined) {
