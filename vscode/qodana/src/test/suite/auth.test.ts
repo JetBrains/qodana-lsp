@@ -13,10 +13,10 @@ import {
 } from '../../core/auth';
 import { FAILED_TO_AUTHENTICATE, PROCEED } from '../../core/messages';
 import axios from 'axios';
-import {AuthorizedImpl} from "../../core/auth/AuthorizedImpl";
-import {CloudEnvironment} from "../../core/cloud";
-import {NotAuthorizedImpl} from "../../core/auth/NotAuthorizedImpl";
-import {AuthorizingImpl} from "../../core/auth/AuthorizingImpl";
+import {AuthorizedImpl} from '../../core/auth/AuthorizedImpl';
+import {CloudEnvironment} from '../../core/cloud';
+import {NotAuthorizedImpl} from '../../core/auth/NotAuthorizedImpl';
+import {AuthorizingImpl} from '../../core/auth/AuthorizingImpl';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 

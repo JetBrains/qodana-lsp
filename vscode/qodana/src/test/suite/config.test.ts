@@ -5,7 +5,7 @@ import assert = require('assert');
 import config, {CONF_PATH_PREFIX, CONF_PROJ_ID} from '../../core/config';
 import { QodanaExtension } from '../../core/extension';
 import { PROCEED, RELOAD, ULS_PROCEED } from '../../core/messages';
-import { LanguageClient, State } from "vscode-languageclient/node";
+import { LanguageClient, State } from 'vscode-languageclient/node';
 
 describe('Configuration Test Suite', () => {
     let sandbox: sinon.SinonSandbox;
@@ -104,7 +104,7 @@ describe('Configuration Test Suite', () => {
         let notCalled2 = sandbox.stub(client, 'start').resolves();
         sandbox.stub(config, 'configIsValid').resolves(true);
         sandbox.stub(vscode.window, 'showInformationMessage').resolves(RELOAD as any);
-        let stub = sandbox.stub(vscode.commands, 'executeCommand').resolves();
+        sandbox.stub(vscode.commands, 'executeCommand').resolves();
         config.sectionChangeHandler(client, {} as any);
         await promise;
         // sandbox.assert.calledOnce(stub); Todo rework test

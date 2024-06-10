@@ -1,10 +1,10 @@
-import * as vscode from "vscode";
-import {CancellationToken, WebviewView, WebviewViewResolveContext} from "vscode";
-import {Events} from "../events";
-import {buildHtml} from "./util";
-import {extensionInstance} from "../extension";
-import {COMMANDS, WS_OPENED_REPORT} from "../config";
-import {loggedInAs} from "../messages";
+import * as vscode from 'vscode';
+import {CancellationToken, WebviewView, WebviewViewResolveContext} from 'vscode';
+import {Events} from '../events';
+import {buildHtml} from './util';
+import {extensionInstance} from '../extension';
+import {COMMANDS, WS_OPENED_REPORT} from '../config';
+import {loggedInAs} from '../messages';
 
 export class SettingsView implements vscode.WebviewViewProvider {
     public static readonly viewType = 'qodana.settings';
@@ -49,8 +49,8 @@ export class SettingsView implements vscode.WebviewViewProvider {
               <p>${loggedInAs(username)}</p>
               <br>
               
-              <button class="close-report-button secondary hide-element">Turn Analysis Off</button>
-              <button class="logout-button secondary">Log Out</button>`
+              <button class='close-report-button secondary hide-element'>Turn Analysis Off</button>
+              <button class='logout-button secondary'>Log Out</button>`
         );
     }
 }

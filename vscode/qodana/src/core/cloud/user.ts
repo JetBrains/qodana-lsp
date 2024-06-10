@@ -1,19 +1,19 @@
-import {CloudEnvironment, getHeaders} from "./index";
-import {isValidString} from "../defaults";
-import telemetry from "../telemetry";
-import * as vscode from "vscode";
-import {failedToObtainData, failedToObtainReportId, noReportsFound, projectIdIsNotValid} from "../messages";
-import axios from "axios";
+import {CloudEnvironment, getHeaders} from './index';
+import {isValidString} from '../defaults';
+import telemetry from '../telemetry';
+import * as vscode from 'vscode';
+import {failedToObtainData, failedToObtainReportId, noReportsFound, projectIdIsNotValid} from '../messages';
+import axios from 'axios';
 import {
     CloudProjectResponse,
     CloudProjectsByOriginUrlResponse,
     Files, PaginatedResponse,
     QodanaCloudFileResponse, QodanaCloudReportResponse,
     QodanaCloudUserApi, QodanaCloudUserInfoResponse
-} from "./api";
+} from './api';
 
 export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
-    private version = "1";
+    private version = '1';
     private environment: CloudEnvironment;
     private readonly tokenRetriever: () => Promise<string | undefined>;
 
@@ -26,7 +26,7 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
         // const url = new URL(, await this.environment.getBackendUrlForVersion(this.version)).toString();
         return this.doRequest<CloudProjectsByOriginUrlResponse>(
             `projects/search?originUrl=${originUrl}`,
-            () => "");
+            () => '');
     }
 
     async getProjectProperties(projectId: string, withError: boolean = true): Promise<CloudProjectResponse | undefined> {

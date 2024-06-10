@@ -1,11 +1,11 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 import axios from 'axios';
 import * as fs from 'fs';
-import { noFilesFound, failedToObtainReport, failedToDownloadReport, failedToDownloadReportWithId, YES, NEW_REPORT_AVAILABLE, NO } from "../messages";
-import telemetry from "../telemetry";
-import { Events } from "../events";
-import { WS_OPENED_REPORT, WS_REPORT_ID } from "../config";
-import {Authorized} from "../auth";
+import { noFilesFound, failedToObtainReport, failedToDownloadReport, failedToDownloadReportWithId, YES, NEW_REPORT_AVAILABLE, NO } from '../messages';
+import telemetry from '../telemetry';
+import { Events } from '../events';
+import { WS_OPENED_REPORT, WS_REPORT_ID } from '../config';
+import {Authorized} from '../auth';
 
 export async function openReportById(projectId: string, reportId: string, context: vscode.ExtensionContext, authorized: Authorized) {
     let handlerReportPath = await getReportFileById(context, authorized, projectId, reportId);
@@ -89,7 +89,7 @@ export async function downloadFile(url: string, filePath: string): Promise<strin
 
     return vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: "Downloading File",
+        title: 'Downloading File',
         cancellable: false
     }, (progress) => {
         // The event 'data' will be emitted when there is data available.

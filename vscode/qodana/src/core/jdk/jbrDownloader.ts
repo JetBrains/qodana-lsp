@@ -8,13 +8,13 @@ import {
     successfullyExtracted,
     failedToExtractJbr
 } from '../messages';
-import { links } from "./jdk.json";
+import { links } from './jdk.json';
 import telemetry from '../telemetry';
 import * as tar from 'tar';
 import * as os from 'os';
 import * as path from 'path';
 import { downloadFile } from '../report';
-import {GS_JAVA_EXECUTABLE_PATH} from "../config";
+import {GS_JAVA_EXECUTABLE_PATH} from '../config';
 
 
 /*export function getJbrReleases(): Promise<Map<string, Release>> {
@@ -87,23 +87,23 @@ export async function getMatchingReleaseUrl(): Promise<Release | undefined> {
 export function getOsAndArch() {
     let osType: string;
     switch (os.type()) {
-        case "Linux":
-            osType = "linux";
+        case 'Linux':
+            osType = 'linux';
             break;
-        case "Darwin":
-            osType = "osx";
+        case 'Darwin':
+            osType = 'osx';
             break;
         default:
-            osType = "windows";
+            osType = 'windows';
             break;
     }
     let osArch: string;
     switch (os.arch()) {
-        case "arm64":
-            osArch = "aarch64";
+        case 'arm64':
+            osArch = 'aarch64';
             break;
         default:
-            osArch = "x64";
+            osArch = 'x64';
             break;
     }
 
@@ -158,7 +158,7 @@ export function getJavaExecutablePath(): string | null {
             javaClassVersion = require('child_process').execSync(cmd).toString().split('=')[1].trim();
         } catch (error) {
             telemetry.errorReceived('#getJavaExecutablePath exception (getting java class version)');
-            console.log("Failed to get JAVA_HOME. " + (error));
+            console.log('Failed to get JAVA_HOME. ' + (error));
         }
 
         if (javaClassVersion) {

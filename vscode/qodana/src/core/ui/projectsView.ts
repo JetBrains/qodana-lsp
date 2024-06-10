@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import {MatchingProject} from "../cloud/api";
-import {COMMAND_SELECT_NODE} from "../config";
-import {LAST_RUN, LINK_OTHER_PROJECT, OTHER_PROJECT, problemsCountString, SELECT_PROJECT} from "../messages";
+import {MatchingProject} from '../cloud/api';
+import {COMMAND_SELECT_NODE} from '../config';
+import {LAST_RUN, LINK_OTHER_PROJECT, OTHER_PROJECT, problemsCountString, SELECT_PROJECT} from '../messages';
 
 export class ProjectsView implements vscode.TreeDataProvider<vscode.TreeItem> {
     protected _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>();

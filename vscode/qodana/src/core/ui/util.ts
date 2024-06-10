@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import {Uri} from "vscode";
+import * as vscode from 'vscode';
+import {Uri} from 'vscode';
 
 
 export function buildHtml(webview: vscode.Webview, extensionUri: Uri, scriptName: string, body: string): string {

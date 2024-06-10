@@ -4,10 +4,10 @@ import * as vscode from 'vscode';
 import { extensionInstance } from './core/extension';
 import { ShowMarkerHandler } from './core/handler';
 import telemetry from './core/telemetry';
-import {OtherTreeItem, ProjectsView} from "./core/ui/projectsView";
-import {LinkedView} from "./core/ui/linkedView";
-import {LogInView} from "./core/ui/loginView";
-import {SettingsView} from "./core/ui/settingsView";
+import {OtherTreeItem, ProjectsView} from './core/ui/projectsView';
+import {LinkedView} from './core/ui/linkedView';
+import {LogInView} from './core/ui/loginView';
+import {SettingsView} from './core/ui/settingsView';
 import {
 	COMMAND_CANCEL_AUTHORIZATION,
 	COMMAND_CLOSE_REPORT,
@@ -20,9 +20,9 @@ import {
 	COMMAND_RUN_LOCALLY,
 	COMMAND_SELECT_NODE, COMMAND_TREE_OTHER_ITEM,
 	COMMAND_UNLINK, LOCAL_REPORT, WS_REPORT_ID
-} from "./core/config";
-import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from "./core/messages";
-import {RunLocallyView} from "./core/ui/runLocallyView";
+} from './core/config';
+import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from './core/messages';
+import {RunLocallyView} from './core/ui/runLocallyView';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -33,7 +33,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	telemetry.extensionStarted(context);
 	//Initialize the LS Client extension instance.
 	await extensionInstance.init().catch((error)=> {
-		console.log("Failed to activate Qodana SARIF extension. " + (error));
+		console.log('Failed to activate Qodana SARIF extension. ' + (error));
 		telemetry.errorReceived('#activate exception');
 	});
 
@@ -118,7 +118,7 @@ function initProjectsView(context: vscode.ExtensionContext) {
 	const projectsView = new ProjectsView(async () => {
 		return extensionInstance.auth?.getProjects();
 	});
-	context.subscriptions.push(vscode.window.createTreeView("qodana.link-view", {
+	context.subscriptions.push(vscode.window.createTreeView('qodana.link-view', {
 		treeDataProvider: projectsView
 	}));
 
@@ -131,7 +131,7 @@ function initProjectsView(context: vscode.ExtensionContext) {
 				prompt: OTHER_PROJECT_TOOLTIP,
 			});
 			if (userInput !== undefined) {
-				otherItem.label = "Other project: " + userInput;
+				otherItem.label = 'Other project: ' + userInput;
 				otherItem.projectId = userInput;
 				projectsView.refreshItem(otherItem);
 			}

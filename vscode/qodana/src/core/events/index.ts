@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import { State } from "vscode-languageclient/node";
+import * as vscode from 'vscode';
+import { State } from 'vscode-languageclient/node';
 
 export class Events {
   private static _instance: Events;

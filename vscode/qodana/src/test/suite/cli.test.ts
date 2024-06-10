@@ -4,9 +4,9 @@ import assert = require('assert');
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { downloadAndUnpackCli, getCli } from "../../core/cli/cliDownloader";
+import { downloadAndUnpackCli, getCli } from '../../core/cli/cliDownloader';
 import { NO } from '../../core/messages';
-import {GS_CLI_SETTING} from "../../core/config";
+import {GS_CLI_SETTING} from '../../core/config';
 
 describe('CLI Downloader', () => {
     let sandbox: sinon.SinonSandbox;

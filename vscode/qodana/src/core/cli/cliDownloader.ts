@@ -1,4 +1,4 @@
-import { checksum, version } from "./cli.json";
+import { checksum, version } from './cli.json';
 import * as vscode from 'vscode';
 import { createHash } from 'crypto';
 import { downloadFile } from '../report';
@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import telemetry from '../telemetry';
 import * as AdmZip from 'adm-zip';
-import {GS_CLI_SETTING} from "../config";
+import {GS_CLI_SETTING} from '../config';
 
 const SUPPORTED_PLATFORMS = ['windows', 'linux', 'darwin'];
 const SUPPORTED_ARCHS = ['x86_64', 'arm64'];

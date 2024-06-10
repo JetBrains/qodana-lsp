@@ -1,8 +1,8 @@
-import * as vscode from "vscode";
-import {CancellationToken, WebviewView, WebviewViewResolveContext} from "vscode";
-import {Events} from "../events";
-import {buildHtml} from "./util";
-import {COMMANDS, WS_OPENED_REPORT} from "../config";
+import * as vscode from 'vscode';
+import {CancellationToken, WebviewView, WebviewViewResolveContext} from 'vscode';
+import {Events} from '../events';
+import {buildHtml} from './util';
+import {COMMANDS, WS_OPENED_REPORT} from '../config';
 
 export class LogInView implements vscode.WebviewViewProvider {
     public static readonly viewType = 'qodana.login-view';
@@ -40,9 +40,9 @@ export class LogInView implements vscode.WebviewViewProvider {
 
     private getHtml(webview: vscode.Webview) {
         return buildHtml(webview, this.context.extensionUri, 'login.js', `
-              <button class="login-button">Log In to Cloud</button>
-              <button class="self-hosted-button secondary">Log In to Self-Hosted</button>
-              <button class="close-report-button secondary hide-element">Turn Analysis Off</button>`
+              <button class='login-button'>Log In to Cloud</button>
+              <button class='self-hosted-button secondary'>Log In to Self-Hosted</button>
+              <button class='close-report-button secondary hide-element'>Turn Analysis Off</button>`
         );
     }
 }

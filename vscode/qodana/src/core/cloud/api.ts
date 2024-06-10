@@ -1,6 +1,6 @@
-import {BackendUrls, CloudEnvironment} from "./index";
-import {QodanaCloudUnauthorizedApiImpl} from "./unauthorized";
-import {QodanaCloudUserApiImpl} from "./user";
+import {BackendUrls, CloudEnvironment} from './index';
+import {QodanaCloudUnauthorizedApiImpl} from './unauthorized';
+import {QodanaCloudUserApiImpl} from './user';
 
 
 export interface QodanaCloudUnauthorizedApi {

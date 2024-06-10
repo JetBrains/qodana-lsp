@@ -5,9 +5,9 @@ import config, {CONF_PROJ_ID} from '../config';
 import { join } from 'node:path';
 import telemetry from '../telemetry';
 import { Events } from '../events';
-import {extensionInstance} from "../extension";
-import {cloudWebsite} from "../defaults";
-import {normalizeUrl} from "../auth";
+import {extensionInstance} from '../extension';
+import {cloudWebsite} from '../defaults';
+import {normalizeUrl} from '../auth';
 
 
 export class ShowMarkerHandler implements UriHandler {

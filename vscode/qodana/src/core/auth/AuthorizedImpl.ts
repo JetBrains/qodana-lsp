@@ -6,19 +6,19 @@ import {
     TokenExpired,
     TokenPresent,
     Unauthorized
-} from "./index";
-import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
-import * as vscode from "vscode";
+} from './index';
+import {NotAuthorizedImpl} from './NotAuthorizedImpl';
+import * as vscode from 'vscode';
 import {
     AuthorizationResponseData,
     qodanaCloudUnauthorizedApi,
     QodanaCloudUserApi, QodanaCloudUserInfoResponse,
-} from "../cloud/api";
-import {FAILED_TO_AUTHENTICATE, FAILED_TO_RENEW_TOKEN} from "../messages";
-import telemetry from "../telemetry";
-import {CloudEnvironment} from "../cloud";
-import {QodanaCloudUserApiImpl} from "../cloud/user";
-import {SERVER, USER_FULL_NAME, USER_ID, USER_NAME} from "../config";
+} from '../cloud/api';
+import {FAILED_TO_AUTHENTICATE, FAILED_TO_RENEW_TOKEN} from '../messages';
+import telemetry from '../telemetry';
+import {CloudEnvironment} from '../cloud';
+import {QodanaCloudUserApiImpl} from '../cloud/user';
+import {SERVER, USER_FULL_NAME, USER_ID, USER_NAME} from '../config';
 
 export class AuthorizedImpl implements Authorized {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;

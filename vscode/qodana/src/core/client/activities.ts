@@ -1,21 +1,21 @@
-import { LanguageClient, State } from "vscode-languageclient/node";
-import * as vscode from "vscode";
+import { LanguageClient, State } from 'vscode-languageclient/node';
+import * as vscode from 'vscode';
 
-import { Auth } from "../auth";
-import { openReportById, openReportByProjectId } from "../report";
-import { CLOUD_REPORT_LOADED, SHOW_PROBLEMS } from "../messages";
+import { Auth } from '../auth';
+import { openReportById, openReportByProjectId } from '../report';
+import { CLOUD_REPORT_LOADED, SHOW_PROBLEMS } from '../messages';
 import config, {
     CONF_PROJ_ID, IS_DEBUG,
     WS_BASELINE_ISSUES,
     WS_COMPUTED_PREFIX,
     WS_OPENED_REPORT,
     WS_REPORT_ID
-} from "../config";
-import sarif from "../sarif";
-import telemetry from "../telemetry";
-import { Events, ReportFileEvent, UrlCallbackEvent } from "../events";
-import { BaselineToggle } from "../menuitems/BaselineToggle";
-import { QodanaState } from "../menuitems/QodanaState";
+} from '../config';
+import sarif from '../sarif';
+import telemetry from '../telemetry';
+import { Events, ReportFileEvent, UrlCallbackEvent } from '../events';
+import { BaselineToggle } from '../menuitems/BaselineToggle';
+import { QodanaState } from '../menuitems/QodanaState';
 
 export function onUrlCallback(context: vscode.ExtensionContext, auth: Auth) {
     Events.instance.onUrlCallback(async (event: UrlCallbackEvent) => {
@@ -103,7 +103,7 @@ export async function announceWorkspaceFolder(client: LanguageClient, context: v
     let locationParams: SetSourceLocationParams = {
         path: config.getAbsolutePrefix(context)
     };
-    await client.sendRequest("setSourceLocation", locationParams);
+    await client.sendRequest('setSourceLocation', locationParams);
 }
 
 export async function sendReportToLanguageClient(client: LanguageClient, context: vscode.ExtensionContext, reportPath: string) {
@@ -118,11 +118,11 @@ export async function sendReportToLanguageClient(client: LanguageClient, context
         path: reportPath,
         showBaselineIssues: context.workspaceState.get<boolean>(WS_BASELINE_ISSUES, false)
     };
-    await client.sendRequest("setSarifFile", sarifParams);
+    await client.sendRequest('setSarifFile', sarifParams);
     if (IS_DEBUG) {
         vscode.window.showInformationMessage(CLOUD_REPORT_LOADED, SHOW_PROBLEMS).then((value) => {
             if (value === SHOW_PROBLEMS) {
-                vscode.commands.executeCommand("workbench.action.problems.focus");
+                vscode.commands.executeCommand('workbench.action.problems.focus');
             }
         });
     }
@@ -130,12 +130,12 @@ export async function sendReportToLanguageClient(client: LanguageClient, context
 
 export function onReportClosed() {
     Events.instance.onReportClosed(() => {
-        vscode.commands.executeCommand("setContext", "qodana.report-opened", false);
+        vscode.commands.executeCommand('setContext', 'qodana.report-opened', false);
     });
 }
 export function onReportOpened() {
     Events.instance.onReportOpened(() => {
-        vscode.commands.executeCommand("setContext", "qodana.report-opened", true);
+        vscode.commands.executeCommand('setContext', 'qodana.report-opened', true);
     });
 }
 

@@ -2,11 +2,11 @@ import * as vscode from 'vscode';
 import * as sinon from 'sinon';
 import { ShowMarkerHandler } from '../../core/handler';
 import assert = require('assert');
-import {CONF_PATH_PREFIX, CONF_PROJ_ID} from "../../core/config";
-import {extensionInstance} from "../../core/extension";
-import {AuthorizedImpl} from "../../core/auth/AuthorizedImpl";
-import {Auth, AuthState} from "../../core/auth";
-import {CloudEnvironment} from "../../core/cloud";
+import {CONF_PATH_PREFIX, CONF_PROJ_ID} from '../../core/config';
+import {extensionInstance} from '../../core/extension';
+import {AuthorizedImpl} from '../../core/auth/AuthorizedImpl';
+import {Auth, AuthState} from '../../core/auth';
+import {CloudEnvironment} from '../../core/cloud';
 
 describe('URL Handler Test Suite', () => {
     let sandbox: sinon.SinonSandbox;

@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
-import {CancellationToken, WebviewView, WebviewViewResolveContext} from "vscode";
-import {buildHtml} from "./util";
-import {COMMANDS} from "../config";
+import * as vscode from 'vscode';
+import {CancellationToken, WebviewView, WebviewViewResolveContext} from 'vscode';
+import {buildHtml} from './util';
+import {COMMANDS} from '../config';
 
 export class RunLocallyView implements vscode.WebviewViewProvider {
     public static readonly viewType = 'qodana.run-locally-view';
@@ -29,8 +29,8 @@ export class RunLocallyView implements vscode.WebviewViewProvider {
 
     private getHtml(webview: vscode.Webview) {
         return buildHtml(webview, this._extensionUri, 'runLocally.js', `
-              <button class="run-locally-button">Run Locally</button>
-              <button class="view-history-button secondary">View History</button>`
+              <button class='run-locally-button'>Run Locally</button>
+              <button class='view-history-button secondary'>View History</button>`
         );
     }
 }

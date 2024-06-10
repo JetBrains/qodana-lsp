@@ -1,11 +1,11 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 import {
     QS_STATUS_ATTACHED,
     QS_STATUS_NOT_ATTACHED,
     QS_STATUS_SETTINGS_INVALID,
     QS_TIP_ATTACHED,
     QS_TIP_NOT_ATTACHED, QS_TIP_SETTINGS_INVALID
-} from "../messages";
+} from '../messages';
 
 export class QodanaState {
     private static _instance: QodanaState;

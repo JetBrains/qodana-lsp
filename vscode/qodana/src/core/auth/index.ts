@@ -1,14 +1,14 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 import {
     AuthorizationResponseData, MatchingProject, QodanaCloudUserApi, QodanaCloudUserInfoResponse
-} from "../cloud/api";
-import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
-import {AuthorizingImpl} from "./AuthorizingImpl";
-import {AuthorizedImpl} from "./AuthorizedImpl";
-import {CloudEnvironment} from "../cloud";
-import {convertHttpToSsh, convertSshToHttp, getRemoteOrigin} from "../git";
-import {SERVER, STATE_AUTHORIZING, STATE_SIGNED_IN, USER_FULL_NAME, USER_ID, USER_NAME} from "../config";
-import {extensionInstance} from "../extension";
+} from '../cloud/api';
+import {NotAuthorizedImpl} from './NotAuthorizedImpl';
+import {AuthorizingImpl} from './AuthorizingImpl';
+import {AuthorizedImpl} from './AuthorizedImpl';
+import {CloudEnvironment} from '../cloud';
+import {convertHttpToSsh, convertSshToHttp, getRemoteOrigin} from '../git';
+import {SERVER, STATE_AUTHORIZING, STATE_SIGNED_IN, USER_FULL_NAME, USER_ID, USER_NAME} from '../config';
+import {extensionInstance} from '../extension';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -136,13 +136,13 @@ export class Auth {
             this.lastState = state;
             if (state instanceof NotAuthorizedImpl) {
                 vscode.commands.executeCommand('setContext', STATE_AUTHORIZING, false);
-                vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, false);
+                vscode.commands.executeCommand('setContext', STATE_SIGNED_IN, false);
             } else if (state instanceof AuthorizingImpl) {
-                vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, true);
-                vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, false);
+                vscode.commands.executeCommand('setContext', STATE_AUTHORIZING, true);
+                vscode.commands.executeCommand('setContext', STATE_SIGNED_IN, false);
             } else if (state instanceof AuthorizedImpl) {
-                vscode.commands.executeCommand("setContext", STATE_AUTHORIZING, false);
-                vscode.commands.executeCommand("setContext", STATE_SIGNED_IN, true);
+                vscode.commands.executeCommand('setContext', STATE_AUTHORIZING, false);
+                vscode.commands.executeCommand('setContext', STATE_SIGNED_IN, true);
                 extensionInstance.linkService?.getProjectProperties(undefined, false);
             }
         });
@@ -209,7 +209,7 @@ export function normalizeUrl(serverName?: string): string | undefined {
         return serverName;
     }
     let result: string;
-    if (serverName.startsWith("https://") || serverName.startsWith("http://")) {
+    if (serverName.startsWith('https://') || serverName.startsWith('http://')) {
         result = serverName;
     } else {
         result = `https://${serverName}`;

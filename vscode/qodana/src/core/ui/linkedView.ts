@@ -1,9 +1,9 @@
-import * as vscode from "vscode";
-import {CancellationToken, WebviewView, WebviewViewResolveContext} from "vscode";
-import {Events} from "../events";
-import {extensionInstance} from "../extension";
-import {buildHtml} from "./util";
-import {linkedToProject} from "../messages";
+import * as vscode from 'vscode';
+import {CancellationToken, WebviewView, WebviewViewResolveContext} from 'vscode';
+import {Events} from '../events';
+import {extensionInstance} from '../extension';
+import {buildHtml} from './util';
+import {linkedToProject} from '../messages';
 
 export class LinkedView implements vscode.WebviewViewProvider {
     public static readonly viewType = 'qodana.linked';
@@ -49,8 +49,8 @@ export class LinkedView implements vscode.WebviewViewProvider {
         return buildHtml(webview, this._extensionUri, 'link.js', `
               <p>${linkedToProject(extensionInstance.linkService?.getLinkedProjectName())}</p>
               <br>
-              <button class="unlink-button secondary">Unlink Project</button>
-              <button class="open-report-button secondary">Open Report</button>`
+              <button class='unlink-button secondary'>Unlink Project</button>
+              <button class='open-report-button secondary'>Open Report</button>`
         );
     }
 

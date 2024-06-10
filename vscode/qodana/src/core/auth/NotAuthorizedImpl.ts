@@ -1,6 +1,6 @@
-import {Authorized, AuthState_, NotAuthorized} from "./index";
-import {AuthorizingImpl} from "./AuthorizingImpl";
-import * as vscode from "vscode";
+import {Authorized, AuthState_, NotAuthorized} from './index';
+import {AuthorizingImpl} from './AuthorizingImpl';
+import * as vscode from 'vscode';
 
 
 export class NotAuthorizedImpl implements NotAuthorized {

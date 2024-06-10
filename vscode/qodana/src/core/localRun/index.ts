@@ -1,8 +1,8 @@
-import {Events} from "../events";
-import {LOCAL_REPORT} from "../config";
-import * as vscode from "vscode";
-import {showLocalReport} from "../cli/executor";
-import {extensionInstance} from "../extension";
+import {Events} from '../events';
+import {LOCAL_REPORT} from '../config';
+import * as vscode from 'vscode';
+import {showLocalReport} from '../cli/executor';
+import {extensionInstance} from '../extension';
 
 export class LocalRunsService {
     private localReports = new Set<LocalReport>;
@@ -30,7 +30,7 @@ export class LocalRunsService {
     openLocalReportAction() {
         vscode.window.showQuickPick([... this.localReports]).then(async (selection) => {
             if (selection) {
-                let path = selection.path.replace("qodana.sarif.json", "");
+                let path = selection.path.replace('qodana.sarif.json', '');
                 await extensionInstance.closeReport();
                 await showLocalReport(this.context, path);
             }

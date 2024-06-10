@@ -1,10 +1,10 @@
-import * as vscode from "vscode";
-import {CONF_PROJ_ID, STATE_LINKED} from "../config";
-import {extensionInstance} from "../extension";
-import {CloudProjectResponse} from "./api";
-import {openReportByProjectId} from "../report";
-import {Events} from "../events";
-import telemetry from "../telemetry";
+import * as vscode from 'vscode';
+import {CONF_PROJ_ID, STATE_LINKED} from '../config';
+import {extensionInstance} from '../extension';
+import {CloudProjectResponse} from './api';
+import {openReportByProjectId} from '../report';
+import {Events} from '../events';
+import telemetry from '../telemetry';
 
 export class LinkService {
     private linkedProjectId: string | undefined;
@@ -84,7 +84,7 @@ export class LinkService {
         let authorized = extensionInstance.auth.getAuthorized();
         if (authorized) {
             await openReportByProjectId(projectId, this.context, authorized);
-            vscode.commands.executeCommand("workbench.action.problems.focus");
+            vscode.commands.executeCommand('workbench.action.problems.focus');
         }
     }
 

@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import {BL_STATUS_ALL_ISSUES, BL_STATUS_NEW_ISSUES, BL_TTIP_ALL_ISSUES, BL_TTIP_NEW_ISSUES} from "../messages";
+import * as vscode from 'vscode';
+import {BL_STATUS_ALL_ISSUES, BL_STATUS_NEW_ISSUES, BL_TTIP_ALL_ISSUES, BL_TTIP_NEW_ISSUES} from '../messages';
 
 export class BaselineToggle {
     private static _instance: BaselineToggle;

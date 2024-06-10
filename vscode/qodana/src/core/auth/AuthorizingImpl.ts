@@ -1,13 +1,13 @@
-import {Authorized, Authorizing, AuthState_, NotAuthorized} from "./index";
-import {NotAuthorizedImpl} from "./NotAuthorizedImpl";
-import * as vscode from "vscode";
-import {FAILED_TO_AUTHENTICATE, FAILED_TO_OBTAIN_TOKEN} from "../messages";
-import telemetry from "../telemetry";
-import * as net from "net";
-import * as http from "http";
-import {qodanaCloudUnauthorizedApi, qodanaCloudUserApi} from "../cloud/api";
-import {AuthorizedImpl} from "./AuthorizedImpl";
-import {CloudEnvironment} from "../cloud";
+import {Authorized, Authorizing, AuthState_, NotAuthorized} from './index';
+import {NotAuthorizedImpl} from './NotAuthorizedImpl';
+import * as vscode from 'vscode';
+import {FAILED_TO_AUTHENTICATE, FAILED_TO_OBTAIN_TOKEN} from '../messages';
+import telemetry from '../telemetry';
+import * as net from 'net';
+import * as http from 'http';
+import {qodanaCloudUnauthorizedApi, qodanaCloudUserApi} from '../cloud/api';
+import {AuthorizedImpl} from './AuthorizedImpl';
+import {CloudEnvironment} from '../cloud';
 
 export class AuthorizingImpl implements Authorizing {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;
@@ -76,7 +76,7 @@ export class AuthorizingImpl implements Authorizing {
         const url = new URL(authzUrl);
 
         const params = new URLSearchParams(url.search);
-        params.append("state", `idea-${port}-${randomString}`);
+        params.append('state', `idea-${port}-${randomString}`);
 
         url.search = params.toString();
 

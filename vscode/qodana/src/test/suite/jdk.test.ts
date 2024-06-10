@@ -1,4 +1,4 @@
-import { downloadAndUnpackJbr } from "../../core/jdk/jbrDownloader";
+import { downloadAndUnpackJbr } from '../../core/jdk/jbrDownloader';
 import * as sinon from 'sinon';
 import assert = require('assert');
 import * as fs from 'fs';

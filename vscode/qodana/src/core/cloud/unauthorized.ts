@@ -1,12 +1,12 @@
-import {AuthorizationResponseData, QodanaCloudUnauthorizedApi, QodanaOauthProviderData} from "./api";
-import {BackendUrls, CloudEnvironment, getHeaders} from "./index";
-import axios, {AxiosRequestConfig} from "axios";
-import * as vscode from "vscode";
-import {FAILED_TO_AUTHENTICATE} from "../messages";
-import telemetry from "../telemetry";
+import {AuthorizationResponseData, QodanaCloudUnauthorizedApi, QodanaOauthProviderData} from './api';
+import {BackendUrls, CloudEnvironment, getHeaders} from './index';
+import axios, {AxiosRequestConfig} from 'axios';
+import * as vscode from 'vscode';
+import {FAILED_TO_AUTHENTICATE} from '../messages';
+import telemetry from '../telemetry';
 
 export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedApi {
-    private version = "1";
+    private version = '1';
     private environment: CloudEnvironment;
 
     constructor(environment: CloudEnvironment) {
@@ -59,7 +59,7 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
     }
 
     async getBackendUrls(frontendUrl: string): Promise<BackendUrls | undefined> {
-        const url = new URL("api/versions", frontendUrl).toString();
+        const url = new URL('api/versions', frontendUrl).toString();
         let config = {
             headers: getHeaders()
         };

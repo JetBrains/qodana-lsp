@@ -1,6 +1,6 @@
-import {cloudWebsite} from "../defaults";
-import {qodanaCloudUnauthorizedApi} from "./api";
-import {extensionInstance} from "../extension";
+import {cloudWebsite} from '../defaults';
+import {qodanaCloudUnauthorizedApi} from './api';
+import {extensionInstance} from '../extension';
 
 
 export class CloudEnvironment {
@@ -29,7 +29,7 @@ export class CloudEnvironment {
         }
         let urls = await this.lastBackendUrlsRequest;
         return urls?.api?.versions?.find(
-            versionUrl=> versionUrl.version.split(".")[0] === version
+            versionUrl=> versionUrl.version.split('.')[0] === version
         )?.url;
     }
 

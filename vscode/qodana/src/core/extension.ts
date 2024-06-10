@@ -1,12 +1,12 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 
 import {
     LanguageClient,
     State,
-} from "vscode-languageclient/node";
+} from 'vscode-languageclient/node';
 
-import { getLanguageClient } from "./client";
-import config, {WS_BASELINE_ISSUES} from "./config";
+import { getLanguageClient } from './client';
+import config, {WS_BASELINE_ISSUES} from './config';
 
 
 import {
@@ -17,17 +17,17 @@ import {
     onServerStateChange,
     onTimerCallback,
     onUrlCallback
-} from "./client/activities";
+} from './client/activities';
 import { Auth } from './auth';
-import { runQodana, showLocalReport } from "./cli/executor";
-import { getCli } from "./cli/cliDownloader";
-import { obtainToken } from "./cli/token";
-import { Events } from "./events";
-import { QodanaState } from "./menuitems/QodanaState";
-import { BaselineToggle } from "./menuitems/BaselineToggle";
-import { LinkService } from "./cloud/link";
-import {LocalRunsService} from "./localRun";
-import telemetry from "./telemetry";
+import { runQodana, showLocalReport } from './cli/executor';
+import { getCli } from './cli/cliDownloader';
+import { obtainToken } from './cli/token';
+import { Events } from './events';
+import { QodanaState } from './menuitems/QodanaState';
+import { BaselineToggle } from './menuitems/BaselineToggle';
+import { LinkService } from './cloud/link';
+import {LocalRunsService} from './localRun';
+import telemetry from './telemetry';
 
 export class QodanaExtension {
     public languageClient?: LanguageClient;
@@ -56,7 +56,7 @@ export class QodanaExtension {
 
     async init(): Promise<void> {
         if (!this.context) {
-            throw new Error("Context is not set");
+            throw new Error('Context is not set');
         }
         this.auth = await Auth.create(this.context);
 

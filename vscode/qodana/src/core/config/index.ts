@@ -1,11 +1,11 @@
 // return a handler that will accept extension context and will listen for the workspace settings change
-import * as vscode from "vscode";
-import { LanguageClient, State } from "vscode-languageclient/node";
-import { PATH_PREFIX_NOT_SET, PROJECT_ID_NOT_SET, RELOAD, RELOAD_TO_APPLY, ULS_PROCEED, USER_LEVEL_SETTINGS } from "../messages";
+import * as vscode from 'vscode';
+import { LanguageClient, State } from 'vscode-languageclient/node';
+import { PATH_PREFIX_NOT_SET, PROJECT_ID_NOT_SET, RELOAD, RELOAD_TO_APPLY, ULS_PROCEED, USER_LEVEL_SETTINGS } from '../messages';
 import * as fs from 'node:fs/promises';
 import { join } from 'node:path';
-import telemetry from "../telemetry";
-import { Events } from "../events";
+import telemetry from '../telemetry';
+import { Events } from '../events';
 
 
 export const IS_DEBUG = process.env.EXTENSION_DEBUG === 'true';
@@ -111,7 +111,7 @@ class ConfigurationHelper {
         let workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders) {
             telemetry.errorReceived('#computeAbsolutePath');
-            throw new Error("No workspace folders found");
+            throw new Error('No workspace folders found');
         }
 
         let workspaceRoot = workspaceFolders[0].uri.fsPath;
@@ -171,7 +171,7 @@ class ConfigurationHelper {
         if (IS_DEBUG) {
             let value = await vscode.window.showInformationMessage(RELOAD_TO_APPLY, RELOAD);
             if (value === RELOAD) {
-                await vscode.commands.executeCommand("workbench.action.reloadWindow");
+                await vscode.commands.executeCommand('workbench.action.reloadWindow');
             }
         }
     }
