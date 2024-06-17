@@ -32,3 +32,19 @@ export function getRemoteOrigin(): string | undefined {
     }
     return origin;
 }
+
+export function convertSshToHttp(url: string) {
+    if (url.startsWith("https://") || url.startsWith("http://")) {
+        return url;
+    }
+    const [_, host, repo] = url.match(/git@(.*):([\w./-]+)\.git/) || [];
+    return `https://${host}/${repo}`;
+}
+
+export function convertHttpToSsh(url: string) {
+    if (url.startsWith("git@")) {
+        return [url];
+    }
+    const [_, host,user, repo] = url.match(/^https?:\/\/([^/]+)\/([^/]+)\/([^/]+)/) || [];
+    return [`git@${host}:${user}/${repo}`, `git@${host}/${user}/${repo}`]; // workaround for host/user case
+}

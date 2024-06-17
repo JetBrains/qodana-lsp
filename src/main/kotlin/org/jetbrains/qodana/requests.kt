@@ -17,6 +17,7 @@ import java.io.FileReader
 import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.exists
 import kotlin.text.StringBuilder
 
@@ -49,8 +50,8 @@ class SarifFile(private val path: String, private val showBaselineIssues: Boolea
         state.sarifLocation = path
         val diags = computeDiagnosticsAsIs(showBaselineIssues)
         val oldFiles = state.diagnostic?.keys ?: emptyList()
-        state.diagnostic = diags.toMap(mutableMapOf())
-        state.repositoryFileCache = mutableMapOf()
+        state.diagnostic = diags.toMap(ConcurrentHashMap())
+        state.repositoryFileCache = ConcurrentHashMap()
         state.sarifRevision = lazy { getRevisionId(path) }
         state.gitLocator?.value?.close()
         state.gitLocator = lazy {
@@ -264,6 +265,16 @@ class CloseFile(private val uri: String): IRequest {
     override suspend fun execute(state: SarifLanguageServer.ServerState) {
         state.openFileCache.remove(uri)
         state.repositoryFileCache?.remove(uri)
+    }
+}
+
+class CloseReport : IRequest {
+    override suspend fun execute(state: SarifLanguageServer.ServerState) {
+        val oldFiles = state.diagnostic?.keys ?: emptyList()
+        state.diagnostic = null
+        for (file in oldFiles) {
+            state.requestChannel.send(AnnounceDiagnostics(file, emptyList()))
+        }
     }
 }
 

@@ -1,15 +1,23 @@
-import * as https from 'https';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { DOWNLOAD_CONFIRMATION, NO, YES, failedToDownloadJbr, successfullyExtracted } from '../messages';
+import {
+    DOWNLOAD_CONFIRMATION,
+    NO,
+    YES,
+    failedToDownloadJbr,
+    successfullyExtracted,
+    failedToExtractJbr
+} from '../messages';
+import { links } from './jdk.json';
 import telemetry from '../telemetry';
 import * as tar from 'tar';
 import * as os from 'os';
 import * as path from 'path';
 import { downloadFile } from '../report';
+import {GS_JAVA_EXECUTABLE_PATH} from '../config';
 
 
-export function getJbrReleases(): Promise<Map<string, Release>> {
+/*export function getJbrReleases(): Promise<Map<string, Release>> {
     return new Promise((resolve, reject) => {
         let options = {
             hostname: 'api.github.com',
@@ -22,7 +30,7 @@ export function getJbrReleases(): Promise<Map<string, Release>> {
             if (res.statusCode && (res.statusCode < 200 || res.statusCode >= 300)) {
                 return reject(new Error(`Status Code: ${res.statusCode}`));
             }
-            var data = "";
+            let data = "";
             res.on('data', chunk => { data += chunk; });
             res.on('end', () => {
                 try {
@@ -37,7 +45,7 @@ export function getJbrReleases(): Promise<Map<string, Release>> {
         req.on('error', reject);
         req.end();
     });
-}
+}*/
 
 export async function fetchJbr(url: string, filePath: string): Promise<string | undefined> {
     try {
@@ -62,7 +70,7 @@ export async function extractJbr(filePath: string, releaseName: string, extractP
         }
         return path.join(extractPath, dirName, 'bin', 'java'  + (osType === 'windows' ? '.exe' : ''));
     } catch (e) {
-        vscode.window.showErrorMessage(failedToDownloadJbr(filePath) + `: ${e}`);
+        vscode.window.showErrorMessage(failedToExtractJbr(filePath) + `: ${e}`);
         telemetry.errorReceived('#extractJbr exception');
     }
     return undefined;
@@ -70,33 +78,32 @@ export async function extractJbr(filePath: string, releaseName: string, extractP
 
 export async function getMatchingReleaseUrl(): Promise<Release | undefined> {
     let { osType, osArch } = getOsAndArch();
-    let releases = await getJbrReleases();
-    let release = releases.get(`${osType}-${osArch}`);
+    let release = links.find(x => x.name === `${osType}-${osArch}`);
     if (release) {
-        return release;
+        return release.links;
     }
 }
 
 export function getOsAndArch() {
     let osType: string;
     switch (os.type()) {
-        case "Linux":
-            osType = "linux";
+        case 'Linux':
+            osType = 'linux';
             break;
-        case "Darwin":
-            osType = "osx";
+        case 'Darwin':
+            osType = 'osx';
             break;
         default:
-            osType = "windows";
+            osType = 'windows';
             break;
     }
     let osArch: string;
     switch (os.arch()) {
-        case "arm64":
-            osArch = "aarch64";
+        case 'arm64':
+            osArch = 'aarch64';
             break;
         default:
-            osArch = "x64";
+            osArch = 'x64';
             break;
     }
 
@@ -151,7 +158,7 @@ export function getJavaExecutablePath(): string | null {
             javaClassVersion = require('child_process').execSync(cmd).toString().split('=')[1].trim();
         } catch (error) {
             telemetry.errorReceived('#getJavaExecutablePath exception (getting java class version)');
-            console.log("Failed to get JAVA_HOME. " + (error));
+            console.log('Failed to get JAVA_HOME. ' + (error));
         }
 
         if (javaClassVersion) {
@@ -172,18 +179,18 @@ export function getJavaExecutablePath(): string | null {
 
 export async function getJavaForExecution(context: vscode.ExtensionContext): Promise<string | undefined> {
     try {
-        let javaFromSettings = context.globalState.get<string | undefined>('javaExecutablePath');
+        let javaFromSettings = context.globalState.get<string | undefined>(GS_JAVA_EXECUTABLE_PATH);
         if (javaFromSettings) {
             try {
                 await fs.promises.access(javaFromSettings);
                 return javaFromSettings;
             } catch (e) {
-                await context.globalState.update('javaExecutablePath', undefined);
+                await context.globalState.update(GS_JAVA_EXECUTABLE_PATH, undefined);
             }
         }
         let localJava = getJavaExecutablePath();
         if (localJava) {
-            await context.globalState.update('javaExecutablePath', localJava);
+            await context.globalState.update(GS_JAVA_EXECUTABLE_PATH, localJava);
             return localJava;
         }
         let decision = await vscode.window.showErrorMessage(DOWNLOAD_CONFIRMATION, YES, NO);
@@ -193,7 +200,7 @@ export async function getJavaForExecution(context: vscode.ExtensionContext): Pro
             let java = await downloadAndUnpackJbr(downloadedJbrDir);
             if (java) {
                 telemetry.jbrDownloaded();
-                await context.globalState.update('javaExecutablePath', java);
+                await context.globalState.update(GS_JAVA_EXECUTABLE_PATH, java);
                 vscode.window.showInformationMessage(successfullyExtracted(java));
                 return java;
             }
@@ -205,8 +212,8 @@ export async function getJavaForExecution(context: vscode.ExtensionContext): Pro
 }
 
 
-function parseData(data: string) {
-    // regular expression to find markdown table row data
+/*function parseData(data: string) {
+    // regular expression to find Markdown table row data
     const re = /\| (.*?) \| .*? \| \[(.*?)]\((.*?)\)/g;
     let match;
     // create mutable map of platform+arch to file name and file url
@@ -228,7 +235,7 @@ function parseData(data: string) {
         map.set(platformArch, { fileName, fileUrl });
     }
     return map;
-}
+}*/
 
 interface Release {
     fileName: string;

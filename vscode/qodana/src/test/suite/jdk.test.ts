@@ -1,4 +1,4 @@
-import { downloadAndUnpackJbr, getJbrReleases } from "../../core/jdk/jbrDownloader";
+import { downloadAndUnpackJbr } from '../../core/jdk/jbrDownloader';
 import * as sinon from 'sinon';
 import assert = require('assert');
 import * as fs from 'fs';
@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 describe('JBR Downloader', () => {
-    var sandbox: sinon.SinonSandbox;
+    let sandbox: sinon.SinonSandbox;
 
     beforeEach(async () => {
         sandbox = sinon.createSandbox();
@@ -16,10 +16,10 @@ describe('JBR Downloader', () => {
         sandbox.restore();
     });
 
-    it('1: JBR downloader retrieves info about releases', async () => {
+    /*it('1: JBR downloader retrieves info about releases', async () => {
         let releases = await getJbrReleases();
         assert.strictEqual(releases.size, 8);
-    });
+    });*/
 
     it('2: Release is downloadable', async () => {
         // generate random file name

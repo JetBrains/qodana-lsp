@@ -1,10 +1,50 @@
 // return a handler that will accept extension context and will listen for the workspace settings change
-import * as vscode from "vscode";
-import { LanguageClient, State } from "vscode-languageclient/node";
-import { PATH_PREFIX_NOT_SET, PROJECT_ID_NOT_SET, RELOAD, RELOAD_TO_APPLY, ULS_PROCEED, USER_LEVEL_SETTINGS } from "../messages";
+import * as vscode from 'vscode';
+import { LanguageClient, State } from 'vscode-languageclient/node';
+import { PATH_PREFIX_NOT_SET, PROJECT_ID_NOT_SET, RELOAD, RELOAD_TO_APPLY, ULS_PROCEED, USER_LEVEL_SETTINGS } from '../messages';
 import * as fs from 'node:fs/promises';
 import { join } from 'node:path';
-import telemetry from "../telemetry";
+import telemetry from '../telemetry';
+import { Events } from '../events';
+
+
+export const IS_DEBUG = process.env.EXTENSION_DEBUG === 'true';
+
+export const LOCAL_REPORT = 'LOCAL';
+export const WS_BASELINE_ISSUES = 'baselineIssues';
+export const WS_REPORT_ID = 'reportId';
+export const WS_OPENED_REPORT = 'openedReport';
+export const WS_COMPUTED_PREFIX = 'computedPrefix';
+export const GS_CLI_SETTING = 'cliExecutablePath';
+export const GS_JAVA_EXECUTABLE_PATH = 'javaExecutablePath';
+export const CONF_PROJ_ID = 'qodana.projectId';
+export const CONF_PATH_PREFIX = 'qodana.pathPrefix';
+export const SERVER = 'qodana.server';
+export const USER_ID = 'qodana.userId';
+export const USER_FULL_NAME = 'qodana.userFullName';
+export const USER_NAME = 'qodana.userName';
+
+export const STATE_SIGNED_IN = 'qodana.signed-in';
+export const STATE_AUTHORIZING = 'qodana.authorizing';
+export const STATE_LINKED = 'qodana.linked';
+
+export const COMMAND_LOG_IN = 'qodana.login';
+export const COMMAND_LOG_IN_CUSTOM_SERVER = 'qodana.loginCustomServer';
+export const COMMAND_LOG_OUT = 'qodana.logout';
+export const COMMAND_CANCEL_AUTHORIZATION = 'qodana.cancel-authorization';
+export const COMMAND_RUN_LOCALLY = 'qodana.runLocally';
+export const COMMAND_OPEN_LOCAL_REPORT = 'qodana.openLocalReport';
+export const COMMAND_CLOSE_REPORT = 'qodana.closeReport';
+export const COMMAND_LINK = 'qodana.link';
+export const COMMAND_UNLINK = 'qodana.unlink';
+export const COMMAND_SELECT_NODE = 'qodana.selectNode';
+export const COMMAND_REFRESH_PROJECTS = 'qodana.refreshProjects';
+export const COMMAND_TREE_OTHER_ITEM = 'qodanaTreeItem.other-item';
+
+export const COMMANDS = new Set ([
+    COMMAND_LOG_IN, COMMAND_LOG_IN_CUSTOM_SERVER, COMMAND_LOG_OUT, COMMAND_CANCEL_AUTHORIZATION, COMMAND_RUN_LOCALLY,
+    COMMAND_OPEN_LOCAL_REPORT, COMMAND_CLOSE_REPORT, COMMAND_LINK, COMMAND_UNLINK, COMMAND_SELECT_NODE
+]);
 
 class ConfigurationHelper {
     private static _instance: ConfigurationHelper;
@@ -18,9 +58,9 @@ class ConfigurationHelper {
     }
 
     private settings = [
-        { id: 'qodana.projectId', message: PROJECT_ID_NOT_SET, checker: async (value: unknown) => value !== '' },
+        { id: CONF_PROJ_ID, message: PROJECT_ID_NOT_SET, checker: async (value: unknown) => value !== ''},
         {
-            id: 'qodana.pathPrefix', message: PATH_PREFIX_NOT_SET, checker: async (value: unknown) => {
+            id: CONF_PATH_PREFIX, message: PATH_PREFIX_NOT_SET, checker: async (value: unknown) => {
                 if (!value) { return true; }
                 try {
                     await fs.access(this.computeAbsolutePath(value as string));
@@ -33,29 +73,34 @@ class ConfigurationHelper {
     ];
 
     async resetSettings(context: vscode.ExtensionContext): Promise<void> {
-        await context.workspaceState.update('openedreport', null);
-        await context.workspaceState.update('reportId', null);
-        await context.workspaceState.update('computedPrefix', null);
-        await context.workspaceState.update('baselineIssues', false);
-        await context.globalState.update('javaExecutablePath', null);
+        await context.workspaceState.update(WS_OPENED_REPORT, null);
+        await context.workspaceState.update(WS_REPORT_ID, null);
+        await context.workspaceState.update(WS_COMPUTED_PREFIX, null);
+        await context.workspaceState.update(WS_BASELINE_ISSUES, false);
+        await context.globalState.update(GS_JAVA_EXECUTABLE_PATH, null);
+        await context.globalState.update(GS_CLI_SETTING, null);
+        await context.globalState.update(SERVER, undefined);
+        await context.globalState.update(USER_ID, undefined);
+        await context.globalState.update(USER_FULL_NAME, undefined);
+        await context.globalState.update(USER_NAME, undefined);
         // reset workspace settings
-        await vscode.workspace.getConfiguration().update('qodana.projectId', undefined, vscode.ConfigurationTarget.Workspace);
-        await vscode.workspace.getConfiguration().update('qodana.pathPrefix', undefined, vscode.ConfigurationTarget.Workspace);
+        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Workspace);
+        await vscode.workspace.getConfiguration().update(CONF_PATH_PREFIX, undefined, vscode.ConfigurationTarget.Workspace);
 
         // reset global settings
-        await vscode.workspace.getConfiguration().update('qodana.projectId', undefined, vscode.ConfigurationTarget.Global);
-        await vscode.workspace.getConfiguration().update('qodana.pathPrefix', undefined, vscode.ConfigurationTarget.Global);
+        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Global);
+        await vscode.workspace.getConfiguration().update(CONF_PATH_PREFIX, undefined, vscode.ConfigurationTarget.Global);
     }
 
     async resetGlobalSettings(): Promise<void> {
         // reset global settings
-        await vscode.workspace.getConfiguration().update('qodana.projectId', undefined, vscode.ConfigurationTarget.Global);
-        await vscode.workspace.getConfiguration().update('qodana.pathPrefix', undefined, vscode.ConfigurationTarget.Global);
+        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, undefined, vscode.ConfigurationTarget.Global);
+        await vscode.workspace.getConfiguration().update(CONF_PATH_PREFIX, undefined, vscode.ConfigurationTarget.Global);
     }
 
     getAbsolutePrefix(context: vscode.ExtensionContext): string {
-        let pathPrefix = vscode.workspace.getConfiguration().get('qodana.pathPrefix') || '';
-        let computedPrefix = context.workspaceState.get('computedPrefix') || ''; // absolute path
+        let pathPrefix = vscode.workspace.getConfiguration().get(CONF_PATH_PREFIX) || '';
+        let computedPrefix = context.workspaceState.get(WS_COMPUTED_PREFIX) || ''; // absolute path
         if (pathPrefix === '' && computedPrefix !== '') {
             return computedPrefix as string;
         }
@@ -66,7 +111,7 @@ class ConfigurationHelper {
         let workspaceFolders = vscode.workspace.workspaceFolders;
         if (!workspaceFolders) {
             telemetry.errorReceived('#computeAbsolutePath');
-            throw new Error("No workspace folders found");
+            throw new Error('No workspace folders found');
         }
 
         let workspaceRoot = workspaceFolders[0].uri.fsPath;
@@ -110,24 +155,24 @@ class ConfigurationHelper {
         }
 
         // ok, it's not a global settings change, check if workspace settings are valid
-        let isValid = await this.configIsValid(context, false);
+        let silent = !IS_DEBUG;
+        let isValid = await this.configIsValid(context, silent);
         await this.updateClientState(isValid, client);
     }
 
     private async updateClientState(isValid: boolean, client: LanguageClient) {
-        if (isValid && client.state === State.Stopped) {
-            await client.start();
-        } else if (!isValid && client.state === State.Running) {
-            await client.stop();
-        } else if (isValid && client.state === State.Running) {
+        if (isValid && client.state === State.Running) {
+            Events.instance.fireConfigChange();
             await this.reloadWorkspace();
         }
     }
 
     private async reloadWorkspace() {
-        let value = await vscode.window.showInformationMessage(RELOAD_TO_APPLY, RELOAD);
-        if (value === RELOAD) {
-            await vscode.commands.executeCommand("workbench.action.reloadWindow");
+        if (IS_DEBUG) {
+            let value = await vscode.window.showInformationMessage(RELOAD_TO_APPLY, RELOAD);
+            if (value === RELOAD) {
+                await vscode.commands.executeCommand('workbench.action.reloadWindow');
+            }
         }
     }
 }

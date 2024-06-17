@@ -47,6 +47,39 @@
       {
         "command": "qodana.resetAllSettings",
         "title": "Qodana: Reset all settings"
+      },
+      {
+        "command": "qodana.runLocally",
+        "title": "Qodana: Run locally"
+      },
+      {
+        "command": "qodana.openLocalReport",
+        "title": "Open Local Report"
+      },
+      {
+        "command": "qodana.login",
+        "title": "Log In to Qodana"
+      },
+      {
+        "command": "qodana.refreshProjects",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "qodana.link",
+        "title": "Link"
+      },
+      {
+        "command": "qodana.unlink",
+        "title": "Unlink"
+      },
+      {
+        "command": "qodana.selectNode",
+        "title": "Select node"
+      },
+      {
+        "command": "qodanaTreeNode.other-item",
+        "title": "Link other project"
       }
     ],
     "walkthroughs": [
@@ -132,7 +165,76 @@
           }
         ]
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "qodanaView",
+          "title": "Qodana",
+          "icon": "media/qodana-bw.svg"
+        }
+      ]
+    },
+    "views": {
+      "qodanaView": [
+        {
+          "type": "webview",
+          "id": "qodana.login-view",
+          "name": "Log In",
+          "when": "!qodana.signed-in && !qodana.authorizing"
+        },
+        {
+          "id": "qodana.authorizing-view",
+          "name": "Authorizing",
+          "when": "qodana.authorizing"
+        },
+        {
+          "id": "qodana.link-view",
+          "name": "Link project",
+          "titleActions": [
+            "qodana.refresh"
+          ],
+          "when": "qodana.signed-in && !qodana.linked"
+        },
+        {
+          "type": "webview",
+          "id": "qodana.linked",
+          "name": "Linked Project",
+          "when": "qodana.signed-in && qodana.linked"
+        },
+        {
+          "type": "webview",
+          "id": "qodana.run-locally-view",
+          "name": "Run Qodana Locally"
+        },
+        {
+          "type": "webview",
+          "id": "qodana.settings",
+          "name": "Settings",
+          "when": "qodana.signed-in"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "qodana.authorizing-view",
+        "contents": "Authorizing\n[Cancel](command:qodana.cancel-authorization)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "qodana.refreshProjects",
+          "when": "view == qodana.link-view",
+          "group": "navigation"
+        },
+        {
+          "command": "qodana.link",
+          "when": "view == qodana.link-view",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -145,6 +247,7 @@
     "coverage": "c8 --check-coverage  --lines 50 --functions 50 --branches 50 npm run test"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.5",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "20.2.5",
@@ -153,7 +256,7 @@
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
-    "@vscode/test-electron": "^2.3.2",
+    "@vscode/test-electron": "^2.3.8",
     "c8": "^8.0.1",
     "eslint": "^8.41.0",
     "glob": "^8.1.0",
@@ -164,8 +267,9 @@
   },
   "dependencies": {
     "@vscode/extension-telemetry": "^0.8.5",
+    "adm-zip": "^0.5.10",
     "axios": "^1.6.0",
-    "tar": "^6.2.0",
-    "vscode-languageclient": "^8.1.0"
+    "tar": "^6.2.1",
+    "vscode-languageclient": "^9.0.1"
   }
 }
