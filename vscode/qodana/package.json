@@ -268,7 +268,7 @@
   "dependencies": {
     "@vscode/extension-telemetry": "^0.8.5",
     "adm-zip": "^0.5.10",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "tar": "^6.2.1",
     "vscode-languageclient": "^9.0.1"
   }
