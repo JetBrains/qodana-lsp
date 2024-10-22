@@ -16,6 +16,7 @@ export const WS_REPORT_ID = 'reportId';
 export const WS_OPENED_REPORT = 'openedReport';
 export const WS_COMPUTED_PREFIX = 'computedPrefix';
 export const GS_CLI_SETTING = 'cliExecutablePath';
+export const GS_VER_SETTING = 'cliExecutableVersion';
 export const GS_JAVA_EXECUTABLE_PATH = 'javaExecutablePath';
 export const CONF_PROJ_ID = 'qodana.projectId';
 export const CONF_PATH_PREFIX = 'qodana.pathPrefix';
@@ -79,6 +80,7 @@ class ConfigurationHelper {
         await context.workspaceState.update(WS_BASELINE_ISSUES, false);
         await context.globalState.update(GS_JAVA_EXECUTABLE_PATH, null);
         await context.globalState.update(GS_CLI_SETTING, null);
+        await context.globalState.update(GS_VER_SETTING, null);
         await context.globalState.update(SERVER, undefined);
         await context.globalState.update(USER_ID, undefined);
         await context.globalState.update(USER_FULL_NAME, undefined);

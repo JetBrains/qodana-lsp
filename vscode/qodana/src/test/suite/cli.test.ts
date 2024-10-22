@@ -6,7 +6,8 @@ import * as path from 'path';
 import * as os from 'os';
 import { downloadAndUnpackCli, getCli } from '../../core/cli/cliDownloader';
 import { NO } from '../../core/messages';
-import {GS_CLI_SETTING} from '../../core/config';
+import {GS_CLI_SETTING, GS_VER_SETTING} from '../../core/config';
+import { version } from '../../core/cli/cli.json';
 
 describe('CLI Downloader', () => {
     let sandbox: sinon.SinonSandbox;
@@ -48,12 +49,15 @@ describe('CLI Downloader', () => {
         }
     });
 
-    it('2: Existing CLI is reused', async () => {
+    it('2: Existing CLI of current version is reused', async () => {
         const cliPath = path.join(os.tmpdir(), Math.random().toString(36).substring(7));
         try {
             await fs.promises.writeFile(cliPath, 'test');
+            map.set(GS_VER_SETTING, version);
             map.set(GS_CLI_SETTING, cliPath);
+            let stub = sandbox.stub(vscode.window, 'showErrorMessage').returns(NO as any);
             let result = await getCli(context);
+            assert.strictEqual(stub.calledOnce, false);
             assert.strictEqual(result, cliPath);
             assert.strictEqual(map.get(GS_CLI_SETTING), cliPath);
         } catch (e) {
@@ -63,7 +67,26 @@ describe('CLI Downloader', () => {
         }
     });
 
-    it('3: Non-existing CLI is not reused', async () => {
+    it('3: Existing CLI of old version is requested to update and reused if declined', async () => {
+        const cliPath = path.join(os.tmpdir(), Math.random().toString(36).substring(7));
+        try {
+            await fs.promises.writeFile(cliPath, 'test');
+            map.set(GS_VER_SETTING, 'other');
+            map.set(GS_CLI_SETTING, cliPath);
+            let stub = sandbox.stub(vscode.window, 'showErrorMessage').returns(NO as any);
+            let result = await getCli(context);
+            assert.strictEqual(stub.calledOnce, true);
+            assert.strictEqual(result, cliPath);
+            assert.strictEqual(map.get(GS_CLI_SETTING), cliPath);
+            assert.strictEqual(map.get(GS_VER_SETTING), 'other');
+        } catch (e) {
+            assert.fail('Failed to reuse the existing CLI');
+        } finally {
+            await fs.promises.rm(cliPath);
+        }
+    });
+
+    it('4: Non-existing CLI is not reused', async () => {
         const cliPath = path.join(os.tmpdir(), Math.random().toString(36).substring(7));
         try {
             map.set(GS_CLI_SETTING, cliPath);

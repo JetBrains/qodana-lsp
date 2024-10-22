@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import telemetry from '../telemetry';
 import * as AdmZip from 'adm-zip';
-import {GS_CLI_SETTING} from '../config';
+import {GS_CLI_SETTING, GS_VER_SETTING} from '../config';
 
 const SUPPORTED_PLATFORMS = ['windows', 'linux', 'darwin'];
 const SUPPORTED_ARCHS = ['x86_64', 'arm64'];
@@ -15,13 +15,18 @@ const EXECUTABLE = 'qodana';
 
 export async function getCli(context: vscode.ExtensionContext): Promise<string | undefined> {
     let cliFromSettings = context.globalState.get<string | undefined>(GS_CLI_SETTING);
+    let cliVerFromSettings = context.globalState.get<string | undefined>(GS_VER_SETTING);
     if (cliFromSettings) {
         try {
             await fs.promises.access(cliFromSettings);
-            return cliFromSettings;
         } catch (e) {
+            await context.globalState.update(GS_VER_SETTING, undefined);
             await context.globalState.update(GS_CLI_SETTING, undefined);
+            cliFromSettings = undefined;
         }
+    }
+    if (cliFromSettings && cliVerFromSettings === version) {
+        return cliFromSettings;
     }
 
     let decision = await vscode.window.showErrorMessage(CLI_DOWNLOAD_CONFIRMATION, YES, NO);
@@ -33,10 +38,13 @@ export async function getCli(context: vscode.ExtensionContext): Promise<string |
         let cli = await downloadAndUnpackCli(downloadedCliArchDir, downloadedCliDir);
         if (cli) {
             telemetry.cliDownloaded();
+            await context.globalState.update(GS_VER_SETTING, version);
             await context.globalState.update(GS_CLI_SETTING, cli);
             vscode.window.showInformationMessage(cliSuccessfullyExtracted(cli));
             return cli;
         }
+    } else if (cliFromSettings) {
+        return cliFromSettings;
     }
     return undefined;
 }
