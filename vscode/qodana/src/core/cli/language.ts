@@ -54,7 +54,7 @@ productCodeToDockerImageMap.set('QDGO', 'jetbrains/qodana-go:');
 productCodeToDockerImageMap.set('QDJVM', 'jetbrains/qodana-jvm:');
 productCodeToDockerImageMap.set('QDJVMC', 'jetbrains/qodana-jvm-community:');
 
-export const versionPrefix = '2024.2';
+export const versionPrefix = '2025.1';
 const eapPrefix = '-eap';
 
 export async function getLanguagesInWorkspace() {
