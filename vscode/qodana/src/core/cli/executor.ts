@@ -49,8 +49,12 @@ export async function launchTerminal(cli: string, cwd: string, tempDir: string, 
     };
     let terminal = vscode.window.createTerminal(options);
     terminal.show();
-    // cli could contain spaces in the path in the middle, they should be escaped
-    cli = cli.replace(/ /g, '\\ ');
+    // cli could contain spaces in the path in the middle, they should be escaped (not for windows)
+    if (os.platform() === 'win32') {
+        cli = `& "${cli}"`;
+    } else {
+        cli = cli.replace(/ /g, '\\ ');
+    }
     terminal.sendText(`${cli} scan --results-dir ${tempDir} --user root`, false);
     terminal.sendText('; sleep 3; exit');
     return new Promise(resolve => {
