@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as sinon from 'sinon';
+import * as os from 'os';
 import * as fs from 'fs';
 import assert = require('assert');
 import { launchTerminal, prepareRun, runQodana } from '../../core/cli/executor';
@@ -38,7 +39,11 @@ describe('CLI Executor Tests', () => {
         assert.equal(opts.env?.NONINTERACTIVE, '1');
         assert.equal(opts.cwd, 'cwd');
         assert.equal(commands.length, 2);
-        assert.equal(commands[0], 'cli scan --results-dir tempDir --user root');
+        if (os.platform() === 'win32') {
+            assert.equal(commands[0], '& "cli" scan --results-dir tempDir --user root');
+        } else {
+            assert.equal(commands[0], 'cli scan --results-dir tempDir --user root');
+        }
         assert.equal(commands[1], '; sleep 3; exit');
     });
 
