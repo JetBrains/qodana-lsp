@@ -52,6 +52,7 @@ export async function launchTerminal(cli: string, cwd: string, tempDir: string, 
     // cli could contain spaces in the path in the middle, they should be escaped (not for windows)
     if (os.platform() === 'win32') {
         cli = `& "${cli}"`;
+        tempDir = `"${tempDir}"`
     } else {
         cli = cli.replace(/ /g, '\\ ');
     }

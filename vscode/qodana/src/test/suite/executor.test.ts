@@ -40,7 +40,7 @@ describe('CLI Executor Tests', () => {
         assert.equal(opts.cwd, 'cwd');
         assert.equal(commands.length, 2);
         if (os.platform() === 'win32') {
-            assert.equal(commands[0], '& "cli" scan --results-dir tempDir --user root');
+            assert.equal(commands[0], '& "cli" scan --results-dir "tempDir" --user root');
         } else {
             assert.equal(commands[0], 'cli scan --results-dir tempDir --user root');
         }
