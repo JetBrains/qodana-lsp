@@ -70,7 +70,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: '18.16'
+        node-version: '20.18'
     - name: Install dependencies
       run: npm install -g vsce && npm ci
       working-directory: vscode/qodana
