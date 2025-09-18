@@ -24,8 +24,7 @@ export async function showLocalReport(context: vscode.ExtensionContext, reportBa
     }
 }
 
-export async function
-runQodana(cli: string, token: string): Promise<string | undefined> {
+export async function runQodana(cli: string, token: string): Promise<string | undefined> {
     let isPrepared = await prepareRun(token);
     if (isPrepared) {
         let tempDir = path.join(os.tmpdir(), Math.random().toString(36).substring(7));

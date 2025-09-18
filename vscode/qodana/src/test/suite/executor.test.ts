@@ -4,7 +4,6 @@ import * as os from 'os';
 import * as fs from 'fs';
 import assert = require('assert');
 import { launchTerminal, prepareRun, runQodana } from '../../core/cli/executor';
-import { versionPrefix } from '../../core/cli/language';
 
 describe('CLI Executor Tests', () => {
     const sandbox = sinon.createSandbox();
@@ -90,7 +89,7 @@ describe('CLI Executor Tests', () => {
         let result = await prepareRun('token');
         assert.equal(result, true);
         assert.equal(choiceStub.called, true);
-        assert.equal(writtenText.split('\n').pop(), 'linter: jetbrains/qodana-jvm:' + versionPrefix);
+        assert.equal(writtenText.split('\n').pop(), 'linter: qodana-jvm');
     });
 
     it('5: runQodana calls prepareRun and launchTerminal', async () => {

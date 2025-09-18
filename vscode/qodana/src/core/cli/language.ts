@@ -41,21 +41,20 @@ eapCodes.add('QDNETC');
 eapCodes.add('QDCLC');
 
 let productCodeToDockerImageMap = new Map<string, string>();
-productCodeToDockerImageMap.set('QDANDC', 'jetbrains/qodana-jvm-android:');
-productCodeToDockerImageMap.set('QDPHP', 'jetbrains/qodana-php:');
-productCodeToDockerImageMap.set('QDJS', 'jetbrains/qodana-js:');
-productCodeToDockerImageMap.set('QDNET', 'jetbrains/qodana-dotnet:');
-productCodeToDockerImageMap.set('QDNETC', 'jetbrains/qodana-cdnet:');
-productCodeToDockerImageMap.set('QDCL', 'jetbrains/qodana-clang:');
-productCodeToDockerImageMap.set('QDCLC', 'jetbrains/qodana-clang:');
-productCodeToDockerImageMap.set('QDPY', 'jetbrains/qodana-python:');
-productCodeToDockerImageMap.set('QDPYC', 'jetbrains/qodana-python-community:');
-productCodeToDockerImageMap.set('QDGO', 'jetbrains/qodana-go:');
-productCodeToDockerImageMap.set('QDJVM', 'jetbrains/qodana-jvm:');
-productCodeToDockerImageMap.set('QDJVMC', 'jetbrains/qodana-jvm-community:');
+productCodeToDockerImageMap.set('QDANDC', 'qodana-jvm-android');
+productCodeToDockerImageMap.set('QDPHP', 'qodana-php');
+productCodeToDockerImageMap.set('QDJS', 'qodana-js');
+productCodeToDockerImageMap.set('QDNET', 'qodana-dotnet');
+productCodeToDockerImageMap.set('QDNETC', 'qodana-cdnet');
+productCodeToDockerImageMap.set('QDCL', 'qodana-clang');
+productCodeToDockerImageMap.set('QDCLC', 'qodana-clang');
+productCodeToDockerImageMap.set('QDPY', 'qodana-python');
+productCodeToDockerImageMap.set('QDPYC', 'qodana-python-community');
+productCodeToDockerImageMap.set('QDGO', 'qodana-go');
+productCodeToDockerImageMap.set('QDJVM', 'qodana-jvm');
+productCodeToDockerImageMap.set('QDJVMC', 'qodana-jvm-community');
 
-export const versionPrefix = '2025.2';
-const eapPrefix = '-eap';
+const eapPrefix = '-EAP';
 
 export async function getLanguagesInWorkspace() {
     const langsAndCounts = new Map<string, number>();
@@ -98,9 +97,9 @@ export function getLinterByCode(code: string): string| undefined {
     let linter = productCodeToDockerImageMap.get(code);
     if (linter) {
         if (eapCodes.has(code)) {
-            return linter + versionPrefix + eapPrefix;
+            return linter + eapPrefix;
         }
-        return linter + versionPrefix;
+        return linter;
     }
     return undefined;
 }
