@@ -72,7 +72,7 @@ jobs:
       with:
         node-version: '20.18'
     - name: Install dependencies
-      run: npm install -g vsce && npm ci
+      run: npm install -g vsce ovsx && npm ci
       working-directory: vscode/qodana
     - name: Run ts tests
       run: xvfb-run -a npm run test
@@ -96,7 +96,9 @@ jobs:
       run: |
         gh release create ${GITHUB_REF##*/}
         vsce publish -p ${{ secrets.VSCE_PAT }} -i qodana-cloud-plugin.vsix
+        ovsx publish qodana-cloud-plugin.vsix -p ${{ secrets.OVSX_PAT }}
       working-directory: vscode/qodana
       env:
         VSCE_PAT: ${{ secrets.VSCE_PAT }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        OVSX_PAT: ${{ secrets.OVSX_PAT }}
