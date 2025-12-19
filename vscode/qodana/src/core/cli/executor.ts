@@ -24,8 +24,7 @@ export async function showLocalReport(context: vscode.ExtensionContext, reportBa
     }
 }
 
-export async function
-runQodana(cli: string, token: string): Promise<string | undefined> {
+export async function runQodana(cli: string, token: string): Promise<string | undefined> {
     let isPrepared = await prepareRun(token);
     if (isPrepared) {
         let tempDir = path.join(os.tmpdir(), Math.random().toString(36).substring(7));
@@ -140,6 +139,11 @@ const TEMPLATE = `
 #               Qodana analysis is configured by qodana.yaml file               #
 #             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
 #-------------------------------------------------------------------------------#
+
+#################################################################################
+#              WARNING: Do not store sensitive information in this file,        #
+#               as its contents will be included in the Qodana report.          #
+#################################################################################
 version: "1.0"
 
 #Specify inspection profile for code analysis
