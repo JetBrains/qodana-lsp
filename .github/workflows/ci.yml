@@ -26,6 +26,8 @@ jobs:
         uses: JetBrains/qodana-action@v2025.3
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_JVM }} # read the steps about it below
+        with:
+          args: --log-level,debug
 
   qodana-js:
     runs-on: ubuntu-latest
