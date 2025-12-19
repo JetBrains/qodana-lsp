@@ -27,6 +27,7 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_JVM }} # read the steps about it below
         with:
+          pr-mode: false
           args: --log-level,debug
 
   qodana-js:
