@@ -14,6 +14,7 @@ extensionToLanguageMap.set('fs', ['C#', 'F#', 'Visual Basic .NET']);
 extensionToLanguageMap.set('vb', ['C#', 'F#', 'Visual Basic .NET']);
 extensionToLanguageMap.set('c', ['C/C++']);
 extensionToLanguageMap.set('cpp', ['C/C++']);
+extensionToLanguageMap.set('rb', ['Ruby']);
 
 let languageToProductCodeMap = new Map<string, string[]>();
 languageToProductCodeMap.set('C/C++', ['QDCL', 'QDNET', 'QDCLC']);
@@ -27,6 +28,7 @@ languageToProductCodeMap.set('Go', ['QDGO']);
 languageToProductCodeMap.set('C#', ['QDNET', 'QDNETC']);
 languageToProductCodeMap.set('F#', ['QDNET']);
 languageToProductCodeMap.set('Visual Basic .NET', ['QDNET', 'QDNETC']);
+languageToProductCodeMap.set('Ruby', ['QDRUBY']);
 
 // every code that ends with C is a community code
 let communityCodes = new Set<string>();
@@ -39,9 +41,12 @@ communityCodes.add('QDCLC');
 let eapCodes = new Set<string>();
 eapCodes.add('QDNETC');
 eapCodes.add('QDCLC');
+eapCodes.add('QDCPP');
+eapCodes.add('QDRUBY');
 
 let productCodeToDockerImageMap = new Map<string, string>();
 productCodeToDockerImageMap.set('QDANDC', 'qodana-jvm-android');
+productCodeToDockerImageMap.set('QDAND', 'qodana-android');
 productCodeToDockerImageMap.set('QDPHP', 'qodana-php');
 productCodeToDockerImageMap.set('QDJS', 'qodana-js');
 productCodeToDockerImageMap.set('QDNET', 'qodana-dotnet');
@@ -53,6 +58,8 @@ productCodeToDockerImageMap.set('QDPYC', 'qodana-python-community');
 productCodeToDockerImageMap.set('QDGO', 'qodana-go');
 productCodeToDockerImageMap.set('QDJVM', 'qodana-jvm');
 productCodeToDockerImageMap.set('QDJVMC', 'qodana-jvm-community');
+productCodeToDockerImageMap.set('QDCPP', 'qodana-cpp');
+productCodeToDockerImageMap.set('QDRUBY', 'qodana-ruby');
 
 const eapPrefix = '-EAP';
 
