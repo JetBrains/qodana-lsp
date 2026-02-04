@@ -15,7 +15,6 @@ import sarif from '../sarif';
 import telemetry from '../telemetry';
 import { Events, ReportFileEvent, UrlCallbackEvent } from '../events';
 import { BaselineToggle } from '../menuitems/BaselineToggle';
-import { QodanaState } from '../menuitems/QodanaState';
 
 export function onUrlCallback(context: vscode.ExtensionContext, auth: Auth) {
     Events.instance.onUrlCallback(async (event: UrlCallbackEvent) => {
@@ -91,13 +90,15 @@ export function onReportFile(client: LanguageClient, context: vscode.ExtensionCo
     Events.instance.onReportFile(async (event: ReportFileEvent) => {
         await context.workspaceState.update(WS_REPORT_ID, event.reportId);
         await context.workspaceState.update(WS_OPENED_REPORT, event.reportFile);
-        if (client.state === State.Running && event.reportFile) {
-            telemetry.reportOpened();
-            await sendReportToLanguageClient(client, context, event.reportFile);
-            QodanaState.instance.attachedToReport(event.reportId);
-            Events.instance.fireReportOpened();
+        if (event.reportFile) {
+            if (client.state === State.Running) {
+                telemetry.reportOpened();
+                await sendReportToLanguageClient(client, context, event.reportFile);
+                Events.instance.fireReportOpened();
+            } else {
+                await client.start();
+            }
         } else {
-            QodanaState.instance.notAttachedToReport();
             Events.instance.fireReportClosed();
         }
     });

@@ -80,6 +80,10 @@
       {
         "command": "qodanaTreeNode.other-item",
         "title": "Link other project"
+      },
+      {
+        "command": "qodana.toggleUI",
+        "title": "Qodana: Open Qodana Tab"
       }
     ],
     "walkthroughs": [
