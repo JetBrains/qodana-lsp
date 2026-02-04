@@ -19,8 +19,11 @@ export class LinkService {
 
     private constructor(private context: vscode.ExtensionContext) {
         vscode.workspace.onDidChangeConfiguration(async (e) => {
-            if (e.affectsConfiguration('qodana')) {
-                await this.selectAndLink();
+            if (e.affectsConfiguration(CONF_PROJ_ID)) {
+                let projectId = vscode.workspace.getConfiguration().get<string>(CONF_PROJ_ID);
+                if (projectId !== this.linkedProjectId) {
+                    await this.selectAndLink();
+                }
             }
         });
     }
@@ -39,7 +42,7 @@ export class LinkService {
         this.linkedProjectId = projectId;
     }
 
-    async linkProject() {
+    async linkProject(fireEvent: boolean = true) {
         let projectId = this.linkedProjectId;
         if (projectId === undefined) {
             return;
@@ -50,10 +53,13 @@ export class LinkService {
         }
         this.projectProperties = projectProperties;
         this.isLinked = true;
-        vscode.workspace.getConfiguration().update(CONF_PROJ_ID, this.linkedProjectId, vscode.ConfigurationTarget.Workspace);
+        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, this.linkedProjectId, vscode.ConfigurationTarget.Workspace);
         vscode.commands.executeCommand('setContext', STATE_LINKED, true);
         telemetry.projectLinked();
-        Events.instance.fireProjectLinked();
+        if (fireEvent) {
+            Events.instance.fireProjectLinked();
+            await this.openReport();
+        }
     }
 
     async unlinkProject() {

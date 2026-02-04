@@ -23,14 +23,16 @@ export class ShowMarkerHandler implements UriHandler {
             if (projectId && !projectIdInSettings) {
                 vscode.window.showErrorMessage(idNotSet(projectId), ID_SET, ID_CANCEL).then(async (value) => {
                     if (value === ID_SET) {
-                        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, projectId, vscode.ConfigurationTarget.Workspace);
+                        extensionInstance.linkService?.selectProject(projectId);
+                        await extensionInstance.linkService?.linkProject(false);
                     }
                     resolve(value === ID_SET);
                 });
             } else if (projectId && projectIdInSettings !== projectId) {
                 vscode.window.showErrorMessage(idNotEqual(projectId), ID_SET, ID_CANCEL).then(async (value) => {
                     if (value === ID_SET) {
-                        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, projectId, vscode.ConfigurationTarget.Workspace);
+                        extensionInstance.linkService?.selectProject(projectId);
+                        await extensionInstance.linkService?.linkProject(false);
                     }
                     resolve(value === ID_SET);
                 });
@@ -89,6 +91,7 @@ export class ShowMarkerHandler implements UriHandler {
                 return;
             }
             let cloudReportId = cloudReportIdArg.split('=')[1];
+            Events.instance.stopTimer();
             Events.instance.fireUrlCallback({ projectId: cloudProjectId, reportId: cloudReportId });
             let pathValueParts = uriPath.split(':');
             if (pathValueParts.length === 3) {

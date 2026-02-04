@@ -92,17 +92,20 @@ export class Events {
     return this._onTimer.event;
   }
 
-  public startTimer(interval: number) {
+  public startTimer(interval: number, fireImmediately: boolean = true) {
     this.stopTimer();
     this.recurringTimer = setInterval(() => {
       this._onTimer.fire();
     }, interval);
-    this._onTimer.fire();
+    if (fireImmediately) {
+      this._onTimer.fire();
+    }
   }
 
   public stopTimer() {
     if (this.recurringTimer) {
       clearInterval(this.recurringTimer);
+      this.recurringTimer = undefined;
     }
   }
 }

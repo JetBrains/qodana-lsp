@@ -50,15 +50,19 @@ export function onConfigChange(client: LanguageClient, context: vscode.Extension
             Events.instance.stopTimer();
         }
     });
-    Events.instance.onConfigChange(async () => {
+
+    const resetTimer = async (fireImmediately: boolean) => {
         let clientIsRunning = client.state === State.Running;
         let isValid = await config.configIsValid(context, true);
         if (clientIsRunning && isValid) {
-            Events.instance.startTimer(5 * 60 * 1000);
+            Events.instance.startTimer(5 * 60 * 1000, fireImmediately);
         } else {
             Events.instance.stopTimer();
         }
-    });
+    };
+
+    Events.instance.onConfigChange(() => resetTimer(false));
+    Events.instance.onProjectLinked(() => resetTimer(false));
 }
 
 export function onBaselineStatusChange(client: LanguageClient, context: vscode.ExtensionContext) {
