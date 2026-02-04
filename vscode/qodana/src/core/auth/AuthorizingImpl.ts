@@ -8,6 +8,7 @@ import * as http from 'http';
 import {qodanaCloudUnauthorizedApi, qodanaCloudUserApi} from '../cloud/api';
 import {AuthorizedImpl} from './AuthorizedImpl';
 import {CloudEnvironment} from '../cloud';
+import {generateCodeChallenge, generateCodeVerifier} from './pkce';
 
 export class AuthorizingImpl implements Authorizing {
     private readonly stateEmitter: vscode.EventEmitter<AuthState_>;
@@ -27,7 +28,8 @@ export class AuthorizingImpl implements Authorizing {
         // authorize
         let notAuthorized = new NotAuthorizedImpl(this.context, this.stateEmitter);
         try {
-            let code = await this.getCodeFromOAuth();
+            const codeVerifier = generateCodeVerifier();
+            let code = await this.getCodeFromOAuth(codeVerifier);
             if (!code) {
                 telemetry.errorReceived('#handleUnauthorizedState no code');
                 this.stateEmitter.fire(notAuthorized);
@@ -35,7 +37,7 @@ export class AuthorizingImpl implements Authorizing {
             }
 
             // do a post request to get token, refresh token and expires
-            let auth = await qodanaCloudUnauthorizedApi(this.environment).getOauthToken(code);
+            let auth = await qodanaCloudUnauthorizedApi(this.environment).getOauthToken(code, codeVerifier);
             if (!auth) {
                 vscode.window.showErrorMessage(FAILED_TO_OBTAIN_TOKEN);
                 telemetry.errorReceived('#handleUnauthorizedState no auth');
@@ -55,14 +57,14 @@ export class AuthorizingImpl implements Authorizing {
         }
     }
 
-    async getCodeFromOAuth(): Promise<string | undefined> {
+    async getCodeFromOAuth(codeVerifier: string): Promise<string | undefined> {
         const { server, portNumber } = await this.getServerAndPortNumber();
         try {
             let authUrl = (await qodanaCloudUnauthorizedApi(this.environment).getOauthProviderData())?.oauthUrl;
             if (authUrl === undefined) {
                 return undefined;
             }
-            return await this.makeOAuthRequest(authUrl, server, portNumber);
+            return await this.makeOAuthRequest(authUrl, server, portNumber, codeVerifier);
         } catch (error) {
             vscode.window.showErrorMessage(`${FAILED_TO_AUTHENTICATE} ${error}`);
             telemetry.errorReceived('#getCodeFromOAuth exception');
@@ -72,22 +74,24 @@ export class AuthorizingImpl implements Authorizing {
         }
     }
 
-    private constructOAuthURL(authzUrl: string, port: number, randomString: string): string {
+    private constructOAuthURL(authzUrl: string, port: number, randomString: string, codeVerifier: string): string {
         const url = new URL(authzUrl);
 
         const params = new URLSearchParams(url.search);
-        params.append('state', `idea-${port}-${randomString}`);
+        const codeChallenge = generateCodeChallenge(codeVerifier);
+        const codeChallengeMethod = 'SHA-256';
+        params.append('state', `idea-${port}-${randomString}|pkce:method:${codeChallengeMethod};code:${codeChallenge}`);
 
         url.search = params.toString();
 
         return url.toString();
     }
 
-    async makeOAuthRequest(authzUrl: string, server: http.Server, port: number): Promise<string> {
+    async makeOAuthRequest(authzUrl: string, server: http.Server, port: number, codeVerifier: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // generate random string of 32 characters
             let randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            vscode.env.openExternal(vscode.Uri.parse(this.constructOAuthURL(authzUrl, port, randomString)));
+            vscode.env.openExternal(vscode.Uri.parse(this.constructOAuthURL(authzUrl, port, randomString, codeVerifier)));
 
             server.on('request', (req: http.IncomingMessage, res: http.ServerResponse) => {
                 const reqUrl = new URL(`http://${req.headers.host}${req.url}`);

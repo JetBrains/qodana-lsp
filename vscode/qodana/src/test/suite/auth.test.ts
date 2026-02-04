@@ -172,8 +172,12 @@ describe('Authentication Test Suite', () => {
                 sandbox.stub().callsFake(async (state: AuthState_) => { val = state;})
             );
             sandbox.stub(axios, 'post').callsFake(async (url, data) => {
-                assert.strictEqual((data as any).code, 'externalToken');
-                return undefined;
+                if (url.toString().includes('auth/token')) {
+                    assert.strictEqual((data as any).code, 'externalToken');
+                    assert.ok((data as any).code_verifier);
+                    return undefined;
+                }
+                return { data: {} };
             });
 
             let authorizing = new AuthorizingImpl(context, emitter);
@@ -191,7 +195,7 @@ describe('Authentication Test Suite', () => {
             setupAxiosPostRequest();
             sandbox.stub(axios, 'get').rejects(new Error('Test error'));
 
-            const token = await authorizing.getCodeFromOAuth();
+            const token = await authorizing.getCodeFromOAuth('codeVerifier');
 
             assert.strictEqual(token, undefined);
             assert.strictEqual(stub.calledWith(`${FAILED_TO_AUTHENTICATE} Error: Test error`), true);
@@ -296,8 +300,9 @@ describe('Authentication Test Suite', () => {
     function setupAxiosPostRequest(withCheckCode: boolean = false) {
         let oldPost = axios.post;
         sandbox.stub(axios, 'post').callsFake(async (url, data) => {
-            if (withCheckCode) {
+            if (withCheckCode && url.toString().includes('auth/token')) {
                 assert.strictEqual((data as any).code, 'externalToken');
+                assert.ok((data as any).code_verifier);
             }
             return {
                 data: {
