@@ -155,7 +155,9 @@ export class QodanaExtension {
             if (token === undefined) {
                 return;
             }
-            let tempDir = await runQodana(cli, token);
+            let authorized = this.auth?.getAuthorized();
+            let endpoint = authorized?.environment.frontendUrl;
+            let tempDir = await runQodana(cli, token, endpoint);
             await this.closeReport();
             await showLocalReport(this.context, tempDir);
         }

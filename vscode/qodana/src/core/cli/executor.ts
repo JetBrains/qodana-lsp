@@ -24,24 +24,26 @@ export async function showLocalReport(context: vscode.ExtensionContext, reportBa
     }
 }
 
-export async function runQodana(cli: string, token: string): Promise<string | undefined> {
+export async function runQodana(cli: string, token: string, endpoint?: string): Promise<string | undefined> {
     let isPrepared = await prepareRun(token);
     if (isPrepared) {
         let tempDir = path.join(os.tmpdir(), Math.random().toString(36).substring(7));
         await fs.promises.mkdir(tempDir, { recursive: true });
-        let exitStatus = await launchTerminal(cli, vscode.workspace.workspaceFolders![0].uri.fsPath, tempDir, token);
+        let exitStatus = await launchTerminal(cli, vscode.workspace.workspaceFolders![0].uri.fsPath, tempDir, token, endpoint);
         vscode.window.showInformationMessage(scanFinished(exitStatus));
         return tempDir;
     }
 }
 
-export async function launchTerminal(cli: string, cwd: string, tempDir: string, token: string | undefined): Promise<number | undefined> {
+export async function launchTerminal(cli: string, cwd: string, tempDir: string, token: string | undefined, endpoint?: string): Promise<number | undefined> {
     let options: vscode.TerminalOptions = {
         env: {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             QODANA_TOKEN: token,
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            NONINTERACTIVE: '1'
+            NONINTERACTIVE: '1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            QODANA_ENDPOINT: endpoint
         },
         cwd: cwd,
         name: 'Qodana CLI',
