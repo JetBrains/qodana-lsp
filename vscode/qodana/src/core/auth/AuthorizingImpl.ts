@@ -28,7 +28,8 @@ export class AuthorizingImpl implements Authorizing {
         // authorize
         let notAuthorized = new NotAuthorizedImpl(this.context, this.stateEmitter);
         try {
-            const codeVerifier = generateCodeVerifier();
+            const usePkce = await this.environment.isPkceSupported();
+            const codeVerifier = usePkce ? generateCodeVerifier() : undefined;
             let code = await this.getCodeFromOAuth(codeVerifier);
             if (!code) {
                 telemetry.errorReceived('#handleUnauthorizedState no code');
@@ -57,7 +58,7 @@ export class AuthorizingImpl implements Authorizing {
         }
     }
 
-    async getCodeFromOAuth(codeVerifier: string): Promise<string | undefined> {
+    async getCodeFromOAuth(codeVerifier?: string): Promise<string | undefined> {
         const { server, portNumber } = await this.getServerAndPortNumber();
         try {
             let authUrl = (await qodanaCloudUnauthorizedApi(this.environment).getOauthProviderData())?.oauthUrl;
@@ -74,20 +75,24 @@ export class AuthorizingImpl implements Authorizing {
         }
     }
 
-    private constructOAuthURL(authzUrl: string, port: number, randomString: string, codeVerifier: string): string {
+    private constructOAuthURL(authzUrl: string, port: number, randomString: string, codeVerifier?: string): string {
         const url = new URL(authzUrl);
 
         const params = new URLSearchParams(url.search);
-        const codeChallenge = generateCodeChallenge(codeVerifier);
-        const codeChallengeMethod = 'SHA-256';
-        params.append('state', `idea-${port}-${randomString}|pkce:method:${codeChallengeMethod};code:${codeChallenge}`);
+        let state = `idea-${port}-${randomString}`;
+        if (codeVerifier) {
+            const codeChallenge = generateCodeChallenge(codeVerifier);
+            const codeChallengeMethod = 'SHA-256';
+            state += `|pkce:method:${codeChallengeMethod};code:${codeChallenge}`;
+        }
+        params.append('state', state);
 
         url.search = params.toString();
 
         return url.toString();
     }
 
-    async makeOAuthRequest(authzUrl: string, server: http.Server, port: number, codeVerifier: string): Promise<string> {
+    async makeOAuthRequest(authzUrl: string, server: http.Server, port: number, codeVerifier?: string): Promise<string> {
         return new Promise((resolve, reject) => {
             // generate random string of 32 characters
             let randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

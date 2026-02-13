@@ -11,7 +11,14 @@ export class CloudEnvironment {
         this.frontendUrl = frontendUrl ? frontendUrl : cloudWebsite();
     }
 
-    async getBackendUrlForVersion(version: String) {
+    async getBackendUrlForVersion(version: string) {
+        let urls = await this.getBackendUrls();
+        return urls?.api?.versions?.find(
+            versionUrl=> versionUrl.version.split('.')[0] === version
+        )?.url;
+    }
+
+    async getBackendUrls() {
         if (this.lastBackendUrlsRequest === undefined) {
             this.lastBackendUrlsRequest = new Promise (async (resolve, reject) => {
                 try {
@@ -27,10 +34,17 @@ export class CloudEnvironment {
                 }
             });
         }
-        let urls = await this.lastBackendUrlsRequest;
-        return urls?.api?.versions?.find(
-            versionUrl=> versionUrl.version.split('.')[0] === version
-        )?.url;
+        return await this.lastBackendUrlsRequest;
+    }
+
+    async isPkceSupported(): Promise<boolean> {
+        const urls = await this.getBackendUrls();
+        const apiVersion = urls?.api?.versions?.find(v => v.version.startsWith('1.'))?.version;
+        if (apiVersion) {
+            const minorVersion = parseInt(apiVersion.split('.')[1]);
+            return minorVersion >= 37;
+        }
+        return false;
     }
 
 }

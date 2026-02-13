@@ -13,11 +13,15 @@ export class QodanaCloudUnauthorizedApiImpl implements QodanaCloudUnauthorizedAp
         this.environment = environment;
     }
 
-    async getOauthToken(code: string | undefined, codeVerifier: string | undefined) {
+    async getOauthToken(code: string | undefined, codeVerifier?: string) {
         let host = await this.environment.getBackendUrlForVersion(this.version);
+        const data: any = { 'code': code };
+        if (codeVerifier) {
+            data['codeVerifier'] = codeVerifier;
+        }
         return this.requestToken(
             new URL(`${host}/idea/auth/token/`).toString(),
-            { 'code': code, 'codeVerifier': codeVerifier },
+            data,
             { headers: getHeaders() });
     }
 
