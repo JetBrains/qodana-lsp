@@ -58,7 +58,7 @@ export class AuthorizingImpl implements Authorizing {
         }
     }
 
-    async getCodeFromOAuth(codeVerifier?: string): Promise<string | undefined> {
+    async getCodeFromOAuth(codeVerifier: string | undefined): Promise<string | undefined> {
         const { server, portNumber } = await this.getServerAndPortNumber();
         try {
             let authUrl = (await qodanaCloudUnauthorizedApi(this.environment).getOauthProviderData())?.oauthUrl;
@@ -75,7 +75,7 @@ export class AuthorizingImpl implements Authorizing {
         }
     }
 
-    private constructOAuthURL(authzUrl: string, port: number, randomString: string, codeVerifier?: string): string {
+    private constructOAuthURL(authzUrl: string, port: number, randomString: string, codeVerifier: string | undefined): string {
         const url = new URL(authzUrl);
 
         const params = new URLSearchParams(url.search);
@@ -92,7 +92,7 @@ export class AuthorizingImpl implements Authorizing {
         return url.toString();
     }
 
-    async makeOAuthRequest(authzUrl: string, server: http.Server, port: number, codeVerifier?: string): Promise<string> {
+    async makeOAuthRequest(authzUrl: string, server: http.Server, port: number, codeVerifier: string | undefined): Promise<string> {
         return new Promise((resolve, reject) => {
             // generate random string of 32 characters
             let randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

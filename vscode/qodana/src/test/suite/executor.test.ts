@@ -32,9 +32,10 @@ describe('CLI Executor Tests', () => {
             return { dispose: () => {} };
         });
 
-        let exitStatus = await launchTerminal('cli', 'cwd', 'tempDir', 'token');
+        let exitStatus = await launchTerminal('cli', 'cwd', 'tempDir', 'token', 'endpoint');
         assert.equal(exitStatus, 123);
         assert.equal(opts.env?.QODANA_TOKEN, 'token');
+        assert.equal(opts.env?.QODANA_ENDPOINT, 'endpoint');
         assert.equal(opts.env?.NONINTERACTIVE, '1');
         assert.equal(opts.cwd, 'cwd');
         assert.equal(commands.length, 2);

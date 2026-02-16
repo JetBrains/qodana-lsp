@@ -35,16 +35,19 @@ export async function runQodana(cli: string, token: string, endpoint?: string): 
     }
 }
 
-export async function launchTerminal(cli: string, cwd: string, tempDir: string, token: string | undefined, endpoint?: string): Promise<number | undefined> {
+export async function launchTerminal(cli: string, cwd: string, tempDir: string, token: string | undefined, endpoint: string | undefined): Promise<number | undefined> {
+    let env: { [key: string]: string | undefined } = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        QODANA_TOKEN: token,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        NONINTERACTIVE: '1',
+    };
+    if (endpoint !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        env['QODANA_ENDPOINT'] = endpoint;
+    }
     let options: vscode.TerminalOptions = {
-        env: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            QODANA_TOKEN: token,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            NONINTERACTIVE: '1',
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            QODANA_ENDPOINT: endpoint
-        },
+        env: env,
         cwd: cwd,
         name: 'Qodana CLI',
     };

@@ -135,14 +135,13 @@ describe('Authentication Test Suite', () => {
 
     describe('#NotAuthorized', function () {
         it('authorize fires stateEmitter', async function () {
-            let emitter = new vscode.EventEmitter<AuthState>();
-            sandbox.stub(emitter, 'fire').value(
-                sandbox.stub().callsFake(async () => { return; })
-            );
+            let emitter = new vscode.EventEmitter<AuthState_>();
+            sandbox.stub(emitter, 'fire').callsFake(() => { return; });
             let notAuthorized = new NotAuthorizedImpl(context, emitter);
 
-            // noinspection ES6MissingAwait
-            notAuthorized.authorize();
+            sandbox.stub(AuthorizingImpl.prototype, 'startOauth').resolves({} as any);
+
+            await notAuthorized.authorize();
             let stub = emitter.fire as sinon.SinonStub;
             assert.strictEqual(stub.callCount, 1);
         });
@@ -160,9 +159,17 @@ describe('Authentication Test Suite', () => {
             let authorizing = new AuthorizingImpl(context, emitter);
 
             sandbox.stub(authorizing, 'getCodeFromOAuth').resolves('externalToken');
+            sandbox.stub(CloudEnvironment.prototype, 'isPkceSupported').resolves(true);
 
             await authorizing.startOauth();
             assert(val instanceof AuthorizedImpl);
+
+            let postStub = axios.post as sinon.SinonStub;
+            let tokenCall = postStub.getCalls().find(c => c.args[0]?.toString().includes('auth/token'));
+            assert.ok(tokenCall, 'auth/token POST should have been made');
+            let tokenData = tokenCall!.args[1] as any;
+            assert.strictEqual(tokenData.code, 'externalToken');
+            assert.ok(tokenData.codeVerifier, 'codeVerifier should be present');
         });
 
         it('authorizing failure', async function () {
@@ -171,23 +178,47 @@ describe('Authentication Test Suite', () => {
             sandbox.stub(emitter, 'fire').value(
                 sandbox.stub().callsFake(async (state: AuthState_) => { val = state;})
             );
-            sandbox.stub(axios, 'post').callsFake(async (url, data) => {
-                if (url.toString().includes('auth/token')) {
-                    assert.strictEqual((data as any).code, 'externalToken');
-                    assert.ok((data as any).code_verifier);
-                    return undefined;
-                }
-                return { data: {} };
-            });
+            let postStub = sandbox.stub(axios, 'post').resolves({ data: undefined });
 
             let authorizing = new AuthorizingImpl(context, emitter);
 
             sandbox.stub(authorizing, 'getCodeFromOAuth').resolves('externalToken');
+            sandbox.stub(CloudEnvironment.prototype, 'isPkceSupported').resolves(true);
 
             await authorizing.startOauth();
-            assert(val instanceof NotAuthorizedImpl);
+            assert.strictEqual(val instanceof NotAuthorizedImpl, true, 'State should be NotAuthorizedImpl on failure');
+
+            let tokenCall = postStub.getCalls().find(c => c.args[0]?.toString().includes('auth/token'));
+            assert.ok(tokenCall, 'auth/token POST should have been made');
+            let tokenData = tokenCall!.args[1] as any;
+            assert.strictEqual(tokenData.code, 'externalToken');
+            assert.ok(tokenData.codeVerifier, 'codeVerifier should be present');
         });
 
+
+        it('authorizing success without pkce', async function () {
+            let emitter = new vscode.EventEmitter<AuthState_>();
+            let val: any = undefined;
+            sandbox.stub(emitter, 'fire').value(
+                sandbox.stub().callsFake(async (state: AuthState_) => { val = state;})
+            );
+            setupAxiosPostRequest();
+
+            let authorizing = new AuthorizingImpl(context, emitter);
+
+            sandbox.stub(authorizing, 'getCodeFromOAuth').resolves('externalToken');
+            sandbox.stub(CloudEnvironment.prototype, 'isPkceSupported').resolves(false);
+
+            await authorizing.startOauth();
+            assert(val instanceof AuthorizedImpl);
+
+            let postStub = axios.post as sinon.SinonStub;
+            let tokenCall = postStub.getCalls().find(c => c.args[0]?.toString().includes('auth/token'));
+            assert.ok(tokenCall, 'auth/token POST should have been made');
+            let tokenData = tokenCall!.args[1] as any;
+            assert.strictEqual(tokenData.code, 'externalToken');
+            assert.strictEqual(tokenData.codeVerifier, undefined, 'codeVerifier should not be present when pkce is not supported');
+        });
 
         it('should handle errors properly', async function () {
             let stub = sandbox.stub(vscode.window, 'showErrorMessage');
@@ -297,13 +328,9 @@ describe('Authentication Test Suite', () => {
         });
     });
 
-    function setupAxiosPostRequest(withCheckCode: boolean = false) {
+    function setupAxiosPostRequest() {
         let oldPost = axios.post;
         sandbox.stub(axios, 'post').callsFake(async (url, data) => {
-            if (withCheckCode && url.toString().includes('auth/token')) {
-                assert.strictEqual((data as any).code, 'externalToken');
-                assert.ok((data as any).code_verifier);
-            }
             return {
                 data: {
                     'access': 'freshToken',
