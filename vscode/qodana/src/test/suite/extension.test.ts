@@ -8,6 +8,8 @@ describe('Extension Test Suite', () => {
 	});
 
 	it('Extension registered commands should be present', async () => {
+		const ext = vscode.extensions.getExtension('jetbrains.qodana-code');
+		await ext?.activate();
 		const commands = await vscode.commands.getCommands(true);
 		assert.ok(commands.includes('qodana.resetToken'));
 		assert.ok(commands.includes('qodana.resetAllSettings'));
