@@ -88,6 +88,17 @@ describe('Language/Linter Selection Tests', () => {
         assert.equal(choiceStub.called, true);
     });
 
+    it('9: getLinters should return QDRST for Rust language', () => {
+        const { communityLinters, paidLinters } = getLinters(['Rust']);
+        assert.ok(arraysAreEqual(communityLinters, []));
+        assert.ok(arraysAreEqual(paidLinters, ['QDRST']));
+    });
+
+    it('10: getLinterByCode should return EAP Docker image for QDRST', () => {
+        const linterImage = getLinterByCode('QDRST');
+        assert.equal(linterImage, 'qodana-rust-EAP');
+    });
+
     function arraysAreEqual<T>(arr1: T[], arr2: T[]): boolean {
         if (arr1.length !== arr2.length) { return false; }
         for (let i = 0; i < arr1.length; i++) {
