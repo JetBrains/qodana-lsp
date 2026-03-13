@@ -60,7 +60,11 @@ export function onConfigChange(client: LanguageClient, context: vscode.Extension
         }
     };
 
-    Events.instance.onConfigChange(() => resetTimer(false));
+    Events.instance.onConfigChange(() => {
+        let hasOpenedReport = !!context.workspaceState.get(WS_OPENED_REPORT);
+        // noinspection JSIgnoredPromiseFromCall
+        resetTimer(!hasOpenedReport);
+    });
     Events.instance.onProjectLinked(() => resetTimer(false));
 }
 

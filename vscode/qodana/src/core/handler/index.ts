@@ -111,12 +111,12 @@ export class ShowMarkerHandler implements UriHandler {
                     let endPosition = new vscode.Position(Number(line) - 1, Number(column) - 1 + Number(lengthValue));
                     editor.selection = new vscode.Selection(startPosition, endPosition);
                     editor.revealRange(new vscode.Range(startPosition, endPosition), vscode.TextEditorRevealType.InCenter);
-                    return;
                 } else {
                     vscode.window.showErrorMessage(FAILED_PREFIX_NOT_SET);
                     telemetry.errorReceived('#handleUri no prefix');
                 }
             }
+            Events.instance.startTimer(5 * 60 * 1000, false);
         }
     }
 }

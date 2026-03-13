@@ -21,7 +21,7 @@ export class LinkService {
         vscode.workspace.onDidChangeConfiguration(async (e) => {
             if (e.affectsConfiguration(CONF_PROJ_ID)) {
                 let projectId = vscode.workspace.getConfiguration().get<string>(CONF_PROJ_ID);
-                if (projectId !== this.linkedProjectId) {
+                if (projectId !== this.getLinkedProjectId()) {
                     await this.selectAndLink();
                 }
             }
@@ -47,8 +47,12 @@ export class LinkService {
         if (projectId === undefined) {
             return;
         }
+        let previousProjectId = this.isLinked ? vscode.workspace.getConfiguration().get<string>(CONF_PROJ_ID) : undefined;
         let projectProperties = await this.getProjectProperties(projectId);
         if (!projectProperties) {
+            if (previousProjectId) {
+                this.linkedProjectId = previousProjectId;
+            }
             return;
         }
         this.projectProperties = projectProperties;
@@ -94,7 +98,7 @@ export class LinkService {
         }
     }
 
-    async getProjectProperties(projectId?: string, withError: boolean = true) {
+    async getProjectProperties(projectId?: string, withError: boolean = true, withUnlink: boolean = false) {
         let id = projectId ? projectId : this.linkedProjectId;
         if (!id) {
             return undefined;
@@ -102,7 +106,8 @@ export class LinkService {
         let projectProperties = await extensionInstance.auth?.getAuthorized()?.qodanaCloudUserApi((api) => {
             return api.getProjectProperties(id!, withError);
         });
-        if (!projectProperties) {
+        // no need to always unlink, for example for open in VS Code
+        if (!projectProperties && withUnlink && this.getLinkedProjectId()) {
             await this.unlinkProject();
         }
         return projectProperties;
