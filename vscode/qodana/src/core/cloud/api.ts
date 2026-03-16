@@ -4,7 +4,7 @@ import {QodanaCloudUserApiImpl} from './user';
 
 
 export interface QodanaCloudUnauthorizedApi {
-    getOauthToken(code: string | undefined): Promise<AuthorizationResponseData | undefined>
+    getOauthToken(code: string | undefined, codeVerifier?: string): Promise<AuthorizationResponseData | undefined>
 
     refreshOauthToken(refreshCode: string | undefined): Promise<AuthorizationResponseData | undefined>
 

@@ -40,11 +40,14 @@ export const COMMAND_LINK = 'qodana.link';
 export const COMMAND_UNLINK = 'qodana.unlink';
 export const COMMAND_SELECT_NODE = 'qodana.selectNode';
 export const COMMAND_REFRESH_PROJECTS = 'qodana.refreshProjects';
+export const COMMAND_TOGGLE_QODANA = 'qodana.toggleQodana';
+export const COMMAND_OPEN_QODANA_TAB = 'qodana.openQodanaTab';
 export const COMMAND_TREE_OTHER_ITEM = 'qodanaTreeItem.other-item';
 
 export const COMMANDS = new Set ([
     COMMAND_LOG_IN, COMMAND_LOG_IN_CUSTOM_SERVER, COMMAND_LOG_OUT, COMMAND_CANCEL_AUTHORIZATION, COMMAND_RUN_LOCALLY,
-    COMMAND_OPEN_LOCAL_REPORT, COMMAND_CLOSE_REPORT, COMMAND_LINK, COMMAND_UNLINK, COMMAND_SELECT_NODE
+    COMMAND_OPEN_LOCAL_REPORT, COMMAND_CLOSE_REPORT, COMMAND_LINK, COMMAND_UNLINK, COMMAND_SELECT_NODE, COMMAND_TOGGLE_QODANA,
+    COMMAND_OPEN_QODANA_TAB
 ]);
 
 class ConfigurationHelper {

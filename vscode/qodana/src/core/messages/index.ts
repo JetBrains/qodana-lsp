@@ -106,13 +106,8 @@ export const BL_TTIP_NEW_ISSUES = vscode.l10n.t('[Qodana] Baseline issues are hi
 
 // qodana state
 
-export const QS_STATUS_ATTACHED = vscode.l10n.t('$(eye) Qodana');
-export const QS_TIP_ATTACHED = vscode.l10n.t('Attached to report: ');
-export const QS_STATUS_NOT_ATTACHED = vscode.l10n.t('$(eye-closed) Qodana');
-export const QS_TIP_NOT_ATTACHED = vscode.l10n.t('Not attached to report');
-export const QS_STATUS_SETTINGS_INVALID = vscode.l10n.t('$(gear) Qodana');
-export const QS_TIP_SETTINGS_INVALID = vscode.l10n.t('Settings are not valid');
-
+export const QS_STATUS_SETTINGS = vscode.l10n.t('$(settings) Qodana');
+export const QS_TIP_SETTINGS = vscode.l10n.t('Open Qodana Settings');
 
 // LINK
 export const OTHER_PROJECT_TOOLTIP = vscode.l10n.t('Input Qodana Project ID');

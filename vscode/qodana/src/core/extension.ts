@@ -69,12 +69,8 @@ export class QodanaExtension {
                 Events.instance.fireServerStateChange(stateChangeEvent.newState);
             }
         );
-        this.statusIcon.notAttachedToReport();
         this.baselineFilterIcon.toggle(this.context?.workspaceState.get(WS_BASELINE_ISSUES, false));
 
-        if (!await config.configIsValid(this.context, true)) {
-            this.statusIcon.settingsNotValid();
-        }
         config.sectionChangeHandler(this.languageClient, this.context);
         onReportFile(this.languageClient, this.context);
         onServerStateChange(this.context);
@@ -149,7 +145,6 @@ export class QodanaExtension {
     async resetAllSettings() {
         await config.resetSettings(this.context as vscode.ExtensionContext);
         await this.resetToken();
-        this.statusIcon.settingsNotValid();
         Events.instance.fireBaselineChange();
     }
 
@@ -160,7 +155,9 @@ export class QodanaExtension {
             if (token === undefined) {
                 return;
             }
-            let tempDir = await runQodana(cli, token);
+            let authorized = this.auth?.getAuthorized();
+            let endpoint = authorized?.environment.frontendUrl;
+            let tempDir = await runQodana(cli, token, endpoint);
             await this.closeReport();
             await showLocalReport(this.context, tempDir);
         }

@@ -53,14 +53,6 @@
         "title": "Qodana: Run locally"
       },
       {
-        "command": "qodana.openLocalReport",
-        "title": "Open Local Report"
-      },
-      {
-        "command": "qodana.login",
-        "title": "Log In to Qodana"
-      },
-      {
         "command": "qodana.refreshProjects",
         "title": "Refresh",
         "icon": "$(refresh)"
@@ -74,12 +66,8 @@
         "title": "Unlink"
       },
       {
-        "command": "qodana.selectNode",
-        "title": "Select node"
-      },
-      {
-        "command": "qodanaTreeNode.other-item",
-        "title": "Link other project"
+        "command": "qodana.openQodanaTab",
+        "title": "Qodana: Open Qodana Tab"
       }
     ],
     "walkthroughs": [

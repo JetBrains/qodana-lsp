@@ -19,7 +19,7 @@ import {
 	COMMAND_REFRESH_PROJECTS,
 	COMMAND_RUN_LOCALLY,
 	COMMAND_SELECT_NODE, COMMAND_TREE_OTHER_ITEM,
-	COMMAND_UNLINK, LOCAL_REPORT, WS_REPORT_ID
+	COMMAND_UNLINK, LOCAL_REPORT, WS_REPORT_ID, COMMAND_OPEN_QODANA_TAB
 } from './core/config';
 import {OTHER_PROJECT_TOOLTIP, SELF_HOSTED_TOOLTIP} from './core/messages';
 import {RunLocallyView} from './core/ui/runLocallyView';
@@ -76,6 +76,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 		telemetry.baselineToggled();
 		await extensionInstance.toggleBaseline();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand(COMMAND_OPEN_QODANA_TAB, async () => {
+		await vscode.commands.executeCommand('workbench.view.extension.qodanaView');
 	}));
 
 	// add command to run qodana locally

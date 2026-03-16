@@ -23,14 +23,16 @@ export class ShowMarkerHandler implements UriHandler {
             if (projectId && !projectIdInSettings) {
                 vscode.window.showErrorMessage(idNotSet(projectId), ID_SET, ID_CANCEL).then(async (value) => {
                     if (value === ID_SET) {
-                        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, projectId, vscode.ConfigurationTarget.Workspace);
+                        extensionInstance.linkService?.selectProject(projectId);
+                        await extensionInstance.linkService?.linkProject(false);
                     }
                     resolve(value === ID_SET);
                 });
             } else if (projectId && projectIdInSettings !== projectId) {
                 vscode.window.showErrorMessage(idNotEqual(projectId), ID_SET, ID_CANCEL).then(async (value) => {
                     if (value === ID_SET) {
-                        await vscode.workspace.getConfiguration().update(CONF_PROJ_ID, projectId, vscode.ConfigurationTarget.Workspace);
+                        extensionInstance.linkService?.selectProject(projectId);
+                        await extensionInstance.linkService?.linkProject(false);
                     }
                     resolve(value === ID_SET);
                 });
@@ -89,6 +91,7 @@ export class ShowMarkerHandler implements UriHandler {
                 return;
             }
             let cloudReportId = cloudReportIdArg.split('=')[1];
+            Events.instance.stopTimer();
             Events.instance.fireUrlCallback({ projectId: cloudProjectId, reportId: cloudReportId });
             let pathValueParts = uriPath.split(':');
             if (pathValueParts.length === 3) {
@@ -108,12 +111,12 @@ export class ShowMarkerHandler implements UriHandler {
                     let endPosition = new vscode.Position(Number(line) - 1, Number(column) - 1 + Number(lengthValue));
                     editor.selection = new vscode.Selection(startPosition, endPosition);
                     editor.revealRange(new vscode.Range(startPosition, endPosition), vscode.TextEditorRevealType.InCenter);
-                    return;
                 } else {
                     vscode.window.showErrorMessage(FAILED_PREFIX_NOT_SET);
                     telemetry.errorReceived('#handleUri no prefix');
                 }
             }
+            Events.instance.startTimer(5 * 60 * 1000, false);
         }
     }
 }

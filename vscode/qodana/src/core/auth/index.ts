@@ -143,7 +143,7 @@ export class Auth {
             } else if (state instanceof AuthorizedImpl) {
                 vscode.commands.executeCommand('setContext', STATE_AUTHORIZING, false);
                 vscode.commands.executeCommand('setContext', STATE_SIGNED_IN, true);
-                extensionInstance.linkService?.getProjectProperties(undefined, false);
+                extensionInstance.linkService?.getProjectProperties(undefined, false, true);
             }
         });
     }

@@ -73,7 +73,7 @@ export class QodanaCloudUserApiImpl implements QodanaCloudUserApi {
             url: (new URL(`${host}/projects/${projectId}/timeline`)).toString(),
             method: 'get',
             headers: getHeaders(token),
-            data: pagination
+            params: pagination
         };
         let res = await axios(config);
         if (!res.data) {

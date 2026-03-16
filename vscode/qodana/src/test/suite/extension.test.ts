@@ -7,11 +7,18 @@ describe('Extension Test Suite', () => {
 		assert.ok(vscode.extensions.getExtension('jetbrains.qodana-code'));
 	});
 
-	it('Extension registered commands should be present', () => {
-		assert.ok(vscode.commands.getCommands(true).then((commands) => {
-			return commands.includes('qodana.resetToken')
-				&& commands.includes('qodana.resetAllSettings')
-				&& commands.includes('qodana.toggleQodana');
-		}));
+	it('Extension registered commands should be present', async () => {
+		const ext = vscode.extensions.getExtension('jetbrains.qodana-code');
+		await ext?.activate();
+		const commands = await vscode.commands.getCommands(true);
+		assert.ok(commands.includes('qodana.resetToken'));
+		assert.ok(commands.includes('qodana.resetAllSettings'));
+		assert.ok(commands.includes('qodana.openQodanaTab'));
+		assert.ok(commands.includes('qodana.runLocally'));
+		assert.ok(commands.includes('qodana.openLocalReport'));
+		assert.ok(commands.includes('qodana.login'));
+		assert.ok(commands.includes('qodana.refreshProjects'));
+		assert.ok(commands.includes('qodana.link'));
+		assert.ok(commands.includes('qodana.unlink'));
 	});
 });

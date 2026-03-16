@@ -14,6 +14,10 @@
         vscode.postMessage({ type: myConstants.COMMAND_CLOSE_REPORT });
     });
 
+    document.querySelector('.toggle-analysis-button').addEventListener('click', () => {
+        vscode.postMessage({ type: myConstants.COMMAND_TOGGLE_QODANA });
+    });
+
     window.addEventListener('message', event => {
         const message = event.data; // Here 'data' contains information sent from extension.
         switch (message.type) {
@@ -23,6 +27,12 @@
                     element.classList.add('hide-element');
                 } else if (element) {
                     element.classList.remove('hide-element');
+                }
+                break;
+            case 'update-state':
+                let el = document.querySelector(message.data.selector);
+                if (el) {
+                    el.textContent = message.data.text;
                 }
                 break;
         }
