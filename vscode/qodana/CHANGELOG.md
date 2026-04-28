@@ -20,8 +20,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 
 - Fix latest report opening on "Open in VS Code" action (QD-13470).
-- Fix PKCE usage with regard to cloud backend version.
-- Set qodana endpoint in local run if user already authenticated.
 
 ## [1.1.5] - 2024-10-01
 
