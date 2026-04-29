@@ -28,6 +28,7 @@ import { BaselineToggle } from './menuitems/BaselineToggle';
 import { LinkService } from './cloud/link';
 import {LocalRunsService} from './localRun';
 import telemetry from './telemetry';
+import { ReportService } from './report/service';
 
 export class QodanaExtension {
     public languageClient?: LanguageClient;
@@ -38,6 +39,7 @@ export class QodanaExtension {
     private baselineFilterIcon: BaselineToggle = BaselineToggle.instance;
     public linkService?: LinkService;
     public localRunService?: LocalRunsService;
+    public reportService?: ReportService;
 
     private constructor() {
     }
@@ -59,6 +61,7 @@ export class QodanaExtension {
             throw new Error('Context is not set');
         }
         this.auth = await Auth.create(this.context);
+        this.reportService = new ReportService(this.context, this.auth);
 
         this.linkService = await LinkService.create(this.context);
         this.localRunService = new LocalRunsService(this.context);

@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import {CONF_PROJ_ID, STATE_LINKED} from '../config';
 import {extensionInstance} from '../extension';
 import {CloudProjectResponse} from './api';
-import {openReportByProjectId} from '../report';
 import {Events} from '../events';
 import telemetry from '../telemetry';
 
@@ -88,14 +87,11 @@ export class LinkService {
 
     async openReport() {
         let projectId = this?.getLinkedProjectId();
-        if (projectId === undefined || extensionInstance.languageClient === undefined || extensionInstance.auth === undefined || this.context === undefined) {
+        if (projectId === undefined || extensionInstance.languageClient === undefined || extensionInstance.reportService === undefined) {
             return;
         }
-        let authorized = extensionInstance.auth.getAuthorized();
-        if (authorized) {
-            await openReportByProjectId(projectId, this.context, authorized);
-            vscode.commands.executeCommand('workbench.action.problems.focus');
-        }
+        await extensionInstance.reportService.openReportByProjectId(projectId);
+        vscode.commands.executeCommand('workbench.action.problems.focus');
     }
 
     async getProjectProperties(projectId?: string, withError: boolean = true, withUnlink: boolean = false) {
