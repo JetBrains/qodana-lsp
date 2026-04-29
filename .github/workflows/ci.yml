@@ -23,7 +23,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2025.3
+        uses: JetBrains/qodana-action@v2026.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_JVM }} # read the steps about it below
         with:
@@ -42,7 +42,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2025.3
+        uses: JetBrains/qodana-action@v2026.1
         with:
           args: -i,vscode/qodana
           pr-mode: false
@@ -85,6 +85,28 @@ jobs:
       run: npm run test
       working-directory: vscode/qodana
       if: runner.os != 'Linux'
+    - name: Prepare release from tag
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
+      run: |
+        # Extract version from tag (remove 'v' prefix)
+        TAG=${GITHUB_REF##*/}
+        VERSION=${TAG#v}
+
+        echo "Preparing release for version $VERSION from tag $TAG"
+
+        # Run release preparation script
+        node scripts/prepare-release.js $VERSION
+
+        # Check if there are changes to commit
+        if ! git diff --quiet; then
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "chore: prepare release $VERSION"
+          git push
+        else
+          echo "No changes to commit"
+        fi
     - name: Package
       run: npm run package
       working-directory: vscode/qodana
@@ -94,10 +116,60 @@ jobs:
       with:
         name: qodana
         path: vscode/qodana/*.vsix
+    - name: Generate release notes
+      if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
+      id: release_notes
+      run: |
+        TAG=${GITHUB_REF##*/}
+        PREV_TAG=$(git describe --tags --abbrev=0 ${TAG}^ 2>/dev/null || echo "")
+
+        if [ -z "$PREV_TAG" ]; then
+          RANGE="HEAD"
+        else
+          RANGE="${PREV_TAG}..${TAG}"
+        fi
+
+        echo "Generating release notes from ${RANGE}..."
+
+        # Generate changelog from conventional commits
+        NOTES=""
+        ADDED=""
+        CHANGED=""
+        FIXED=""
+
+        while IFS= read -r commit; do
+          if [[ $commit =~ ^feat[:(] ]]; then
+            DESC=$(echo "$commit" | sed -E 's/^feat(\([^)]+\))?: //')
+            ADDED="${ADDED}- ${DESC}\n"
+          elif [[ $commit =~ ^fix[:(] ]]; then
+            DESC=$(echo "$commit" | sed -E 's/^fix(\([^)]+\))?: //')
+            FIXED="${FIXED}- ${DESC}\n"
+          elif [[ $commit =~ ^(chore|refactor|perf|docs)[:(] ]]; then
+            DESC=$(echo "$commit" | sed -E 's/^[a-z]+(\([^)]+\))?: //')
+            CHANGED="${CHANGED}- ${DESC}\n"
+          fi
+        done < <(git log ${RANGE} --pretty=format:"%s")
+
+        if [ -n "$ADDED" ]; then
+          NOTES="${NOTES}### Added\n\n${ADDED}\n"
+        fi
+        if [ -n "$CHANGED" ]; then
+          NOTES="${NOTES}### Changed\n\n${CHANGED}\n"
+        fi
+        if [ -n "$FIXED" ]; then
+          NOTES="${NOTES}### Fixed\n\n${FIXED}\n"
+        fi
+
+        if [ -z "$NOTES" ]; then
+          NOTES="Release ${TAG}"
+        fi
+
+        echo "$NOTES" > release_notes.md
+        cat release_notes.md
     - name: Publish
       if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
       run: |
-        gh release create ${GITHUB_REF##*/}
+        gh release create ${GITHUB_REF##*/} --notes-file release_notes.md
         vsce publish -p ${{ secrets.VSCE_PAT }} -i qodana-cloud-plugin.vsix
         ovsx publish qodana-cloud-plugin.vsix -p ${{ secrets.OVSX_PAT }}
       working-directory: vscode/qodana
