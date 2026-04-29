@@ -20,7 +20,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Status bar behaviour to open Qodana tab on click.
 - Update Qodana CLI to 2026.1.0 (QD-14515).
 - Update Qodana GitHub Action to v2026.1 (QD-14515).
-- GitHub Actions workflow now automatically generates release notes from conventional commits (QD-14520).
 
 ### Fixed
 
