@@ -79,9 +79,10 @@ export class ReportService {
                 vscode.window.showErrorMessage(failedToDownloadReport(projectId));
                 return undefined;
             }
-            // Fire-and-forget: the file is ready to use immediately; cache update and
+            await this.context.workspaceState.update(WS_REPORT_ID, reportId);
+            // Fire-and-forget: the file is ready to use immediately;
             // old-file deletion don't need to block returning the path.
-            this.cleanupAfterDownload(storedReportId, reportId).catch(() => { /* ignore */ });
+            this.deleteOldReportFile(storedReportId).catch(() => { /* ignore */ });
             return newReportPath;
         } catch (e) {
             vscode.window.showErrorMessage(failedToDownloadReportWithId(projectId, reportId) + `: ${e}`);
@@ -90,18 +91,18 @@ export class ReportService {
         }
     }
 
-    private async cleanupAfterDownload(oldReportId: string | undefined, newReportId: string): Promise<void> {
-        await this.context.workspaceState.update(WS_REPORT_ID, newReportId);
-        if (oldReportId) {
-            try {
-                let storedPath = await reportPath(this.context, oldReportId);
-                let stat = await fs.promises.stat(storedPath);
-                if (stat.isFile()) {
-                    await fs.promises.unlink(storedPath);
-                }
-            } catch (e) {
-                // ignore
+    private async deleteOldReportFile(oldReportId: string | undefined): Promise<void> {
+        if (!oldReportId) {
+            return;
+        }
+        try {
+            let storedPath = await reportPath(this.context, oldReportId);
+            let stat = await fs.promises.stat(storedPath);
+            if (stat.isFile()) {
+                await fs.promises.unlink(storedPath);
             }
+        } catch (e) {
+            // ignore
         }
     }
 
