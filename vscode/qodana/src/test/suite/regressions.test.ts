@@ -18,7 +18,6 @@ import {LinkService} from '../../core/cloud/link';
 import {extensionInstance} from '../../core/extension';
 import {ShowMarkerHandler} from '../../core/handler';
 import {ID_SET} from '../../core/messages';
-import * as report from '../../core/report';
 
 describe('Regression Test Suite', () => {
     let sandbox: sinon.SinonSandbox;
@@ -60,6 +59,7 @@ describe('Regression Test Suite', () => {
         extensionInstance.languageClient = undefined;
         extensionInstance.linkService = undefined;
         extensionInstance.localRunService = undefined;
+        extensionInstance.reportService = undefined;
     });
 
     afterEach(() => {
@@ -69,6 +69,7 @@ describe('Regression Test Suite', () => {
         extensionInstance.languageClient = undefined;
         extensionInstance.linkService = undefined;
         extensionInstance.localRunService = undefined;
+        extensionInstance.reportService = undefined;
         clock = undefined;
     });
 
@@ -80,7 +81,11 @@ describe('Regression Test Suite', () => {
             getAuthorized: sandbox.stub().returns(authorized),
         } as any;
 
-        const openLatestReport = sandbox.stub(report, 'openReportByProjectId').resolves();
+        const openLatestReport = sandbox.stub();
+        extensionInstance.reportService = {
+            openReportByProjectId: openLatestReport,
+            openReportById: sandbox.stub().resolves(),
+        } as any;
         const client = {
             state: State.Running,
         } as any;
@@ -116,8 +121,11 @@ describe('Regression Test Suite', () => {
         } as any;
         extensionInstance.auth = auth;
 
-        const openLatestReport = sandbox.stub(report, 'openReportByProjectId').resolves();
-        sandbox.stub(report, 'openReportById').resolves();
+        const openLatestReport = sandbox.stub();
+        extensionInstance.reportService = {
+            openReportByProjectId: openLatestReport,
+            openReportById: sandbox.stub().resolves(),
+        } as any;
         sandbox.stub(config, 'configIsValid').resolves(true);
         sandbox.stub(vscode.workspace, 'openTextDocument').resolves({} as vscode.TextDocument);
         sandbox.stub(vscode.window, 'showTextDocument').resolves({

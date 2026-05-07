@@ -2,7 +2,7 @@ import { LanguageClient, State } from 'vscode-languageclient/node';
 import * as vscode from 'vscode';
 
 import { Auth } from '../auth';
-import { openReportById, openReportByProjectId } from '../report';
+import { extensionInstance } from '../extension';
 import { CLOUD_REPORT_LOADED, SHOW_PROBLEMS } from '../messages';
 import config, {
     CONF_PROJ_ID, IS_DEBUG,
@@ -18,12 +18,7 @@ import { BaselineToggle } from '../menuitems/BaselineToggle';
 
 export function onUrlCallback(context: vscode.ExtensionContext, auth: Auth) {
     Events.instance.onUrlCallback(async (event: UrlCallbackEvent) => {
-        let authorized = auth.getAuthorized();
-        if (authorized) {
-            await openReportById(event.projectId, event.reportId, context, authorized);
-        } else {
-            telemetry.errorReceived('#onUrlCallback exception');
-        }
+        await extensionInstance.reportService?.openReportById(event.projectId, event.reportId);
     });
 }
 
@@ -31,12 +26,7 @@ export function onTimerCallback(context: vscode.ExtensionContext, auth: Auth) {
     Events.instance.onTimer(async () => {
         let projectId = vscode.workspace.getConfiguration().get<string>(CONF_PROJ_ID);
         if (projectId) {
-            let authorized = auth.getAuthorized();
-            if (authorized) {
-                await openReportByProjectId(projectId, context, authorized);
-            } else {
-                telemetry.errorReceived('#onTimerCallback exception');
-            }
+            await extensionInstance.reportService?.openReportByProjectId(projectId);
         }
     });
 }
