@@ -91,9 +91,9 @@ export const NO_WORKSPACE_OPENED = vscode.l10n.t('[Qodana] No workspace is curre
 
 // CLI EXECUTION 
 
-export function scanFinished(exitStatus: number| undefined) { 
-    if (exitStatus) { return vscode.l10n.t('[Qodana] Scan finished with exit code {0}.', exitStatus); }
-    return vscode.l10n.t('[Qodana] Scan finished with unknown exit code.');
+export function scanFinished(exitStatus: number| undefined) {
+    if (exitStatus === undefined) { return vscode.l10n.t('[Qodana] Scan finished with unknown exit code.'); }
+    return vscode.l10n.t('[Qodana] Scan finished with exit code {0}.', exitStatus);
 }
 export const NO_REPORT_FOUND = vscode.l10n.t('[Qodana] No report found.');
 

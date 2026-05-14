@@ -75,4 +75,30 @@ describe('Activities Test Suite', () => {
 
         sinon.assert.calledWith(startTimerStub, 5 * 60 * 1000, false);
     });
+
+    it('first LS Running transition fires timer immediately when no report is open', async () => {
+        onConfigChange(mockClient as any, context);
+        Events.instance.fireServerStateChange(State.Running);
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        sinon.assert.calledWith(startTimerStub, 5 * 60 * 1000, true);
+    });
+
+    it('subsequent LS Running transitions (restart) never fire timer immediately', async () => {
+        onConfigChange(mockClient as any, context);
+        // First Running: startup — may fire immediately
+        Events.instance.fireServerStateChange(State.Running);
+        await new Promise(resolve => setTimeout(resolve, 10));
+        startTimerStub.resetHistory();
+
+        // Simulate closeReport: WS_OPENED_REPORT cleared, LS stops then restarts
+        Events.instance.fireServerStateChange(State.Stopped);
+        Events.instance.fireServerStateChange(State.Running);
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        // The restart must NOT fire immediately, even though WS_OPENED_REPORT is empty
+        sinon.assert.calledWith(startTimerStub, 5 * 60 * 1000, false);
+        sinon.assert.neverCalledWith(startTimerStub, 5 * 60 * 1000, true);
+    });
 });
