@@ -104,6 +104,11 @@ jobs:
           git add .
           git commit -m "chore: prepare release $VERSION"
           git push
+
+          # Move the tag to the new commit
+          echo "Moving tag $TAG to the new commit"
+          git tag -f $TAG
+          git push -f origin $TAG
         else
           echo "No changes to commit"
         fi
