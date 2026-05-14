@@ -32,14 +32,6 @@ export function onTimerCallback(context: vscode.ExtensionContext, auth: Auth) {
 }
 
 export function onConfigChange(client: LanguageClient, context: vscode.ExtensionContext) {
-    Events.instance.onServerStateChange((state: State) => {
-        if (state === State.Running) {
-            Events.instance.fireConfigChange(); // to trigger subscription to timer
-        } else {
-            Events.instance.stopTimer();
-        }
-    });
-
     const resetTimer = async (fireImmediately: boolean) => {
         let clientIsRunning = client.state === State.Running;
         let isValid = await config.configIsValid(context, true);
@@ -49,6 +41,25 @@ export function onConfigChange(client: LanguageClient, context: vscode.Extension
             Events.instance.stopTimer();
         }
     };
+
+    let initialRunningSeen = false;
+    Events.instance.onServerStateChange((state: State) => {
+        if (state === State.Running) {
+            if (!initialRunningSeen) {
+                initialRunningSeen = true;
+                Events.instance.fireConfigChange(); // to trigger subscription to timer
+            } else {
+                // Subsequent LS-Running transitions are restarts (e.g. closeReport
+                // before localRun opens a new report). WS_OPENED_REPORT is cleared
+                // at that point, so firing immediately would race the local report
+                // open and download a cloud report on top of it.
+                // noinspection JSIgnoredPromiseFromCall
+                resetTimer(false);
+            }
+        } else {
+            Events.instance.stopTimer();
+        }
+    });
 
     Events.instance.onConfigChange(() => {
         let hasOpenedReport = !!context.workspaceState.get(WS_OPENED_REPORT);
