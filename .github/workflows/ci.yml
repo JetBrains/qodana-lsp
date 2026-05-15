@@ -102,6 +102,10 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
+
+          # Switch to main branch before committing (staged changes will be preserved)
+          git checkout main
+
           git commit -m "chore: prepare release $VERSION"
           git push
 
