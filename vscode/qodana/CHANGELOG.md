@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.1.6] - 2026-05-15
+
 ### Added
 
 - PKCE support for OAuth authentication (QD-13301).
@@ -24,6 +26,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 
 - Fix latest report opening on "Open in VS Code" action (QD-13470).
+
 
 ## [1.1.5] - 2024-10-01
 
