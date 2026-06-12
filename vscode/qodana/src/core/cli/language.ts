@@ -19,8 +19,8 @@ extensionToLanguageMap.set('rs', ['Rust']);
 
 let languageToProductCodeMap = new Map<string, string[]>();
 languageToProductCodeMap.set('C/C++', ['QDCL', 'QDNET', 'QDCLC']);
-languageToProductCodeMap.set('Java', ['QDJVM', 'QDJVMC', 'QDANDC', 'QDIV']);
-languageToProductCodeMap.set('Kotlin', ['QDJVM', 'QDJVMC', 'QDANDC', 'QDIV']);
+languageToProductCodeMap.set('Java', ['QDJVM', 'QDJVMC', 'QDANDC']);
+languageToProductCodeMap.set('Kotlin', ['QDJVM', 'QDJVMC', 'QDANDC']);
 languageToProductCodeMap.set('PHP', ['QDPHP']);
 languageToProductCodeMap.set('Python', ['QDPY', 'QDPYC']);
 languageToProductCodeMap.set('JavaScript', ['QDJS', 'QDIV']);

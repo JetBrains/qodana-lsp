@@ -105,7 +105,7 @@ describe('Language/Linter Selection Tests', () => {
     });
 
     it('12: getLinters should return QDIV for supported languages', () => {
-        const supportedLanguages = ['Java', 'Kotlin', 'C#', 'F#', 'Visual Basic .NET', 'JavaScript', 'TypeScript'];
+        const supportedLanguages = ['C#', 'F#', 'Visual Basic .NET', 'JavaScript', 'TypeScript'];
 
         for (const language of supportedLanguages) {
             const { communityLinters, paidLinters } = getLinters([language]);
