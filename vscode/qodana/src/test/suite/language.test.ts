@@ -99,6 +99,11 @@ describe('Language/Linter Selection Tests', () => {
         assert.equal(linterImage, 'qodana-rust-EAP');
     });
 
+    it('11: getLinterByCode should return EAP Docker image for QDIV', () => {
+        const linterImage = getLinterByCode('QDIV');
+        assert.equal(linterImage, 'qodana-void-EAP');
+    });
+
     function arraysAreEqual<T>(arr1: T[], arr2: T[]): boolean {
         if (arr1.length !== arr2.length) { return false; }
         for (let i = 0; i < arr1.length; i++) {

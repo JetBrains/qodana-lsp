@@ -46,6 +46,7 @@ eapCodes.add('QDCLC');
 eapCodes.add('QDCPP');
 eapCodes.add('QDRUBY');
 eapCodes.add('QDRST');
+eapCodes.add('QDIV');
 
 let productCodeToDockerImageMap = new Map<string, string>();
 productCodeToDockerImageMap.set('QDANDC', 'qodana-jvm-android');
@@ -64,6 +65,7 @@ productCodeToDockerImageMap.set('QDJVMC', 'qodana-jvm-community');
 productCodeToDockerImageMap.set('QDCPP', 'qodana-cpp');
 productCodeToDockerImageMap.set('QDRUBY', 'qodana-ruby');
 productCodeToDockerImageMap.set('QDRST', 'qodana-rust');
+productCodeToDockerImageMap.set('QDIV', 'qodana-void');
 
 const eapPrefix = '-EAP';
 
