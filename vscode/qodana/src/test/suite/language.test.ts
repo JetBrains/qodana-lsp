@@ -33,7 +33,7 @@ describe('Language/Linter Selection Tests', () => {
         const testLangs = ['Java', 'TypeScript'];
         const { communityLinters, paidLinters } = getLinters(testLangs);
         assert.ok(arraysAreEqual(communityLinters, ['QDJVMC', 'QDANDC']));
-        assert.ok(arraysAreEqual(paidLinters, ['QDJVM', 'QDIV', 'QDJS']), paidLinters.toString());
+        assert.ok(arraysAreEqual(paidLinters, ['QDJVM', 'QDJS', 'QDIV']), paidLinters.toString());
     });
 
     it('3: getLinterByCode should return correct Docker image with versioned prefix tag', () => {
