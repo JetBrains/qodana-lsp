@@ -23,12 +23,12 @@ languageToProductCodeMap.set('Java', ['QDJVM', 'QDJVMC', 'QDANDC']);
 languageToProductCodeMap.set('Kotlin', ['QDJVM', 'QDJVMC', 'QDANDC']);
 languageToProductCodeMap.set('PHP', ['QDPHP']);
 languageToProductCodeMap.set('Python', ['QDPY', 'QDPYC']);
-languageToProductCodeMap.set('JavaScript', ['QDJS']);
-languageToProductCodeMap.set('TypeScript', ['QDJS']);
+languageToProductCodeMap.set('JavaScript', ['QDJS', 'QDIV']);
+languageToProductCodeMap.set('TypeScript', ['QDJS', 'QDIV']);
 languageToProductCodeMap.set('Go', ['QDGO']);
-languageToProductCodeMap.set('C#', ['QDNET', 'QDNETC']);
-languageToProductCodeMap.set('F#', ['QDNET']);
-languageToProductCodeMap.set('Visual Basic .NET', ['QDNET', 'QDNETC']);
+languageToProductCodeMap.set('C#', ['QDNET', 'QDNETC', 'QDIV']);
+languageToProductCodeMap.set('F#', ['QDNET', 'QDIV']);
+languageToProductCodeMap.set('Visual Basic .NET', ['QDNET', 'QDNETC', 'QDIV']);
 languageToProductCodeMap.set('Ruby', ['QDRUBY']);
 languageToProductCodeMap.set('Rust', ['QDRST']);
 
@@ -46,6 +46,7 @@ eapCodes.add('QDCLC');
 eapCodes.add('QDCPP');
 eapCodes.add('QDRUBY');
 eapCodes.add('QDRST');
+eapCodes.add('QDIV');
 
 let productCodeToDockerImageMap = new Map<string, string>();
 productCodeToDockerImageMap.set('QDANDC', 'qodana-jvm-android');
@@ -64,6 +65,7 @@ productCodeToDockerImageMap.set('QDJVMC', 'qodana-jvm-community');
 productCodeToDockerImageMap.set('QDCPP', 'qodana-cpp');
 productCodeToDockerImageMap.set('QDRUBY', 'qodana-ruby');
 productCodeToDockerImageMap.set('QDRST', 'qodana-rust');
+productCodeToDockerImageMap.set('QDIV', 'qodana-void');
 
 const eapPrefix = '-EAP';
 
