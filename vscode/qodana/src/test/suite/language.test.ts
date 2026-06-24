@@ -33,7 +33,7 @@ describe('Language/Linter Selection Tests', () => {
         const testLangs = ['Java', 'TypeScript'];
         const { communityLinters, paidLinters } = getLinters(testLangs);
         assert.ok(arraysAreEqual(communityLinters, ['QDJVMC', 'QDANDC']));
-        assert.ok(arraysAreEqual(paidLinters, ['QDJVM', 'QDJS', 'QDIV']), paidLinters.toString());
+        assert.ok(arraysAreEqual(paidLinters, ['QDJVM', 'QDJS', 'QDPOLY']), paidLinters.toString());
     });
 
     it('3: getLinterByCode should return correct Docker image with versioned prefix tag', () => {
@@ -99,18 +99,18 @@ describe('Language/Linter Selection Tests', () => {
         assert.equal(linterImage, 'qodana-rust-EAP');
     });
 
-    it('11: getLinterByCode should return EAP Docker image for QDIV', () => {
-        const linterImage = getLinterByCode('QDIV');
-        assert.equal(linterImage, 'qodana-void-EAP');
+    it('11: getLinterByCode should return EAP Docker image for QDPOLY', () => {
+        const linterImage = getLinterByCode('QDPOLY');
+        assert.equal(linterImage, 'qodana-poly-EAP');
     });
 
-    it('12: getLinters should return QDIV for supported languages', () => {
+    it('12: getLinters should return QDPOLY for supported languages', () => {
         const supportedLanguages = ['C#', 'F#', 'Visual Basic .NET', 'JavaScript', 'TypeScript'];
 
         for (const language of supportedLanguages) {
             const { communityLinters, paidLinters } = getLinters([language]);
-            assert.ok(!communityLinters.includes('QDIV'), `${language}: ${communityLinters.toString()}`);
-            assert.ok(paidLinters.includes('QDIV'), `${language}: ${paidLinters.toString()}`);
+            assert.ok(!communityLinters.includes('QDPOLY'), `${language}: ${communityLinters.toString()}`);
+            assert.ok(paidLinters.includes('QDPOLY'), `${language}: ${paidLinters.toString()}`);
         }
     });
 
