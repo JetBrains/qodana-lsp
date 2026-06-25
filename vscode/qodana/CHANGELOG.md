@@ -6,6 +6,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [1.1.7] - 2026-06-25
+
+### Changed
+
+- QD-15187: Update Qodana CLI to 2026.1.3.
+
+### Fixed
+
+- QD-15188: Remove duplicate ticket ID from changelog entries.
+
+
 ## [1.1.6] - 2026-05-15
 
 ### Added
