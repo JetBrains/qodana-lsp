@@ -209,7 +209,7 @@ describe('Regression Test Suite', () => {
             },
             extension: {
                 packageJSON: {
-                    version: '1.1.6',
+                    version: '1.1.7',
                 },
             },
         } as any as vscode.ExtensionContext;
