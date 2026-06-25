@@ -8,11 +8,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [1.1.7] - 2026-06-25
 
-### Added
-
-- QD-14970: Offer QDIV for supported VS Code languages.
-- QD-14970: Add QDIV linter mapping to VS Code extension.
-
 ### Changed
 
 - QD-15187: Update Qodana CLI to 2026.1.3.
@@ -20,7 +15,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Fixed
 
 - QD-15188: Remove duplicate ticket ID from changelog entries.
-- QD-14970: Remove QDIV from Java and Kotlin mappings.
 
 
 ## [1.1.6] - 2026-05-15
