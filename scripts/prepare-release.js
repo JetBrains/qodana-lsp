@@ -82,13 +82,12 @@ function generateChangelogSections(commits) {
 
         // Format: QD-XXXXX: description
         let entry;
+        const cleanDesc = parsed.description.replace(/\s*\(?QD-\d+\)?\s*$/, "").trim();
         if (ticketMatch) {
-            // Capitalize first letter of description
-            const desc = parsed.description.charAt(0).toUpperCase() + parsed.description.slice(1);
+            const desc = cleanDesc.charAt(0).toUpperCase() + cleanDesc.slice(1);
             entry = `- ${ticketMatch[1]}: ${desc}.`;
         } else {
-            // No ticket, just description
-            const desc = parsed.description.charAt(0).toUpperCase() + parsed.description.slice(1);
+            const desc = cleanDesc.charAt(0).toUpperCase() + cleanDesc.slice(1);
             entry = `- ${desc}.`;
         }
 
