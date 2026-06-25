@@ -37,9 +37,9 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/) for autom
 
 Examples:
 ```
-feat: add support for Qodana Rust linter (QD-13871)
-fix: resolve latest report opening issue (QD-13470)
-chore: update CLI to 2026.1.0 (QD-14515)
+feat: QD-13871 add support for Qodana Rust linter
+fix: QD-13470 resolve latest report opening issue
+chore: QD-14515 update CLI to 2026.1.0
 ```
 
 ### Creating a Release
@@ -57,7 +57,7 @@ Releases are mostly automated. When you push a version tag, the workflow automat
    # Update Qodana CLI
    node scripts/update-cli.js
    git add vscode/qodana/src/core/cli/cli.json
-   git commit -m "chore: update CLI to <version> (QD-XXXXX)"
+   git commit -m "chore: QD-XXXXX update CLI to <version>"
    git push
 
    # Dependabot will automatically create PRs for:
