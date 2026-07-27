@@ -40,7 +40,7 @@ export async function downloadFile(url: string, filePath: string): Promise<strin
         responseType: 'stream',
     });
     const writer = fs.createWriteStream(filePath);
-    const totalBytes = parseInt(response.headers['content-length']);
+    const totalBytes = parseInt(String(response.headers['content-length']));
     const knownSize = !isNaN(totalBytes) && totalBytes > 0;
 
     let receivedBytes = 0;
@@ -62,6 +62,9 @@ export async function downloadFile(url: string, filePath: string): Promise<strin
         response.data.pipe(writer);
 
         return new Promise((resolve, reject) => {
+            // pipe() does not forward source errors, so a dropped connection
+            // would otherwise leave this promise pending forever
+            response.data.on('error', reject);
             writer.on('finish', () => { resolve(filePath); });
             writer.on('error', reject);
         });
