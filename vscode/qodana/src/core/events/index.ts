@@ -13,7 +13,7 @@ export class Events {
   private _onServerStateChange: vscode.EventEmitter<State> = new vscode.EventEmitter<State>();
   private _onTimer: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
   private _onUrlCallback: vscode.EventEmitter<UrlCallbackEvent> = new vscode.EventEmitter<UrlCallbackEvent>();
-  private recurringTimer?: NodeJS.Timer;
+  private recurringTimer?: NodeJS.Timeout;
   
   private constructor() { }
 

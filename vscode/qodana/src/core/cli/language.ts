@@ -84,7 +84,7 @@ export async function getLanguagesInWorkspace() {
         }
     });
     // sort by count and return only the list of languages
-    langsAndCounts[Symbol.iterator] = function* () {
+    langsAndCounts[Symbol.iterator] = function* (): MapIterator<[string, number]> {
         yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
     };
     return Array.from(langsAndCounts.keys());
