@@ -99,9 +99,9 @@ describe('Language/Linter Selection Tests', () => {
         assert.equal(linterImage, 'qodana-rust-EAP');
     });
 
-    it('11: getLinterByCode should return EAP Docker image for QDPOLY', () => {
+    it('11: getLinterByCode should return release Docker image for QDPOLY', () => {
         const linterImage = getLinterByCode('QDPOLY');
-        assert.equal(linterImage, 'qodana-poly-EAP');
+        assert.equal(linterImage, 'qodana-poly');
     });
 
     it('12: getLinters should return QDPOLY for supported languages', () => {

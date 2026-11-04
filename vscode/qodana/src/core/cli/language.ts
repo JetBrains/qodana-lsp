@@ -46,7 +46,6 @@ eapCodes.add('QDCLC');
 eapCodes.add('QDCPP');
 eapCodes.add('QDRUBY');
 eapCodes.add('QDRST');
-eapCodes.add('QDPOLY');
 
 let productCodeToDockerImageMap = new Map<string, string>();
 productCodeToDockerImageMap.set('QDANDC', 'qodana-jvm-android');
