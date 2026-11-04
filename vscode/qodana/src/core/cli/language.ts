@@ -16,6 +16,8 @@ extensionToLanguageMap.set('c', ['C/C++']);
 extensionToLanguageMap.set('cpp', ['C/C++']);
 extensionToLanguageMap.set('rb', ['Ruby']);
 extensionToLanguageMap.set('rs', ['Rust']);
+extensionToLanguageMap.set('lua', ['Lua']);
+extensionToLanguageMap.set('dart', ['Dart']);
 
 let languageToProductCodeMap = new Map<string, string[]>();
 languageToProductCodeMap.set('C/C++', ['QDCL', 'QDNET', 'QDCLC']);
@@ -31,6 +33,8 @@ languageToProductCodeMap.set('F#', ['QDNET', 'QDPOLY']);
 languageToProductCodeMap.set('Visual Basic .NET', ['QDNET', 'QDNETC', 'QDPOLY']);
 languageToProductCodeMap.set('Ruby', ['QDRUBY']);
 languageToProductCodeMap.set('Rust', ['QDRST']);
+languageToProductCodeMap.set('Lua', ['QDPOLY']);
+languageToProductCodeMap.set('Dart', ['QDPOLY']);
 
 // every code that ends with C is a community code
 let communityCodes = new Set<string>();
