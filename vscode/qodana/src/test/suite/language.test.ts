@@ -114,6 +114,26 @@ describe('Language/Linter Selection Tests', () => {
         }
     });
 
+    it('13: getLinters should target Lua and Dart to QDPOLY only', () => {
+        for (const language of ['Lua', 'Dart']) {
+            const { communityLinters, paidLinters } = getLinters([language]);
+            assert.ok(arraysAreEqual(communityLinters, []), `${language}: ${communityLinters.toString()}`);
+            assert.ok(arraysAreEqual(paidLinters, ['QDPOLY']), `${language}: ${paidLinters.toString()}`);
+        }
+    });
+
+    it('14: getLanguagesInWorkspace should detect Lua and Dart files', async () => {
+        sandbox.restore();
+        sandbox.stub(vscode.workspace, 'findFiles').resolves([
+            vscode.Uri.file('/testFolder/main.lua'),
+            vscode.Uri.file('/testFolder/init.lua'),
+            vscode.Uri.file('/testFolder/main.dart'),
+        ] as any);
+        sandbox.stub(vscode.workspace, 'asRelativePath').callsFake(uri => uri.toString());
+        const langs = await getLanguagesInWorkspace();
+        assert.ok(arraysAreEqual(langs, ['Lua', 'Dart']), langs.toString());
+    });
+
     function arraysAreEqual<T>(arr1: T[], arr2: T[]): boolean {
         if (arr1.length !== arr2.length) { return false; }
         for (let i = 0; i < arr1.length; i++) {
